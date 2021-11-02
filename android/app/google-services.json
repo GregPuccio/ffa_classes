@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "797695595204",
+    "project_id": "ffaclasses",
+    "storage_bucket": "ffaclasses.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797695595204:android:b6a7c57a50eb857d5b6f91",
+        "android_client_info": {
+          "package_name": "com.example.ffaclasses"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797695595204-71sc0ceqgpnn6tkj44bf4rnnhooklpap.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ffaclasses",
+            "certificate_hash": "d990016f147b7ac5a6c3ab8494aca192837e24d9"
+          }
+        },
+        {
+          "client_id": "797695595204-860ve140rrsnjbskm6t5h6sis225e9oh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEwnyruphyAIQiysSptyMnmJ_VYc68xJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797695595204-860ve140rrsnjbskm6t5h6sis225e9oh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
