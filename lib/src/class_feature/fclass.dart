@@ -1,19 +1,22 @@
 import 'dart:convert';
 
-import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'package:ffaclasses/src/constants/enums.dart';
+import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 
 class FClass {
   final String id;
-  final DateTime startTime;
-  final DateTime endTime;
+  final DateTime date;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
   final int cost;
   final ClassType classType;
   final List<Fencer> fencers;
   FClass({
     required this.id,
+    required this.date,
     required this.startTime,
     required this.endTime,
     required this.cost,
@@ -53,7 +56,7 @@ class FClass {
     }
   }
 
-  String get dates {
+  String get times {
     String startDate = startTime.toString();
     String endDate = endTime.toString();
     return '$startDate - $endDate';
@@ -61,14 +64,16 @@ class FClass {
 
   FClass copyWith({
     String? id,
-    DateTime? startTime,
-    DateTime? endTime,
+    DateTime? date,
+    TimeOfDay? startTime,
+    TimeOfDay? endTime,
     int? cost,
     ClassType? classType,
     List<Fencer>? fencers,
   }) {
     return FClass(
       id: id ?? this.id,
+      date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       cost: cost ?? this.cost,
@@ -80,8 +85,13 @@ class FClass {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'startTime': startTime.millisecondsSinceEpoch,
-      'endTime': endTime.millisecondsSinceEpoch,
+      'date': date.millisecondsSinceEpoch,
+      'startTime': DateTime(1)
+          .add(Duration(hours: startTime.hour, minutes: startTime.minute))
+          .millisecondsSinceEpoch,
+      'endTime': DateTime(1)
+          .add(Duration(hours: endTime.hour, minutes: endTime.minute))
+          .millisecondsSinceEpoch,
       'cost': cost,
       'classType': classType.index,
       'fencers': fencers.map((x) => x.toMap()).toList(),
@@ -91,8 +101,11 @@ class FClass {
   factory FClass.fromMap(Map<String, dynamic> map) {
     return FClass(
       id: map['id'],
-      startTime: DateTime.fromMillisecondsSinceEpoch(map['startTime']),
-      endTime: DateTime.fromMillisecondsSinceEpoch(map['endTime']),
+      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+      startTime: TimeOfDay.fromDateTime(
+          DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
+      endTime: TimeOfDay.fromDateTime(
+          DateTime.fromMillisecondsSinceEpoch(map['endTime'])),
       cost: map['cost'],
       classType: ClassType.values[map['classType']],
       fencers: List<Fencer>.from(map['fencers']?.map((x) => Fencer.fromMap(x))),
@@ -105,7 +118,7 @@ class FClass {
 
   @override
   String toString() {
-    return 'FClass(id: $id, startTime: $startTime, endTime: $endTime, cost: $cost, classType: $classType, fencers: $fencers)';
+    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, cost: $cost, classType: $classType, fencers: $fencers)';
   }
 
   @override
@@ -114,6 +127,7 @@ class FClass {
 
     return other is FClass &&
         other.id == id &&
+        other.date == date &&
         other.startTime == startTime &&
         other.endTime == endTime &&
         other.cost == cost &&
@@ -124,6 +138,7 @@ class FClass {
   @override
   int get hashCode {
     return id.hashCode ^
+        date.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^
         cost.hashCode ^
