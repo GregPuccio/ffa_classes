@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:flutter/material.dart';
 
 class FirestoreService {
@@ -175,5 +176,53 @@ class FirestoreService {
     final Future<DocumentSnapshot<Map<String, dynamic>>> snapshots =
         reference.get();
     return snapshots.then((snapshot) => builder(snapshot.data(), snapshot.id));
+  }
+
+  /// a stream of a map that is created from a collection of fClasss and
+  /// the dates that they occur on
+  Stream<Map<DateTime, List<FClass>>> collectionCalendarStream<T>({
+    required String path,
+    required FClass Function(Map<String, dynamic>? data, String documentID)
+        builder,
+    required Query<Map<String, dynamic>> Function(
+            Query<Map<String, dynamic>> query)?
+        queryBuilder,
+    required DateTime startDate,
+    required DateTime endDate,
+    int Function(FClass lhs, FClass rhs)? sort,
+  }) {
+    Query<Map<String, dynamic>> query =
+        FirebaseFirestore.instance.collection(path);
+    if (queryBuilder != null) {
+      query = queryBuilder(query);
+    }
+    final Stream<QuerySnapshot<Map<String, dynamic>>> snapshots =
+        query.snapshots();
+    return snapshots.map((snapshot) {
+      final result = snapshot.docs
+          .map((snapshot) => builder(snapshot.data(), snapshot.id))
+          .toList();
+      if (sort != null) {
+        result.sort(sort);
+      }
+      final Map<DateTime, List<FClass>> map = {};
+      DateTime day = startDate;
+      while (endDate.isAfter(day)) {
+        final List<FClass> fClasssOnDay = [];
+        for (final fClass in result) {
+          if (day.isAtSameMomentAs(fClass.date)) {
+            fClasssOnDay.add(fClass);
+          }
+        }
+        if (fClasssOnDay.isNotEmpty) {
+          map.addEntries([
+            MapEntry(day, fClasssOnDay),
+          ]);
+        }
+
+        day = day.add(const Duration(days: 1));
+      }
+      return map;
+    });
   }
 }

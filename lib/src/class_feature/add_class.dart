@@ -25,13 +25,13 @@ class _AddClassState extends State<AddClass> {
   void initState() {
     fClass = FClass(
       id: 'id',
-      date: DateTime.now().subtract(Duration(days: DateTime.now().day - 1)),
+      date: DateTime.utc(DateTime.now().year, DateTime.now().month),
       startTime: const TimeOfDay(hour: 16, minute: 30),
       endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: widget.classType ?? ClassType.foundation,
       fencers: [],
     );
-    repeat = false;
+    repeat = true;
     super.initState();
   }
 
@@ -44,7 +44,8 @@ class _AddClassState extends State<AddClass> {
     );
     if (newDate != null) {
       setState(() {
-        fClass = fClass.copyWith(date: newDate);
+        fClass = fClass.copyWith(
+            date: DateTime.utc(newDate.year, newDate.month, newDate.day));
       });
     }
   }
@@ -130,11 +131,12 @@ class _AddClassState extends State<AddClass> {
                 onPressed: () {
                   List<FClass> classes = [fClass];
                   if (repeat) {
-                    DateTime newDate =
-                        fClass.date.toUtc().add(const Duration(days: 7));
+                    DateTime newDate = DateTime.utc(fClass.date.year,
+                        fClass.date.month, fClass.date.day + 7);
                     while (newDate.month == fClass.date.month) {
                       classes.add(fClass.copyWith(date: newDate));
-                      newDate = newDate.add(const Duration(days: 7));
+                      newDate = DateTime.utc(
+                          newDate.year, newDate.month, newDate.day + 7);
                     }
                   }
                   showDialog(
