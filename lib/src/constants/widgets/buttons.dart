@@ -4,7 +4,12 @@ class InkButton extends StatelessWidget {
   final String text;
   final Function? onPressed;
   final bool active;
-  const InkButton({this.text = 'Next', this.onPressed, this.active = true});
+  const InkButton({
+    Key? key,
+    this.text = 'Next',
+    this.onPressed,
+    this.active = true,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -57,11 +62,6 @@ class SecondaryButton extends StatelessWidget {
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxHeight: 55, maxWidth: 400),
-        // decoration: BoxDecoration(
-        //   borderRadius: BorderRadius.circular(15),
-        //   color: color10BlueAndGreen,
-        //   boxShadow: kElevationToShadow[1],
-        // ),
         margin: const EdgeInsets.all(10.0),
         child: OutlinedButton(
           style: OutlinedButton.styleFrom(
@@ -69,7 +69,7 @@ class SecondaryButton extends StatelessWidget {
                 color: active
                     ? Theme.of(context).colorScheme.secondaryVariant
                     : Colors.grey),
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 1,
           ),
           onPressed: active ? onPressed as void Function()? : null,

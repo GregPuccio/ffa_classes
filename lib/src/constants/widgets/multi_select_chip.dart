@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 class MultiSelectChip extends StatefulWidget {
   final List<String> itemList;
   final Function(List<String>) onSelectionChanged;
+  final List<String> initialChoices;
   final bool multi;
+  final bool horizScroll;
   const MultiSelectChip({
     Key? key,
     required this.itemList,
     required this.onSelectionChanged,
+    this.initialChoices = const [],
     this.multi = true,
+    this.horizScroll = false,
   }) : super(key: key);
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
@@ -23,6 +27,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
       choices.add(Container(
         padding: const EdgeInsets.all(2.0),
         child: ChoiceChip(
+          padding: const EdgeInsets.all(8),
           label: Text(item),
           selected: widget.multi
               ? selectedChoices.contains(item)
@@ -38,6 +43,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
             } else {
               setState(() {
                 selectedChoice = item;
+                widget.onSelectionChanged([item]);
               });
             }
           },
@@ -48,10 +54,34 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
   }
 
   @override
+  void initState() {
+    if (widget.initialChoices.isNotEmpty) {
+      if (widget.multi) {
+        selectedChoices = widget.initialChoices;
+      } else {
+        selectedChoice = widget.initialChoices.first;
+      }
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      children: _buildChoiceList(),
-    );
+    if (widget.horizScroll) {
+      return Container(
+        alignment: Alignment.centerLeft,
+        height: 60,
+        child: ListView(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          children: _buildChoiceList(),
+        ),
+      );
+    } else {
+      return Wrap(
+        alignment: WrapAlignment.center,
+        children: _buildChoiceList(),
+      );
+    }
   }
 }

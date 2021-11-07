@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
@@ -11,7 +12,6 @@ class FClass {
   final DateTime date;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
-  final int cost;
   final ClassType classType;
   final List<Fencer> fencers;
   FClass({
@@ -19,7 +19,6 @@ class FClass {
     required this.date,
     required this.startTime,
     required this.endTime,
-    required this.cost,
     required this.classType,
     required this.fencers,
   });
@@ -56,10 +55,8 @@ class FClass {
     }
   }
 
-  String get times {
-    String startDate = startTime.toString();
-    String endDate = endTime.toString();
-    return '$startDate - $endDate';
+  String get writtenDate {
+    return "${DateFormat('EEEE').format(date)} ${date.month}/${date.day}/${date.year}";
   }
 
   FClass copyWith({
@@ -68,7 +65,7 @@ class FClass {
     TimeOfDay? startTime,
     TimeOfDay? endTime,
     int? cost,
-    ClassType? classType,
+    String? classType,
     List<Fencer>? fencers,
   }) {
     return FClass(
@@ -76,15 +73,61 @@ class FClass {
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      cost: cost ?? this.cost,
-      classType: classType ?? this.classType,
+      classType: trueClassType(classType) ?? this.classType,
       fencers: fencers ?? this.fencers,
     );
   }
 
+  ClassType? trueClassType(String? classString) {
+    switch (classString) {
+      case 'Foundation':
+        return ClassType.foundation;
+      case 'Youth':
+        return ClassType.youth;
+      case 'Mixed':
+        return ClassType.mixed;
+      case 'Advanced':
+        return ClassType.advanced;
+
+      default:
+        return null;
+    }
+  }
+
+  String get writtenClassType {
+    switch (classType) {
+      case ClassType.foundation:
+        return 'Foundation';
+      case ClassType.youth:
+        return 'Youth Competitive';
+      case ClassType.mixed:
+        return 'Mixed Competitive';
+      case ClassType.advanced:
+        return 'Advanced';
+
+      default:
+        return 'Foundation';
+    }
+  }
+
+  String get classCost {
+    switch (classType) {
+      case ClassType.foundation:
+        return 'Member: \$30 - Non Member: \$30';
+      case ClassType.youth:
+        return 'Member: \$40 - Non Member: \$50';
+      case ClassType.mixed:
+        return 'Member: \$40 - Non Member: \$50';
+      case ClassType.advanced:
+        return 'Member: \$40 - Non Member: \$50';
+
+      default:
+        return 'Class incorrectly set up.';
+    }
+  }
+
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'date': date.millisecondsSinceEpoch,
       'startTime': DateTime(1)
           .add(Duration(hours: startTime.hour, minutes: startTime.minute))
@@ -92,7 +135,6 @@ class FClass {
       'endTime': DateTime(1)
           .add(Duration(hours: endTime.hour, minutes: endTime.minute))
           .millisecondsSinceEpoch,
-      'cost': cost,
       'classType': classType.index,
       'fencers': fencers.map((x) => x.toMap()).toList(),
     };
@@ -100,13 +142,12 @@ class FClass {
 
   factory FClass.fromMap(Map<String, dynamic> map) {
     return FClass(
-      id: map['id'],
+      id: '',
       date: DateTime.fromMillisecondsSinceEpoch(map['date']),
       startTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
       endTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['endTime'])),
-      cost: map['cost'],
       classType: ClassType.values[map['classType']],
       fencers: List<Fencer>.from(map['fencers']?.map((x) => Fencer.fromMap(x))),
     );
@@ -118,7 +159,7 @@ class FClass {
 
   @override
   String toString() {
-    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, cost: $cost, classType: $classType, fencers: $fencers)';
+    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, classType: $classType, fencers: $fencers)';
   }
 
   @override
@@ -130,7 +171,6 @@ class FClass {
         other.date == date &&
         other.startTime == startTime &&
         other.endTime == endTime &&
-        other.cost == cost &&
         other.classType == classType &&
         listEquals(other.fencers, fencers);
   }
@@ -141,7 +181,6 @@ class FClass {
         date.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^
-        cost.hashCode ^
         classType.hashCode ^
         fencers.hashCode;
   }

@@ -1,8 +1,13 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
+import 'package:ffaclasses/src/constants/lists.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
+import 'package:ffaclasses/src/firebase/firestore_path.dart';
+import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
+import 'package:time_range/time_range.dart';
+import 'package:intl/intl.dart';
 
 class AddClass extends StatefulWidget {
   final ClassType? classType;
@@ -20,10 +25,9 @@ class _AddClassState extends State<AddClass> {
   void initState() {
     fClass = FClass(
       id: 'id',
-      date: DateTime.now(),
-      startTime: TimeOfDay.now(),
-      endTime: TimeOfDay.now().replacing(hour: TimeOfDay.now().hour + 1),
-      cost: 0,
+      date: DateTime.now().subtract(Duration(days: DateTime.now().day - 1)),
+      startTime: const TimeOfDay(hour: 16, minute: 30),
+      endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: widget.classType ?? ClassType.foundation,
       fencers: [],
     );
@@ -31,49 +35,74 @@ class _AddClassState extends State<AddClass> {
     super.initState();
   }
 
-  void showTimeSelector() async {
-    await showTimePicker(context: context, initialTime: fClass.startTime);
-  }
-
   void showDateChooser() async {
-    await showDatePicker(
+    DateTime? newDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: fClass.date,
       firstDate: DateTime.now().subtract(const Duration(days: 31)),
       lastDate: DateTime.now().add(const Duration(days: 100)),
     );
+    if (newDate != null) {
+      setState(() {
+        fClass = fClass.copyWith(date: newDate);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Class'),
+        title: const Text('Add Class'),
       ),
       body: ListView(
         children: [
           MultiSelectChip(
-            itemList: const ['Foundation', 'Youth', 'Mixed', 'Advanced'],
-            onSelectionChanged: (val) => setState(() {}),
+            itemList: classTypes,
+            initialChoices: [fClass.writtenClassType],
+            onSelectionChanged: (val) => setState(() {
+              if (val.isNotEmpty) {
+                fClass = fClass.copyWith(classType: val.first);
+              }
+            }),
             multi: false,
           ),
           SecondaryButton(
             active: true,
             onPressed: showDateChooser,
-            text: fClass.date.toString(),
+            text: fClass.writtenDate,
           ),
-          SecondaryButton(
-            active: true,
-            onPressed: showTimeSelector,
-            text: fClass.times,
+          TimeRange(
+            fromTitle: const Text('From'),
+            toTitle: const Text('To'),
+            titlePadding: 20,
+            textStyle: Theme.of(context).textTheme.bodyText1,
+            activeTextStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.transparent,
+            firstTime: const TimeOfDay(hour: 8, minute: 00),
+            lastTime: const TimeOfDay(hour: 20, minute: 00),
+            initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
+            timeStep: 10,
+            timeBlock: 30,
+            onRangeCompleted: (range) => setState(() {
+              fClass = fClass.copyWith(
+                startTime: range?.start,
+                endTime: range?.end,
+              );
+            }),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Class cost',
-                border: OutlineInputBorder(),
+                hintText: fClass.classCost,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.attach_money),
               ),
+              readOnly: true,
             ),
           ),
           Padding(
@@ -91,8 +120,58 @@ class _AddClassState extends State<AddClass> {
             ),
           ),
           InkButton(
-            text: 'Save',
-            onPressed: () => Navigator.pop(context),
+            text: 'Create class${repeat ? 'es' : ''}',
+            onPressed: () {
+              List<FClass> classes = [fClass];
+              if (repeat) {
+                DateTime newDate =
+                    fClass.date.toUtc().add(const Duration(days: 7));
+                while (newDate.month == fClass.date.month) {
+                  classes.add(fClass.copyWith(date: newDate));
+                  newDate = newDate.add(const Duration(days: 7));
+                }
+              }
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Please Confirm Information'),
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          'Are you sure you would like to create the following:'),
+                      Text(
+                          "${classes.length} ${fClass.writtenClassType} Class${classes.length > 1 ? 'es' : ''}"),
+                      Text(
+                          "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
+                      Text(
+                          "From ${fClass.startTime.format(context)} to ${fClass.endTime.format(context)}"),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        for (var fClass in classes) {
+                          FirestoreService().addData(
+                              path: FirestorePath.fClasses(),
+                              data: fClass.toMap());
+                        }
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Confirm"),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),

@@ -1,9 +1,6 @@
 import 'package:ffaclasses/src/class_feature/add_class.dart';
-import 'package:ffaclasses/src/class_folders_home/class_folders_list.dart';
-import 'package:ffaclasses/src/class_folders_home/class_types/advanced_classes.dart';
-import 'package:ffaclasses/src/class_folders_home/class_types/foundation_classes.dart';
-import 'package:ffaclasses/src/class_folders_home/class_types/mixed_classes.dart';
-import 'package:ffaclasses/src/class_folders_home/class_types/youth_classes.dart';
+import 'package:ffaclasses/src/class_feature/fclass_details.dart';
+import 'package:ffaclasses/src/filterable_class_list.dart/filterable_class_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -72,22 +69,16 @@ class MyApp extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
-                  case ClassFolders.routeName:
-                    return const ClassFolders();
-                  case FoundationClasses.routeName:
-                    return const FoundationClasses();
-                  case YouthClasses.routeName:
-                    return const YouthClasses();
-                  case MixedClasses.routeName:
-                    return const MixedClasses();
-                  case AdvancedClasses.routeName:
-                    return const AdvancedClasses();
+                  case FilterableClassList.routeName:
+                    return const FilterableClassList();
+                  case FClassDetails.routeName:
+                    return const FClassDetails();
                   case AddClass.routeName:
                     return const AddClass();
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   default:
-                    return const ClassFolders();
+                    return const FilterableClassList();
                 }
               },
             );
