@@ -136,39 +136,43 @@ class _FilterableClassListState extends State<FilterableClassList> {
                   )..addAll(snapshot.data!);
                   return Column(
                     children: [
-                      TableCalendar(
-                        availableCalendarFormats: const {
-                          CalendarFormat.month: 'Month'
-                        },
-                        pageJumpingEnabled: true,
-                        firstDay: DateTime.utc(DateTime.now().year - 10),
-                        lastDay: DateTime.utc(DateTime.now().year + 20),
-                        focusedDay: _focusedDay,
-                        selectedDayPredicate: (day) {
-                          return isSameDay(_selectedDay, day);
-                        },
-                        onDaySelected: (selectedDay, focusedDay) {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                            _focusedDay = focusedDay;
-                            _selectedFClasses.value =
-                                _getFClassesForDay(selectedDay);
-                          });
-                        },
-                        calendarFormat: _calendarFormat,
-                        onFormatChanged: (format) {
-                          setState(() {
-                            _calendarFormat = format;
-                          });
-                        },
-                        onPageChanged: (focusedDay) {
-                          _focusedDay = focusedDay;
-                        },
-                        eventLoader: (day) {
-                          return _getFClassesForDay(day);
-                        },
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TableCalendar(
+                            availableCalendarFormats: const {
+                              CalendarFormat.month: 'Month'
+                            },
+                            pageJumpingEnabled: true,
+                            firstDay: DateTime.utc(DateTime.now().year - 10),
+                            lastDay: DateTime.utc(DateTime.now().year + 20),
+                            focusedDay: _focusedDay,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                                _selectedFClasses.value =
+                                    _getFClassesForDay(selectedDay);
+                              });
+                            },
+                            calendarFormat: _calendarFormat,
+                            onFormatChanged: (format) {
+                              setState(() {
+                                _calendarFormat = format;
+                              });
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            eventLoader: (day) {
+                              return _getFClassesForDay(day);
+                            },
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 8.0),
                       Expanded(
                         child: ValueListenableBuilder<List<FClass>>(
                           valueListenable: _selectedFClasses,
@@ -177,18 +181,20 @@ class _FilterableClassListState extends State<FilterableClassList> {
                               itemCount: fClasses.length,
                               itemBuilder: (context, index) {
                                 final FClass fClass = fClasses[index];
-                                return ListTile(
-                                  title: Text(fClass.title),
-                                  subtitle: Text(fClass.description),
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/fClasses',
-                                      arguments: ScreenArgs(
-                                        fClass: fClass,
-                                      ),
-                                    );
-                                  },
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(fClass.title),
+                                    subtitle: Text(fClass.description),
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        FClassDetails.routeName,
+                                        arguments: ScreenArgs(
+                                          fClass: fClass,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 );
                               },
                             );
