@@ -18,7 +18,7 @@ class FilterableClassList extends StatefulWidget {
 
 class _FilterableClassListState extends State<FilterableClassList> {
   List<String> filters = ["All", "Foundation", "Youth", "Mixed", "Advanced"];
-  int currentFilter = 0;
+  int currentFilter = -1;
 
   void setFilter(String val) {
     setState(() {
@@ -65,88 +65,97 @@ class _FilterableClassListState extends State<FilterableClassList> {
           Navigator.restorablePushNamed(context, AddClass.routeName);
         },
       ),
-      body: Column(
-        children: [
-          MultiSelectChip(
-            initialChoices: [filters.first],
-            itemList: filters,
-            onSelectionChanged: (val) => setFilter(val.first),
-            multi: false,
-            horizScroll: true,
-          ),
-          Flexible(
-            child: StreamBuilder<List<FClass>>(
-              stream: FirestoreService().collectionStream(
-                path: FirestorePath.fClasses(),
-                builder: (map, docID) =>
-                    FClass.fromMap(map!).copyWith(id: docID),
-                queryBuilder: (query) {
-                  if (currentFilter != -1) {
-                    return query
-                        .where('classType', isEqualTo: currentFilter)
-                        .orderBy('date');
-                  } else {
-                    return query.orderBy('date');
-                  }
-                },
+      body: Center(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? 600
+              : null,
+          child: Column(
+            children: [
+              MultiSelectChip(
+                initialChoices: [filters.first],
+                itemList: filters,
+                onSelectionChanged: (val) => setFilter(val.first),
+                multi: false,
+                horizScroll: true,
               ),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<FClass> classes = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: classes.length,
-                    itemBuilder: (context, index) {
-                      FClass fClass = classes[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text("${fClass.writtenClassType} Class"),
-                          subtitle: Text(fClass.writtenDate),
-                          trailing: Text("${fClass.fencers.length} fencers"),
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              FClassDetails.routeName,
-                              arguments: ScreenArgs(fClass: fClass),
-                            );
-                          },
-                          onLongPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Class Deletion'),
-                                content: const Text(
-                                    'Would you like to delete this class?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      FirestoreService().deleteData(
-                                          path:
-                                              FirestorePath.fClass(fClass.id));
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      );
+              Flexible(
+                child: StreamBuilder<List<FClass>>(
+                  stream: FirestoreService().collectionStream(
+                    path: FirestorePath.fClasses(),
+                    builder: (map, docID) =>
+                        FClass.fromMap(map!).copyWith(id: docID),
+                    queryBuilder: (query) {
+                      if (currentFilter != -1) {
+                        return query
+                            .where('classType', isEqualTo: currentFilter)
+                            .orderBy('date');
+                      } else {
+                        return query.orderBy('date');
+                      }
                     },
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<FClass> classes = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: classes.length,
+                        itemBuilder: (context, index) {
+                          FClass fClass = classes[index];
+                          return Card(
+                            child: ListTile(
+                              title: Text("${fClass.writtenClassType} Class"),
+                              subtitle: Text(fClass.writtenDate),
+                              trailing:
+                                  Text("${fClass.fencers.length} fencers"),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  FClassDetails.routeName,
+                                  arguments: ScreenArgs(fClass: fClass),
+                                );
+                              },
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Class Deletion'),
+                                    content: const Text(
+                                        'Would you like to delete this class?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          FirestoreService().deleteData(
+                                              path: FirestorePath.fClass(
+                                                  fClass.id));
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

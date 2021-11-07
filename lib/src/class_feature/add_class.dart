@@ -55,125 +55,133 @@ class _AddClassState extends State<AddClass> {
       appBar: AppBar(
         title: const Text('Add Class'),
       ),
-      body: ListView(
-        children: [
-          MultiSelectChip(
-            itemList: classTypes,
-            initialChoices: [fClass.writtenClassType],
-            onSelectionChanged: (val) => setState(() {
-              if (val.isNotEmpty) {
-                fClass = fClass.copyWith(classType: val.first);
-              }
-            }),
-            multi: false,
-          ),
-          SecondaryButton(
-            active: true,
-            onPressed: showDateChooser,
-            text: fClass.writtenDate,
-          ),
-          TimeRange(
-            fromTitle: const Text('From'),
-            toTitle: const Text('To'),
-            titlePadding: 20,
-            textStyle: Theme.of(context).textTheme.bodyText1,
-            activeTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.transparent,
-            firstTime: const TimeOfDay(hour: 8, minute: 00),
-            lastTime: const TimeOfDay(hour: 20, minute: 00),
-            initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
-            timeStep: 10,
-            timeBlock: 30,
-            onRangeCompleted: (range) => setState(() {
-              fClass = fClass.copyWith(
-                startTime: range?.start,
-                endTime: range?.end,
-              );
-            }),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: fClass.classCost,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.attach_money),
+      body: Center(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? 600
+              : null,
+          child: ListView(
+            children: [
+              MultiSelectChip(
+                itemList: classTypes,
+                initialChoices: [fClass.writtenClassType],
+                onSelectionChanged: (val) => setState(() {
+                  if (val.isNotEmpty) {
+                    fClass = fClass.copyWith(classType: val.first);
+                  }
+                }),
+                multi: false,
               ),
-              readOnly: true,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: CheckboxListTile(
-                title: const Text('Repeat for the full month?'),
-                value: repeat,
-                onChanged: (val) {
-                  setState(() {
-                    repeat = !repeat;
-                  });
+              SecondaryButton(
+                active: true,
+                onPressed: showDateChooser,
+                text: fClass.writtenDate,
+              ),
+              TimeRange(
+                fromTitle: const Text('From'),
+                toTitle: const Text('To'),
+                titlePadding: 20,
+                textStyle: Theme.of(context).textTheme.bodyText1,
+                activeTextStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                backgroundColor: Colors.transparent,
+                firstTime: const TimeOfDay(hour: 8, minute: 00),
+                lastTime: const TimeOfDay(hour: 20, minute: 00),
+                initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
+                timeStep: 10,
+                timeBlock: 30,
+                onRangeCompleted: (range) => setState(() {
+                  fClass = fClass.copyWith(
+                    startTime: range?.start,
+                    endTime: range?.end,
+                  );
+                }),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: fClass.classCost,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.attach_money),
+                  ),
+                  readOnly: true,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: CheckboxListTile(
+                    title: const Text('Repeat for the full month?'),
+                    value: repeat,
+                    onChanged: (val) {
+                      setState(() {
+                        repeat = !repeat;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              InkButton(
+                text: 'Create class${repeat ? 'es' : ''}',
+                onPressed: () {
+                  List<FClass> classes = [fClass];
+                  if (repeat) {
+                    DateTime newDate =
+                        fClass.date.toUtc().add(const Duration(days: 7));
+                    while (newDate.month == fClass.date.month) {
+                      classes.add(fClass.copyWith(date: newDate));
+                      newDate = newDate.add(const Duration(days: 7));
+                    }
+                  }
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Please Confirm Information'),
+                      content: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                              'Are you sure you would like to create the following:'),
+                          Text(
+                              "${classes.length} ${fClass.writtenClassType} Class${classes.length > 1 ? 'es' : ''}"),
+                          Text(
+                              "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
+                          Text(
+                              "From ${fClass.startTime.format(context)} to ${fClass.endTime.format(context)}"),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            for (var fClass in classes) {
+                              FirestoreService().addData(
+                                  path: FirestorePath.fClasses(),
+                                  data: fClass.toMap());
+                            }
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Confirm"),
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
-            ),
+            ],
           ),
-          InkButton(
-            text: 'Create class${repeat ? 'es' : ''}',
-            onPressed: () {
-              List<FClass> classes = [fClass];
-              if (repeat) {
-                DateTime newDate =
-                    fClass.date.toUtc().add(const Duration(days: 7));
-                while (newDate.month == fClass.date.month) {
-                  classes.add(fClass.copyWith(date: newDate));
-                  newDate = newDate.add(const Duration(days: 7));
-                }
-              }
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Please Confirm Information'),
-                  content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                          'Are you sure you would like to create the following:'),
-                      Text(
-                          "${classes.length} ${fClass.writtenClassType} Class${classes.length > 1 ? 'es' : ''}"),
-                      Text(
-                          "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
-                      Text(
-                          "From ${fClass.startTime.format(context)} to ${fClass.endTime.format(context)}"),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        for (var fClass in classes) {
-                          FirestoreService().addData(
-                              path: FirestorePath.fClasses(),
-                              data: fClass.toMap());
-                        }
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Confirm"),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

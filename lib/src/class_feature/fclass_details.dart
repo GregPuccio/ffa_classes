@@ -14,10 +14,18 @@ class FClassDetails extends StatelessWidget {
       appBar: AppBar(
         title: Text(fClass.writtenClassType),
       ),
-      body: ListView(
-        children: [
-          Text(fClass.writtenDate),
-        ],
+      body: Center(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? 600
+              : null,
+          child: ListView(
+            children: [
+              Text(fClass.writtenDate),
+            ],
+          ),
+        ),
       ),
     );
   }
