@@ -1,6 +1,6 @@
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
-import 'package:ffaclasses/src/filterable_class_list.dart/filterable_class_list.dart';
+import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -69,8 +69,8 @@ class MyApp extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
-                  case FilterableClassList.routeName:
-                    return const FilterableClassList();
+                  case ClassListWrapper.routeName:
+                    return const ClassListWrapper();
                   case FClassDetails.routeName:
                     return const FClassDetails();
                   case AddClass.routeName:
@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   default:
-                    return const FilterableClassList();
+                    return const ClassListWrapper();
                 }
               },
             );
