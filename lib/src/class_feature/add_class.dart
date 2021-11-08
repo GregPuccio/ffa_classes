@@ -44,8 +44,7 @@ class _AddClassState extends State<AddClass> {
     );
     if (newDate != null) {
       setState(() {
-        fClass = fClass.copyWith(
-            date: DateTime.utc(newDate.year, newDate.month, newDate.day));
+        fClass = fClass.copyWith(date: newDate.toUtc());
       });
     }
   }
@@ -66,7 +65,7 @@ class _AddClassState extends State<AddClass> {
             children: [
               MultiSelectChip(
                 itemList: classTypes,
-                initialChoices: [fClass.writtenClassType],
+                initialChoices: [fClass.title],
                 onSelectionChanged: (val) => setState(() {
                   if (val.isNotEmpty) {
                     fClass = fClass.copyWith(classType: val.first);
@@ -150,7 +149,7 @@ class _AddClassState extends State<AddClass> {
                           const Text(
                               'Are you sure you would like to create the following:'),
                           Text(
-                              "${classes.length} ${fClass.writtenClassType} Class${classes.length > 1 ? 'es' : ''}"),
+                              "${classes.length} ${fClass.title} Class${classes.length > 1 ? 'es' : ''}"),
                           Text(
                               "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
                           Text(

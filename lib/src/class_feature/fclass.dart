@@ -94,22 +94,6 @@ class FClass {
     }
   }
 
-  String get writtenClassType {
-    switch (classType) {
-      case ClassType.foundation:
-        return 'Foundation';
-      case ClassType.youth:
-        return 'Youth Competitive';
-      case ClassType.mixed:
-        return 'Mixed Competitive';
-      case ClassType.advanced:
-        return 'Advanced';
-
-      default:
-        return 'Foundation';
-    }
-  }
-
   String get classCost {
     switch (classType) {
       case ClassType.foundation:
@@ -141,9 +125,11 @@ class FClass {
   }
 
   factory FClass.fromMap(Map<String, dynamic> map) {
+    DateTime date =
+        DateTime.fromMillisecondsSinceEpoch(map['date'], isUtc: true);
     return FClass(
       id: '',
-      date: DateTime.fromMillisecondsSinceEpoch(map['date']),
+      date: DateTime.utc(date.year, date.month, date.day),
       startTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
       endTime: TimeOfDay.fromDateTime(

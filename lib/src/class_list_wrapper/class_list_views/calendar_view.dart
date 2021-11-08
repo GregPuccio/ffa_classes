@@ -28,10 +28,12 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
 
   LinkedHashMap<DateTime, List<FClass>> fClasses = LinkedHashMap();
 
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-
   List<FClass> _getFClassesForDay(DateTime? day) {
     return fClasses[day!] ?? [];
+  }
+
+  int getHashCode(DateTime key) {
+    return key.day * 1000000 + key.month * 10000 + key.year;
   }
 
   @override
@@ -54,23 +56,26 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
         path: FirestorePath.fClasses(),
         queryBuilder: (query) => query
             .where('date',
-                isGreaterThanOrEqualTo: _focusedDay
-                    .subtract(const Duration(days: 31))
+                isGreaterThanOrEqualTo: DateTime.utc(_focusedDay.year,
+                        _focusedDay.month, _focusedDay.day - 31)
                     .millisecondsSinceEpoch)
             .where('date',
-                isLessThanOrEqualTo: _focusedDay
-                    .add(const Duration(days: 31))
+                isLessThanOrEqualTo: DateTime.utc(_focusedDay.year,
+                        _focusedDay.month, _focusedDay.day + 31)
                     .millisecondsSinceEpoch),
-        startDate: _focusedDay.subtract(const Duration(days: 31)),
-        endDate: _focusedDay.add(const Duration(days: 31)),
+        startDate: DateTime.utc(
+            _focusedDay.year, _focusedDay.month, _focusedDay.day - 31),
+        endDate: DateTime.utc(
+            _focusedDay.year, _focusedDay.month, _focusedDay.day + 31),
         builder: (map, docID) => FClass.fromMap(map!).copyWith(id: docID),
       ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           fClasses = LinkedHashMap(
             equals: isSameDay,
-            // hashCode: getHashCode,
+            hashCode: getHashCode,
           )..addAll(snapshot.data!);
+
           bool portrait =
               MediaQuery.of(context).orientation == Orientation.portrait;
           List<Widget> children = [
@@ -82,7 +87,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                     CalendarFormat.month: 'Month'
                   },
                   pageJumpingEnabled: true,
-                  firstDay: DateTime.utc(DateTime.now().year - 10),
+                  firstDay: DateTime.utc(DateTime.now().year - 1),
                   lastDay: DateTime.utc(DateTime.now().year + 20),
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) {
@@ -93,12 +98,6 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
                       _selectedFClasses.value = _getFClassesForDay(selectedDay);
-                    });
-                  },
-                  calendarFormat: _calendarFormat,
-                  onFormatChanged: (format) {
-                    setState(() {
-                      _calendarFormat = format;
                     });
                   },
                   onPageChanged: (focusedDay) {
@@ -120,8 +119,10 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                       final FClass fClass = fClasses[index];
                       return Card(
                         child: ListTile(
-                          title: Text(fClass.title),
-                          subtitle: Text(fClass.description),
+                          title: Text("${fClass.title} Class"),
+                          subtitle: Text(
+                              "${fClass.startTime.format(context)}-${fClass.endTime.format(context)}"),
+                          trailing: Text("${fClass.fencers.length} fencers"),
                           onTap: () {
                             Navigator.pushNamed(
                               context,

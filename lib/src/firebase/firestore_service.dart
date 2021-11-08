@@ -210,7 +210,8 @@ class FirestoreService {
       while (endDate.isAfter(day)) {
         final List<FClass> fClasssOnDay = [];
         for (final fClass in result) {
-          if (day.isAtSameMomentAs(fClass.date)) {
+          if (day.difference(fClass.date).inDays < 1 &&
+              day.difference(fClass.date).inDays > -1) {
             fClasssOnDay.add(fClass);
           }
         }

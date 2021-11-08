@@ -5,17 +5,13 @@ class Fencer {
   final String firstName;
   final String lastName;
   final String phoneNumber;
-  final bool registerByParent;
-  final String parentFirstName;
-  final String parentLastName;
+  final bool checkedIn;
   Fencer({
     required this.id,
     required this.firstName,
     required this.lastName,
     required this.phoneNumber,
-    required this.registerByParent,
-    required this.parentFirstName,
-    required this.parentLastName,
+    required this.checkedIn,
   });
 
   Fencer copyWith({
@@ -23,18 +19,14 @@ class Fencer {
     String? firstName,
     String? lastName,
     String? phoneNumber,
-    bool? registerByParent,
-    String? parentFirstName,
-    String? parentLastName,
+    bool? checkedIn,
   }) {
     return Fencer(
       id: id ?? this.id,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      registerByParent: registerByParent ?? this.registerByParent,
-      parentFirstName: parentFirstName ?? this.parentFirstName,
-      parentLastName: parentLastName ?? this.parentLastName,
+      checkedIn: checkedIn ?? this.checkedIn,
     );
   }
 
@@ -44,9 +36,7 @@ class Fencer {
       'firstName': firstName,
       'lastName': lastName,
       'phoneNumber': phoneNumber,
-      'registerByParent': registerByParent,
-      'parentFirstName': parentFirstName,
-      'parentLastName': parentLastName,
+      'checkedIn': checkedIn,
     };
   }
 
@@ -56,9 +46,7 @@ class Fencer {
       firstName: map['firstName'],
       lastName: map['lastName'],
       phoneNumber: map['phoneNumber'],
-      registerByParent: map['registerByParent'],
-      parentFirstName: map['parentFirstName'],
-      parentLastName: map['parentLastName'],
+      checkedIn: map['checkedIn'],
     );
   }
 
@@ -68,7 +56,7 @@ class Fencer {
 
   @override
   String toString() {
-    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, registerByParent: $registerByParent, parentFirstName: $parentFirstName, parentLastName: $parentLastName)';
+    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, checkedIn: $checkedIn)';
   }
 
   @override
@@ -80,9 +68,7 @@ class Fencer {
         other.firstName == firstName &&
         other.lastName == lastName &&
         other.phoneNumber == phoneNumber &&
-        other.registerByParent == registerByParent &&
-        other.parentFirstName == parentFirstName &&
-        other.parentLastName == parentLastName;
+        other.checkedIn == checkedIn;
   }
 
   @override
@@ -91,8 +77,6 @@ class Fencer {
         firstName.hashCode ^
         lastName.hashCode ^
         phoneNumber.hashCode ^
-        registerByParent.hashCode ^
-        parentFirstName.hashCode ^
-        parentLastName.hashCode;
+        checkedIn.hashCode;
   }
 }

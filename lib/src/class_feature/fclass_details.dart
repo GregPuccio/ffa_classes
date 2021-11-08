@@ -12,7 +12,7 @@ class FClassDetails extends StatelessWidget {
     FClass fClass = args.fClass!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(fClass.writtenClassType),
+        title: Text(fClass.title),
       ),
       body: Center(
         child: Container(

@@ -81,7 +81,7 @@ class _ClassListViewState extends State<ClassListView> {
                         FClass fClass = classes[index];
                         return Card(
                           child: ListTile(
-                            title: Text("${fClass.writtenClassType} Class"),
+                            title: Text("${fClass.title} Class"),
                             subtitle: Text(
                               "${fClass.writtenDate} - ${fClass.startTime.format(context)}",
                             ),
