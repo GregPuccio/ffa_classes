@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/auth_feature/auth.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
@@ -81,7 +82,7 @@ class MyApp extends StatelessWidget {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   default:
-                    return const ClassListWrapper();
+                    return const LoginScreen();
                 }
               },
             );
