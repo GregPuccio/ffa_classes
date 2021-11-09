@@ -18,6 +18,7 @@ class FencerSearch extends StatefulWidget {
 class _FencerSearchState extends State<FencerSearch> {
   late TextEditingController controller;
   bool edited = false;
+  List<Fencer> fencersToAdd = [];
 
   @override
   void initState() {
@@ -57,8 +58,21 @@ class _FencerSearchState extends State<FencerSearch> {
                     itemBuilder: (context, index) {
                       Fencer fencer = fencers[index];
                       return Card(
-                        child: ListTile(
+                        child: CheckboxListTile(
                           title: Text(fencer.name),
+                          value: fencersToAdd.contains(fencer),
+                          onChanged: (val) {
+                            if (edited == false) {
+                              edited = true;
+                            }
+                            if (val == true) {
+                              setState(() {
+                                fencersToAdd.add(fencer);
+                              });
+                            } else {
+                              fencersToAdd.remove(fencer);
+                            }
+                          },
                         ),
                       );
                     },
@@ -73,10 +87,14 @@ class _FencerSearchState extends State<FencerSearch> {
             active: edited,
             text: "Save",
             onPressed: () {
+              fClass.fencers.addAll(fencersToAdd);
               FirestoreService().updateData(
                 path: FirestorePath.fClass(fClass.id),
                 data: fClass.toMap(),
               );
+              setState(() {
+                edited = false;
+              });
             },
           ),
         ],

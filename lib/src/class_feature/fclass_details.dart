@@ -99,6 +99,9 @@ class _FClassDetailsState extends State<FClassDetails> {
                 path: FirestorePath.fClass(fClass.id),
                 data: fClass.toMap(),
               );
+              setState(() {
+                edited = false;
+              });
             },
           ),
         ],

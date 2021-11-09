@@ -72,8 +72,7 @@ class Fencer {
         other.id == id &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        other.phoneNumber == phoneNumber &&
-        other.checkedIn == checkedIn;
+        other.phoneNumber == phoneNumber;
   }
 
   @override
