@@ -59,6 +59,20 @@ class FClass {
     return "${DateFormat('EEEE').format(date)} ${date.month}/${date.day}/${date.year}";
   }
 
+  String get maxFencerNumber {
+    switch (classType) {
+      case ClassType.foundation:
+        return "12";
+      case ClassType.youth:
+      case ClassType.mixed:
+      case ClassType.advanced:
+        return "20";
+
+      default:
+        return "XX";
+    }
+  }
+
   FClass copyWith({
     String? id,
     DateTime? date,

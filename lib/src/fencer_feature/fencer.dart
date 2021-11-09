@@ -30,11 +30,16 @@ class Fencer {
     );
   }
 
+  String get name {
+    return "$firstName ${lastName.substring(0, 1)}.";
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'firstName': firstName,
       'lastName': lastName,
+      'searchName': firstName.toLowerCase(),
       'phoneNumber': phoneNumber,
       'checkedIn': checkedIn,
     };
