@@ -72,30 +72,34 @@ class _LoginScreenState extends State<LoginScreen> {
               showLoading = true;
             });
 
-            await _auth.verifyPhoneNumber(
-              phoneNumber: phoneController.text,
-              verificationCompleted: (phoneAuthCredential) async {
-                setState(() {
-                  showLoading = false;
-                });
-                signInWithPhoneAuthCredential(phoneAuthCredential);
-              },
-              verificationFailed: (verificationFailed) async {
-                setState(() {
-                  showLoading = false;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(verificationFailed.message!)));
-              },
-              codeSent: (verificationId, resendingToken) async {
-                setState(() {
-                  showLoading = false;
-                  currentState = MobileVerificationState.otpFormState;
-                  this.verificationId = verificationId;
-                });
-              },
-              codeAutoRetrievalTimeout: (verificationId) async {},
-            );
+            if (identical(0, 0.0)) {
+              await _auth.signInWithPhoneNumber(phoneController.text);
+            } else {
+              await _auth.verifyPhoneNumber(
+                phoneNumber: phoneController.text,
+                verificationCompleted: (phoneAuthCredential) async {
+                  setState(() {
+                    showLoading = false;
+                  });
+                  signInWithPhoneAuthCredential(phoneAuthCredential);
+                },
+                verificationFailed: (verificationFailed) async {
+                  setState(() {
+                    showLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(verificationFailed.message!)));
+                },
+                codeSent: (verificationId, resendingToken) async {
+                  setState(() {
+                    showLoading = false;
+                    currentState = MobileVerificationState.otpFormState;
+                    this.verificationId = verificationId;
+                  });
+                },
+                codeAutoRetrievalTimeout: (verificationId) async {},
+              );
+            }
           },
           child: const Text("SEND"),
           color: Colors.blue,
