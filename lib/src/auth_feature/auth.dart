@@ -73,7 +73,14 @@ class _LoginScreenState extends State<LoginScreen> {
             });
 
             if (identical(0, 0.0)) {
-              await _auth.signInWithPhoneNumber(phoneController.text);
+              await _auth.signInWithPhoneNumber(
+                phoneController.text,
+                RecaptchaVerifier(
+                  container: 'recaptcha',
+                  size: RecaptchaVerifierSize.compact,
+                  theme: RecaptchaVerifierTheme.dark,
+                ),
+              );
             } else {
               await _auth.verifyPhoneNumber(
                 phoneNumber: phoneController.text,
