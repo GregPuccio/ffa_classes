@@ -29,7 +29,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
         actions: [
           IconButton(
             onPressed: changeView,
-            icon: Icon(calendar ? Icons.list : Icons.calendar_today),
+            icon: Icon(calendar ? Icons.home : Icons.calendar_today),
           ),
           IconButton(
             icon: const Icon(Icons.settings),

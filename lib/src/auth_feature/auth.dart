@@ -1,6 +1,7 @@
-import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
+import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 enum MobileVerificationState {
   mobileFormState,
@@ -46,12 +47,10 @@ class _LoginScreenState extends State<LoginScreen> {
         final authCredential =
             await _auth.signInWithCredential(phoneAuthCredential);
 
-        setState(() {
-          showLoading = false;
-        });
-
-        if (authCredential.user != null) {
-          Navigator.pushReplacementNamed(context, ClassListWrapper.routeName);
+        if (authCredential.user == null) {
+          setState(() {
+            showLoading = false;
+          });
         }
       } on FirebaseAuthException catch (e) {
         setState(() {
@@ -74,70 +73,80 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         const Spacer(),
-        TextField(
-          controller: phoneController,
-          decoration: const InputDecoration(
-            hintText: "Phone Number",
-          ),
+        Text(
+          'Forward Fencing Classes',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headline3,
         ),
-        const SizedBox(
-          height: 16,
+        const SizedBox(height: 16),
+        InternationalPhoneNumberInput(
+          initialValue: PhoneNumber(isoCode: 'US'),
+          onInputChanged: (PhoneNumber value) {
+            phoneController.text = "${value.dialCode}${value.parseNumber()}";
+          },
         ),
-        MaterialButton(
+        const SizedBox(height: 16),
+        InkButton(
           onPressed: () async {
-            setState(() {
-              showLoading = true;
-            });
-
-            if (identical(0, 0.0)) {
-              try {
-                result = await _auth.signInWithPhoneNumber(
-                  phoneController.text,
-                );
-                setState(() {
-                  showLoading = false;
-                  currentState = MobileVerificationState.otpFormState;
-                });
-              } on FirebaseAuthException catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.message!),
-                  ),
-                );
-                setState(() {
-                  showLoading = false;
-                });
-              }
+            if (phoneController.text.length < 12) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Phone number entered incorrectly!"),
+                ),
+              );
             } else {
-              await _auth.verifyPhoneNumber(
-                phoneNumber: phoneController.text,
-                verificationCompleted: (phoneAuthCredential) async {
-                  setState(() {
-                    showLoading = false;
-                  });
-                  signInWithPhoneAuthCredential(phoneAuthCredential);
-                },
-                verificationFailed: (verificationFailed) async {
-                  setState(() {
-                    showLoading = false;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(verificationFailed.message!)));
-                },
-                codeSent: (verificationId, resendingToken) async {
+              setState(() {
+                showLoading = true;
+              });
+
+              if (identical(0, 0.0)) {
+                try {
+                  result = await _auth.signInWithPhoneNumber(
+                    phoneController.text,
+                  );
                   setState(() {
                     showLoading = false;
                     currentState = MobileVerificationState.otpFormState;
-                    this.verificationId = verificationId;
                   });
-                },
-                codeAutoRetrievalTimeout: (verificationId) async {},
-              );
+                } on FirebaseAuthException catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.message!),
+                    ),
+                  );
+                  setState(() {
+                    showLoading = false;
+                  });
+                }
+              } else {
+                await _auth.verifyPhoneNumber(
+                  phoneNumber: phoneController.text,
+                  verificationCompleted: (phoneAuthCredential) async {
+                    setState(() {
+                      showLoading = false;
+                    });
+                    signInWithPhoneAuthCredential(phoneAuthCredential);
+                  },
+                  verificationFailed: (verificationFailed) async {
+                    setState(() {
+                      showLoading = false;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(verificationFailed.message!)));
+                  },
+                  codeSent: (verificationId, resendingToken) async {
+                    setState(() {
+                      showLoading = false;
+                      currentState = MobileVerificationState.otpFormState;
+                      this.verificationId = verificationId;
+                    });
+                  },
+                  codeAutoRetrievalTimeout: (verificationId) async {},
+                );
+              }
             }
           },
-          child: const Text("SEND"),
-          color: Colors.blue,
-          textColor: Colors.white,
+          text: "Continue",
         ),
         const Spacer(),
       ],
@@ -148,6 +157,12 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         const Spacer(),
+        Text(
+          'Forward Fencing Classes',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headline3,
+        ),
+        const SizedBox(height: 16),
         TextField(
           controller: otpController,
           decoration: const InputDecoration(
@@ -182,18 +197,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
+  void dispose() {
+    phoneController.dispose();
+    otpController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
-        body: Container(
-          child: showLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : currentState == MobileVerificationState.mobileFormState
-                  ? getMobileFormWidget(context)
-                  : getOtpFormWidget(context),
-          padding: const EdgeInsets.all(16),
+        body: Center(
+          child: Container(
+            width: MediaQuery.of(context).orientation == Orientation.landscape
+                ? 600
+                : null,
+            child: showLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : currentState == MobileVerificationState.mobileFormState
+                    ? getMobileFormWidget(context)
+                    : getOtpFormWidget(context),
+            padding: const EdgeInsets.all(16),
+          ),
         ));
   }
 }

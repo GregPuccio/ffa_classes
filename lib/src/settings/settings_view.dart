@@ -23,7 +23,7 @@ class SettingsView extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.all(16),
           width: MediaQuery.of(context).orientation == Orientation.landscape
               ? 600
               : null,

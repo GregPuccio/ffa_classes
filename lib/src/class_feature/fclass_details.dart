@@ -45,7 +45,7 @@ class _FClassDetailsState extends State<FClassDetails> {
           Expanded(
             child: Center(
               child: Container(
-                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.all(16),
                 width:
                     MediaQuery.of(context).orientation == Orientation.landscape
                         ? 600

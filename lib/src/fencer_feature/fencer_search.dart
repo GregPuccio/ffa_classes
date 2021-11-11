@@ -86,7 +86,7 @@ class _FencerSearchState extends State<FencerSearch> {
           ),
           InkButton(
             active: edited,
-            text: "Save",
+            text: "Save changes and return",
             onPressed: () {
               fClass.fencers.addAll(fencersToAdd);
               FirestoreService().updateData(
