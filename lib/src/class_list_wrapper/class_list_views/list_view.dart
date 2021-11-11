@@ -61,7 +61,7 @@ class _ClassListViewState extends State<ClassListView> {
           List<FClass> classes = snapshot.data!;
           return Center(
             child: Container(
-              padding: const EdgeInsets.all(16),
+              alignment: Alignment.topCenter,
               width: MediaQuery.of(context).orientation == Orientation.landscape
                   ? 600
                   : null,

@@ -6,6 +6,7 @@ import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class ClassCalendarView extends StatefulWidget {
@@ -142,13 +143,32 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
           ];
           return portrait
               ? Column(children: children)
-              : Row(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(child: children[0]),
+              : Center(
+                  child: Container(
+                    alignment: Alignment.topCenter,
+                    width: 800,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(child: children[0]),
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                              ),
+                              children[1],
+                            ],
+                          ),
+                        )
+                      ],
                     ),
-                    children[1]
-                  ],
+                  ),
                 );
         } else {
           return const Center(child: CircularProgressIndicator());
