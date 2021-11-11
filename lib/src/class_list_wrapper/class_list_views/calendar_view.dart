@@ -152,6 +152,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                         Expanded(
                           child: SingleChildScrollView(child: children[0]),
                         ),
+                        const VerticalDivider(),
                         Expanded(
                           child: Column(
                             children: [

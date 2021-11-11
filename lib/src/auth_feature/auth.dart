@@ -206,21 +206,22 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        body: Center(
-          child: Container(
-            alignment: Alignment.topCenter,
-            width: MediaQuery.of(context).orientation == Orientation.landscape
-                ? 600
-                : null,
-            child: showLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : currentState == MobileVerificationState.mobileFormState
-                    ? getMobileFormWidget(context)
-                    : getOtpFormWidget(context),
-          ),
-        ));
+      key: _scaffoldKey,
+      body: Center(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? 600
+              : null,
+          child: showLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : currentState == MobileVerificationState.mobileFormState
+                  ? getMobileFormWidget(context)
+                  : getOtpFormWidget(context),
+        ),
+      ),
+    );
   }
 }
