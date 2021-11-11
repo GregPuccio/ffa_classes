@@ -3,6 +3,10 @@ import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
+import 'package:ffaclasses/src/firebase/firestore_path.dart';
+import 'package:ffaclasses/src/firebase/firestore_service.dart';
+import 'package:ffaclasses/src/user_feature/create_account.dart';
+import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -102,8 +106,28 @@ class AuthWrapper extends StatelessWidget {
       stream: authChanges(),
       builder: (context, snapshot) {
         return snapshot.data != null
-            ? const ClassListWrapper()
+            ? LoggedInWrapper(user: snapshot.data!)
             : const LoginScreen();
+      },
+    );
+  }
+}
+
+class LoggedInWrapper extends StatelessWidget {
+  final User user;
+  const LoggedInWrapper({Key? key, required this.user}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<UserData?>(
+      stream: FirestoreService().documentStream(
+        path: FirestorePath.user(user.uid),
+        builder: (map, docID) => UserData.fromMap(map!).copyWith(id: docID),
+      ),
+      builder: (context, snapshot) {
+        return snapshot.data != null
+            ? const ClassListWrapper()
+            : CreateAccount(user: user);
       },
     );
   }
