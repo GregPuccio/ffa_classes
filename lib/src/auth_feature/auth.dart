@@ -14,14 +14,18 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+Stream<User?> authChanges() {
+  return _auth.authStateChanges();
+}
+
 class _LoginScreenState extends State<LoginScreen> {
   MobileVerificationState currentState =
       MobileVerificationState.mobileFormState;
 
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late String verificationId;
   late ConfirmationResult result;
@@ -30,31 +34,35 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void signInWithPhoneAuthCredential(
       AuthCredential? phoneAuthCredential) async {
-    setState(() {
-      showLoading = true;
-    });
-
-    try {
-      if (phoneAuthCredential == null) {
-        throw FirebaseAuthException(
-            code: 'error', message: "Account not found");
-      }
-      final authCredential =
-          await _auth.signInWithCredential(phoneAuthCredential);
-
+    if (phoneAuthCredential != null) {
       setState(() {
-        showLoading = false;
+        showLoading = true;
       });
+      try {
+        final authCredential =
+            await _auth.signInWithCredential(phoneAuthCredential);
 
-      if (authCredential.user != null) {
-        Navigator.pushReplacementNamed(context, ClassListWrapper.routeName);
+        setState(() {
+          showLoading = false;
+        });
+
+        if (authCredential.user != null) {
+          Navigator.pushReplacementNamed(context, ClassListWrapper.routeName);
+        }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          showLoading = false;
+        });
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message!)));
       }
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        showLoading = false;
-      });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message!)));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Please input sms code received after verifying phone number'),
+        ),
+      );
     }
   }
 
@@ -78,18 +86,24 @@ class _LoginScreenState extends State<LoginScreen> {
             });
 
             if (identical(0, 0.0)) {
-              result = await _auth.signInWithPhoneNumber(
-                phoneController.text,
-                RecaptchaVerifier(
-                  container: 'recaptcha',
-                  size: RecaptchaVerifierSize.compact,
-                  theme: RecaptchaVerifierTheme.dark,
-                ),
-              );
-              setState(() {
-                showLoading = false;
-                currentState = MobileVerificationState.otpFormState;
-              });
+              try {
+                result = await _auth.signInWithPhoneNumber(
+                  phoneController.text,
+                );
+                setState(() {
+                  showLoading = false;
+                  currentState = MobileVerificationState.otpFormState;
+                });
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.message!),
+                  ),
+                );
+                setState(() {
+                  showLoading = false;
+                });
+              }
             } else {
               await _auth.verifyPhoneNumber(
                 phoneNumber: phoneController.text,
@@ -142,10 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialButton(
           onPressed: () async {
             if (identical(0, 0.0)) {
-              UserCredential userCredential =
-                  await result.confirm(otpController.text);
-
-              signInWithPhoneAuthCredential(userCredential.credential);
+              await result.confirm(otpController.text);
             } else {
               PhoneAuthCredential phoneAuthCredential =
                   PhoneAuthProvider.credential(
