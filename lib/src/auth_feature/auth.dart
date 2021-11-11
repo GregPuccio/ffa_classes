@@ -24,16 +24,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   late String verificationId;
+  late ConfirmationResult result;
 
   bool showLoading = false;
 
   void signInWithPhoneAuthCredential(
-      PhoneAuthCredential phoneAuthCredential) async {
+      AuthCredential? phoneAuthCredential) async {
     setState(() {
       showLoading = true;
     });
 
     try {
+      if (phoneAuthCredential == null) {
+        throw FirebaseAuthException(
+            code: 'error', message: "Account not found");
+      }
       final authCredential =
           await _auth.signInWithCredential(phoneAuthCredential);
 
@@ -73,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
             });
 
             if (identical(0, 0.0)) {
-              await _auth.signInWithPhoneNumber(
+              result = await _auth.signInWithPhoneNumber(
                 phoneController.text,
                 RecaptchaVerifier(
                   container: 'recaptcha',
@@ -81,6 +86,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   theme: RecaptchaVerifierTheme.dark,
                 ),
               );
+              setState(() {
+                showLoading = false;
+                currentState = MobileVerificationState.otpFormState;
+              });
             } else {
               await _auth.verifyPhoneNumber(
                 phoneNumber: phoneController.text,
@@ -132,12 +141,19 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         MaterialButton(
           onPressed: () async {
-            PhoneAuthCredential phoneAuthCredential =
-                PhoneAuthProvider.credential(
-                    verificationId: verificationId,
-                    smsCode: otpController.text);
+            if (identical(0, 0.0)) {
+              UserCredential userCredential =
+                  await result.confirm(otpController.text);
 
-            signInWithPhoneAuthCredential(phoneAuthCredential);
+              signInWithPhoneAuthCredential(userCredential.credential);
+            } else {
+              PhoneAuthCredential phoneAuthCredential =
+                  PhoneAuthProvider.credential(
+                      verificationId: verificationId,
+                      smsCode: otpController.text);
+
+              signInWithPhoneAuthCredential(phoneAuthCredential);
+            }
           },
           child: const Text("VERIFY"),
           color: Colors.blue,
