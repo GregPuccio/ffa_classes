@@ -20,6 +20,10 @@ Stream<User?> authChanges() {
   return _auth.authStateChanges();
 }
 
+void signOut() async {
+  return _auth.signOut();
+}
+
 class _LoginScreenState extends State<LoginScreen> {
   MobileVerificationState currentState =
       MobileVerificationState.mobileFormState;

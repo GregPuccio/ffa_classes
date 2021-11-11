@@ -69,18 +69,19 @@ class _FClassDetailsState extends State<FClassDetails> {
                         ),
                       );
                     } else {
-                      Fencer fencer = fClass.fencers[index - 1];
                       return Card(
                         child: CheckboxListTile(
-                          title: Text(fencer.name),
-                          value: fencer.checkedIn,
+                          title: Text(fClass.fencers[index - 1].name),
+                          value: fClass.fencers[index - 1].checkedIn,
                           onChanged: (val) {
                             setState(() {
                               if (edited == false) {
                                 edited = true;
                               }
-                              fencer =
-                                  fencer.copyWith(checkedIn: !fencer.checkedIn);
+                              fClass.fencers[index - 1] =
+                                  fClass.fencers[index - 1].copyWith(
+                                      checkedIn:
+                                          !fClass.fencers[index - 1].checkedIn);
                             });
                           },
                         ),
@@ -90,6 +91,24 @@ class _FClassDetailsState extends State<FClassDetails> {
                 ),
               ),
             ),
+          ),
+          InkButton(
+            text: "Add fencer",
+            onPressed: () {
+              FirestoreService().addData(
+                path: FirestorePath.users(),
+                data: Fencer(
+                  id: 'id',
+                  firstName: 'John',
+                  lastName: 'Test',
+                  phoneNumber: '9083408640',
+                  checkedIn: false,
+                ).toMap(),
+              );
+              setState(() {
+                edited = false;
+              });
+            },
           ),
           InkButton(
             active: edited,

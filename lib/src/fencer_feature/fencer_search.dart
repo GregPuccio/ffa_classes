@@ -60,7 +60,8 @@ class _FencerSearchState extends State<FencerSearch> {
                       return Card(
                         child: CheckboxListTile(
                           title: Text(fencer.name),
-                          value: fencersToAdd.contains(fencer),
+                          value: fencersToAdd.contains(fencer) ||
+                              fClass.fencers.contains(fencer),
                           onChanged: (val) {
                             if (edited == false) {
                               edited = true;
