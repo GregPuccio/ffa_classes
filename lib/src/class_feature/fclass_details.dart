@@ -27,12 +27,15 @@ class _FClassDetailsState extends State<FClassDetails> {
             "${fClass.title} Class ${fClass.fencers.length}/${fClass.maxFencerNumber}"),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.pushNamed(
+              onPressed: () async {
+                final result = await Navigator.pushNamed(
                   context,
                   FencerSearch.routeName,
                   arguments: ScreenArgs(fClass: fClass),
                 );
+                setState(() {
+                  fClass = result as FClass;
+                });
               },
               icon: const Icon(Icons.person_add)),
         ],
