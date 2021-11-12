@@ -42,6 +42,7 @@ class UserData {
     return {
       'id': id,
       'firstName': firstName,
+      'searchName': firstName.toLowerCase(),
       'lastName': lastName,
       'phoneNumber': phoneNumber,
       'parentSignUp': parentSignUp,

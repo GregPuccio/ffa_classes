@@ -38,8 +38,8 @@ class Fencer {
     return {
       'id': id,
       'firstName': firstName,
-      'lastName': lastName,
       'searchName': firstName.toLowerCase(),
+      'lastName': lastName,
       'phoneNumber': phoneNumber,
       'checkedIn': checkedIn,
     };

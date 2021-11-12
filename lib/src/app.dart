@@ -3,12 +3,12 @@ import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
-import 'package:ffaclasses/src/firebase/firestore_path.dart';
-import 'package:ffaclasses/src/firebase/firestore_service.dart';
+import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/user_feature/create_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -77,38 +77,55 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: authChanges(),
-      builder: (context, snapshot) {
-        return snapshot.data != null
-            ? LoggedInWrapper(user: snapshot.data!)
-            : const LoginScreen();
-      },
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    Widget whenData(User? user) {
+      if (user != null) {
+        return LoggedInWrapper(user: user);
+      } else {
+        return const LoginScreen();
+      }
+    }
+
+    return ref.watch(authStateChangesProvider).when(
+          data: whenData,
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (object, stackTrace) => Center(
+            child: Text(
+              "Error",
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+        );
   }
 }
 
-class LoggedInWrapper extends StatelessWidget {
+class LoggedInWrapper extends ConsumerWidget {
   final User user;
   const LoggedInWrapper({Key? key, required this.user}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<UserData?>(
-      stream: FirestoreService().documentStream(
-        path: FirestorePath.user(user.uid),
-        builder: (map, docID) => UserData.fromMap(map!).copyWith(id: docID),
-      ),
-      builder: (context, snapshot) {
-        return snapshot.data != null
-            ? const ClassListWrapper()
-            : CreateAccount(user: user);
-      },
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    Widget whenData(UserData? userData) {
+      if (userData != null) {
+        return const ClassListWrapper();
+      } else {
+        return CreateAccount(user: user);
+      }
+    }
+
+    return ref.watch(userDataProvider).when(
+          data: whenData,
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (object, stackTrace) => Center(
+            child: Text(
+              "Error",
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+        );
   }
 }
