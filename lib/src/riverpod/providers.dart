@@ -19,11 +19,17 @@ final databaseProvider = Provider<FirestoreService>((ref) {
   throw UnimplementedError();
 });
 
-final userDataProvider = StreamProvider<UserData>((ref) {
+final userDataProvider = StreamProvider<UserData?>((ref) {
   final auth = ref.watch(authStateChangesProvider);
   final database = ref.watch(databaseProvider);
   return database.documentStream(
     path: FirestorePath.user(auth.asData!.value!.uid),
-    builder: (map, docID) => UserData.fromMap(map!).copyWith(id: docID),
+    builder: (map, docID) {
+      if (map != null) {
+        return UserData.fromMap(map).copyWith(id: docID);
+      } else {
+        return null;
+      }
+    },
   );
 });

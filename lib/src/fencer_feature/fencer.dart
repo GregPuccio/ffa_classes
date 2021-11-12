@@ -51,7 +51,7 @@ class Fencer {
       firstName: map['firstName'],
       lastName: map['lastName'],
       phoneNumber: map['phoneNumber'],
-      checkedIn: map['checkedIn'],
+      checkedIn: map['checkedIn'] ?? false,
     );
   }
 

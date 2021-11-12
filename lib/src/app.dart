@@ -106,7 +106,6 @@ class AuthWrapper extends ConsumerWidget {
 class LoggedInWrapper extends ConsumerWidget {
   final User user;
   const LoggedInWrapper({Key? key, required this.user}) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Widget whenData(UserData? userData) {

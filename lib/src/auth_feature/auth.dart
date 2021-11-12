@@ -162,17 +162,20 @@ class _LoginScreenState extends State<LoginScreen> {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline3,
         ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: otpController,
-          decoration: const InputDecoration(
-            hintText: "Enter OTP",
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: otpController,
+            decoration: const InputDecoration(
+              hintText: "Enter OTP",
+            ),
           ),
         ),
         const SizedBox(
-          height: 16,
+          height: 8,
         ),
-        MaterialButton(
+        InkButton(
           onPressed: () async {
             if (identical(0, 0.0)) {
               await result.confirm(otpController.text);
@@ -185,9 +188,16 @@ class _LoginScreenState extends State<LoginScreen> {
               signInWithPhoneAuthCredential(phoneAuthCredential);
             }
           },
-          child: const Text("VERIFY"),
-          color: Colors.blue,
-          textColor: Colors.white,
+          text: "Verify",
+        ),
+        SecondaryButton(
+          text: 'Go back',
+          active: true,
+          onPressed: () {
+            setState(() {
+              currentState = MobileVerificationState.mobileFormState;
+            });
+          },
         ),
         const Spacer(),
       ],

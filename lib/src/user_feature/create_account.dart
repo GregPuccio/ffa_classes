@@ -51,6 +51,7 @@ class _CreateAccountState extends State<CreateAccount> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     controller: firstName,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -61,6 +62,7 @@ class _CreateAccountState extends State<CreateAccount> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     controller: lastName,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -85,6 +87,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      textCapitalization: TextCapitalization.words,
                       controller: parentFirstName,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -96,6 +99,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      textCapitalization: TextCapitalization.words,
                       controller: parentLastName,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
