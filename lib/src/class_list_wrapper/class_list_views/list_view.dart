@@ -50,9 +50,13 @@ class _ClassListViewState extends State<ClassListView> {
           if (currentFilter != -1) {
             return query
                 .where('classType', isEqualTo: currentFilter)
-                .orderBy('date');
+                .orderBy('date')
+                .where('date',
+                    isGreaterThanOrEqualTo:
+                        DateTime.now().millisecondsSinceEpoch);
           } else {
-            return query.orderBy('date');
+            return query.orderBy('date').where('date',
+                isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch);
           }
         },
       ),
