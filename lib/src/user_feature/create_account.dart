@@ -124,6 +124,7 @@ class _CreateAccountState extends State<CreateAccount> {
               } else {
                 UserData user = UserData(
                   id: 'id',
+                  admin: false,
                   firstName: firstName.text,
                   lastName: lastName.text,
                   phoneNumber: widget.user.phoneNumber!,

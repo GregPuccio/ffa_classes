@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:ffaclasses/src/fencer_feature/fencer.dart';
+
 class UserData {
   final String id;
+  final bool admin;
   final String firstName;
   final String lastName;
   final String phoneNumber;
@@ -10,6 +13,7 @@ class UserData {
   final String parentLastName;
   UserData({
     required this.id,
+    required this.admin,
     required this.firstName,
     required this.lastName,
     required this.phoneNumber,
@@ -29,6 +33,7 @@ class UserData {
   }) {
     return UserData(
       id: id ?? this.id,
+      admin: admin,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -38,9 +43,20 @@ class UserData {
     );
   }
 
+  Fencer toFencer() {
+    return Fencer(
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      checkedIn: false,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'admin': admin,
       'firstName': firstName,
       'searchName': firstName.toLowerCase(),
       'lastName': lastName,
@@ -54,6 +70,7 @@ class UserData {
   factory UserData.fromMap(Map<String, dynamic> map) {
     return UserData(
       id: map['id'],
+      admin: map['admin'] ?? false,
       firstName: map['firstName'],
       lastName: map['lastName'],
       phoneNumber: map['phoneNumber'],
