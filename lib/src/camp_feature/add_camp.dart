@@ -1,25 +1,25 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
-import 'package:ffaclasses/src/constants/lists.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
-import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:time_range/time_range.dart';
-import 'package:intl/intl.dart';
 
-class AddClass extends StatefulWidget {
-  const AddClass({Key? key}) : super(key: key);
-  static const routeName = 'addClass';
+class AddCamp extends StatefulWidget {
+  const AddCamp({Key? key}) : super(key: key);
+  static const routeName = 'addCamp';
 
   @override
-  _AddClassState createState() => _AddClassState();
+  _AddCampState createState() => _AddCampState();
 }
 
-class _AddClassState extends State<AddClass> {
+class _AddCampState extends State<AddCamp> {
   late FClass fClass;
-  late bool repeat;
+  late TextEditingController customClassTypeController;
+  late TextEditingController customClassDescriptionController;
+  late TextEditingController customMaxNumberController;
+  late TextEditingController costController;
   @override
   void initState() {
     fClass = FClass(
@@ -28,30 +28,46 @@ class _AddClassState extends State<AddClass> {
           DateTime.now().year, DateTime.now().month, DateTime.now().day),
       startTime: const TimeOfDay(hour: 16, minute: 30),
       endTime: const TimeOfDay(hour: 18, minute: 00),
-      classType: ClassType.foundation,
+      classType: ClassType.custom,
       fencers: [],
     );
-    repeat = true;
-
+    customClassTypeController = TextEditingController();
+    customClassDescriptionController = TextEditingController();
+    customMaxNumberController = TextEditingController();
+    costController = TextEditingController();
     super.initState();
   }
 
   void showDateChooser() async {
-    DateTime? newDate = await showDatePicker(
+    DateTimeRange? newRange = await showDateRangePicker(
       context: context,
-      initialDate: fClass.date,
+      initialDateRange:
+          DateTimeRange(start: fClass.date, end: fClass.endDate ?? fClass.date),
       firstDate: DateTime.now().subtract(const Duration(days: 31)),
       lastDate: DateTime.now().add(const Duration(days: 100)),
     );
-    if (newDate != null) {
+    if (newRange != null) {
       setState(() {
-        fClass = fClass.copyWith(date: newDate.toUtc());
+        fClass = fClass.copyWith(
+            date: newRange.start.toUtc(), endDate: newRange.end.toUtc());
       });
     }
+    // DateTime? newDate = await showDatePicker(
+    //   context: context,
+    //   initialDate: fClass.date,
+    //   firstDate: DateTime.now().subtract(const Duration(days: 31)),
+    //   lastDate: DateTime.now().add(const Duration(days: 100)),
+    // );
+    // if (newDate != null) {
+    //   setState(() {
+    //     fClass = fClass.copyWith(date: newDate.toUtc());
+    //   });
+    // }
   }
 
   @override
   void dispose() {
+    customClassTypeController.dispose();
     super.dispose();
   }
 
@@ -59,7 +75,7 @@ class _AddClassState extends State<AddClass> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Class'),
+        title: const Text('Add A Camp'),
       ),
       body: Center(
         child: Container(
@@ -69,20 +85,40 @@ class _AddClassState extends State<AddClass> {
               : null,
           child: ListView(
             children: [
-              MultiSelectChip(
-                itemList: classTypes,
-                initialChoices: [classTypes.first],
-                onSelectionChanged: (val) => setState(() {
-                  if (val.isNotEmpty) {
-                    fClass = fClass.copyWith(classType: val.first);
-                  }
-                }),
-                multi: false,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: customClassTypeController,
+                  decoration: const InputDecoration(
+                    labelText: "Title",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: customClassDescriptionController,
+                  decoration: const InputDecoration(
+                    labelText: "Description",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: customMaxNumberController,
+                  decoration: const InputDecoration(
+                    labelText: "Maximum number of fencers",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
               SecondaryButton(
                 active: true,
                 onPressed: showDateChooser,
-                text: fClass.writtenDate,
+                text: fClass.dateRange,
               ),
               TimeRange(
                 fromTitle: const Text('From'),
@@ -109,39 +145,33 @@ class _AddClassState extends State<AddClass> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: costController,
                   decoration: InputDecoration(
+                    labelText: "Camp cost",
                     hintText: fClass.classCost,
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.attach_money),
                   ),
-                  readOnly: true,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: CheckboxListTile(
-                    title: const Text('Repeat for the rest of the month?'),
-                    value: repeat,
-                    onChanged: (val) {
-                      setState(() {
-                        repeat = !repeat;
-                      });
-                    },
-                  ),
                 ),
               ),
               InkButton(
-                text: 'Create class${repeat ? 'es' : ''}',
+                text: 'Create camp',
                 onPressed: () {
+                  fClass = fClass.copyWith(
+                    customClassTitle: customClassTypeController.text,
+                    customClassDescription:
+                        customClassDescriptionController.text,
+                    customMaxFencers: customMaxNumberController.text,
+                    customCost: costController.text,
+                  );
                   List<FClass> classes = [fClass];
-                  if (repeat) {
+                  if (fClass.endDate != null && fClass.date != fClass.endDate) {
                     DateTime newDate = DateTime.utc(fClass.date.year,
-                        fClass.date.month, fClass.date.day + 7);
-                    while (newDate.month == fClass.date.month) {
+                        fClass.date.month, fClass.date.day + 1);
+                    while (newDate.isBefore(fClass.endDate!)) {
                       classes.add(fClass.copyWith(date: newDate));
                       newDate = DateTime.utc(
-                          newDate.year, newDate.month, newDate.day + 7);
+                          newDate.year, newDate.month, newDate.day + 1);
                     }
                   }
                   showDialog(
@@ -154,10 +184,10 @@ class _AddClassState extends State<AddClass> {
                         children: [
                           const Text(
                               'Are you sure you would like to create the following:'),
-                          Text(
-                              "${classes.length} ${fClass.title}${classes.length > 1 ? 'es' : ''}"),
-                          Text(
-                              "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
+                          Text(fClass.title.isEmpty
+                              ? 'Custom Event'
+                              : fClass.title),
+                          Text(fClass.dateRange),
                           Text(
                               "From ${fClass.startTime.format(context)} to ${fClass.endTime.format(context)}"),
                         ],

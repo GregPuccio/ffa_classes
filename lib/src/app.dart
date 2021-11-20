@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'camp_feature/add_camp.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -61,6 +62,8 @@ class MyApp extends StatelessWidget {
                     return const FClassDetails();
                   case AddClass.routeName:
                     return const AddClass();
+                  case AddCamp.routeName:
+                    return const AddCamp();
                   case FencerSearch.routeName:
                     return const FencerSearch();
                   case SettingsView.routeName:

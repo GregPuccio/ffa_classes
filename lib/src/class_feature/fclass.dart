@@ -10,6 +10,7 @@ import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 class FClass {
   final String id;
   final DateTime date;
+  final DateTime? endDate;
   final TimeOfDay startTime;
   final TimeOfDay endTime;
   final ClassType classType;
@@ -21,6 +22,7 @@ class FClass {
   FClass({
     required this.id,
     required this.date,
+    this.endDate,
     required this.startTime,
     required this.endTime,
     required this.classType,
@@ -71,6 +73,10 @@ class FClass {
     return "${DateFormat('EEEE').format(date)} ${date.month}/${date.day}/${date.year}";
   }
 
+  String get dateRange {
+    return "${DateFormat('E').format(date)} ${date.month}/${date.day}${endDate != null && endDate != date ? "-${DateFormat('E').format(endDate!)} ${endDate!.month}/${endDate!.day}" : ''}";
+  }
+
   String get maxFencerNumber {
     switch (classType) {
       case ClassType.custom:
@@ -90,6 +96,7 @@ class FClass {
   FClass copyWith({
     String? id,
     DateTime? date,
+    DateTime? endDate,
     TimeOfDay? startTime,
     TimeOfDay? endTime,
     String? classType,
@@ -102,6 +109,7 @@ class FClass {
     return FClass(
       id: id ?? this.id,
       date: date ?? this.date,
+      endDate: endDate ?? this.endDate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       classType: trueClassType(classType) ?? this.classType,
@@ -153,6 +161,7 @@ class FClass {
   Map<String, dynamic> toMap() {
     return {
       'date': date.millisecondsSinceEpoch,
+      'endDate': endDate?.millisecondsSinceEpoch,
       'startTime': DateTime(1)
           .add(Duration(hours: startTime.hour, minutes: startTime.minute))
           .millisecondsSinceEpoch,
@@ -171,9 +180,12 @@ class FClass {
   factory FClass.fromMap(Map<String, dynamic> map) {
     DateTime date =
         DateTime.fromMillisecondsSinceEpoch(map['date'], isUtc: true);
+    DateTime endDate =
+        DateTime.fromMillisecondsSinceEpoch(map['endDate'] ?? 0, isUtc: true);
     return FClass(
       id: '',
       date: DateTime.utc(date.year, date.month, date.day),
+      endDate: DateTime.utc(endDate.year, endDate.month, endDate.day),
       startTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
       endTime: TimeOfDay.fromDateTime(

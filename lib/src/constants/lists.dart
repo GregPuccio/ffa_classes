@@ -3,5 +3,4 @@ const List<String> classTypes = [
   'Youth',
   'Mixed',
   'Advanced',
-  'Custom',
 ];

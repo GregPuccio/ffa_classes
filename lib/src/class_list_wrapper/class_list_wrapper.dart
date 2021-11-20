@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
@@ -49,12 +50,31 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
             ],
           ),
           floatingActionButton: userData.admin
-              ? FloatingActionButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () {
-                    Navigator.restorablePushNamed(context, AddClass.routeName);
-                  },
-                )
+              ? PopupMenuButton(
+                  child: const FloatingActionButton(
+                      onPressed: null, child: Icon(Icons.add)),
+                  itemBuilder: (_) {
+                    return [
+                      PopupMenuItem(
+                        child: ListTile(
+                          title: const Text('Add Classes'),
+                          onTap: () {
+                            Navigator.restorablePushNamed(
+                                context, AddClass.routeName);
+                          },
+                        ),
+                      ),
+                      PopupMenuItem(
+                        child: ListTile(
+                          title: const Text('Add a Camp'),
+                          onTap: () {
+                            Navigator.restorablePushNamed(
+                                context, AddCamp.routeName);
+                          },
+                        ),
+                      ),
+                    ];
+                  })
               : null,
           body: calendar ? const ClassCalendarView() : const ClassListView(),
         );
