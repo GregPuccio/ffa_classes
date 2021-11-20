@@ -13,6 +13,10 @@ class FClass {
   final TimeOfDay startTime;
   final TimeOfDay endTime;
   final ClassType classType;
+  final String? customClassTitle;
+  final String? customClassDescription;
+  final String? customMaxFencers;
+  final String? customCost;
   final List<Fencer> fencers;
   FClass({
     required this.id,
@@ -20,19 +24,25 @@ class FClass {
     required this.startTime,
     required this.endTime,
     required this.classType,
+    this.customClassTitle,
+    this.customClassDescription,
+    this.customMaxFencers,
+    this.customCost,
     required this.fencers,
   });
 
   String get title {
     switch (classType) {
+      case ClassType.custom:
+        return customClassTitle ?? 'Custom Event';
       case ClassType.foundation:
-        return "Foundation";
+        return "Foundation Class";
       case ClassType.youth:
-        return "Youth Competitive";
+        return "Youth Competitive Class";
       case ClassType.mixed:
-        return "Mixed Competitive";
+        return "Mixed Competitive Class";
       case ClassType.advanced:
-        return "Advanced";
+        return "Advanced Class";
 
       default:
         return "Sorry we couldn't find that class!";
@@ -41,6 +51,8 @@ class FClass {
 
   String get description {
     switch (classType) {
+      case ClassType.custom:
+        return customClassDescription ?? 'Custom Class Description';
       case ClassType.foundation:
         return "The class most suitable for younger and newer fencers (age 7-11) or by Coach invitation. This class focuses on coordination, fundamentals, and physical strategy games to build a correct technical base and to have fun and exercise! 12 max per class";
       case ClassType.youth:
@@ -61,6 +73,8 @@ class FClass {
 
   String get maxFencerNumber {
     switch (classType) {
+      case ClassType.custom:
+        return customMaxFencers ?? "XX";
       case ClassType.foundation:
         return "12";
       case ClassType.youth:
@@ -78,8 +92,11 @@ class FClass {
     DateTime? date,
     TimeOfDay? startTime,
     TimeOfDay? endTime,
-    int? cost,
     String? classType,
+    String? customClassTitle,
+    String? customClassDescription,
+    String? customMaxFencers,
+    String? customCost,
     List<Fencer>? fencers,
   }) {
     return FClass(
@@ -88,6 +105,11 @@ class FClass {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       classType: trueClassType(classType) ?? this.classType,
+      customClassTitle: customClassTitle ?? this.customClassTitle,
+      customClassDescription:
+          customClassDescription ?? this.customClassDescription,
+      customMaxFencers: customMaxFencers ?? this.customMaxFencers,
+      customCost: customCost ?? this.customCost,
       fencers: fencers ?? this.fencers,
     );
   }
@@ -102,13 +124,15 @@ class FClass {
         return ClassType.mixed;
       case 'Advanced':
         return ClassType.advanced;
+      case 'Custom':
+        return ClassType.custom;
 
       default:
         return null;
     }
   }
 
-  String get classCost {
+  String? get classCost {
     switch (classType) {
       case ClassType.foundation:
         return 'Member: \$30 - Non Member: \$30';
@@ -118,9 +142,11 @@ class FClass {
         return 'Member: \$40 - Non Member: \$50';
       case ClassType.advanced:
         return 'Member: \$40 - Non Member: \$50';
+      case ClassType.custom:
+        return customCost;
 
       default:
-        return 'Class incorrectly set up.';
+        return null;
     }
   }
 
@@ -134,6 +160,10 @@ class FClass {
           .add(Duration(hours: endTime.hour, minutes: endTime.minute))
           .millisecondsSinceEpoch,
       'classType': classType.index,
+      'customClassTitle': customClassTitle,
+      'customClassDescription': customClassDescription,
+      'customMaxFencers': customMaxFencers,
+      'customCost': customCost,
       'fencers': fencers.map((x) => x.toMap()).toList(),
     };
   }
@@ -149,7 +179,11 @@ class FClass {
       endTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['endTime'])),
       classType: ClassType.values[map['classType']],
-      fencers: List<Fencer>.from(map['fencers']?.map((x) => Fencer.fromMap(x))),
+      customClassTitle: map['customClassTitle'],
+      customClassDescription: map['customClassDescription'],
+      customMaxFencers: map['customMaxFencers'],
+      customCost: map['customCost'],
+      fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
     );
   }
 
@@ -159,7 +193,7 @@ class FClass {
 
   @override
   String toString() {
-    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, classType: $classType, fencers: $fencers)';
+    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, classType: $classType, customClassTitle: $customClassTitle, customClassDescription: $customClassDescription, customMaxFencers: $customMaxFencers, fencers: $fencers)';
   }
 
   @override
@@ -172,6 +206,9 @@ class FClass {
         other.startTime == startTime &&
         other.endTime == endTime &&
         other.classType == classType &&
+        other.customClassTitle == customClassTitle &&
+        other.customClassDescription == customClassDescription &&
+        other.customMaxFencers == customMaxFencers &&
         listEquals(other.fencers, fencers);
   }
 
@@ -182,6 +219,9 @@ class FClass {
         startTime.hashCode ^
         endTime.hashCode ^
         classType.hashCode ^
+        customClassTitle.hashCode ^
+        customClassDescription.hashCode ^
+        customMaxFencers.hashCode ^
         fencers.hashCode;
   }
 }

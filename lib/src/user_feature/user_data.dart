@@ -7,7 +7,7 @@ class UserData {
   final bool admin;
   final String firstName;
   final String lastName;
-  final String phoneNumber;
+  final String emailAddress;
   final bool parentSignUp;
   final String parentFirstName;
   final String parentLastName;
@@ -16,7 +16,7 @@ class UserData {
     required this.admin,
     required this.firstName,
     required this.lastName,
-    required this.phoneNumber,
+    required this.emailAddress,
     required this.parentSignUp,
     required this.parentFirstName,
     required this.parentLastName,
@@ -26,7 +26,7 @@ class UserData {
     String? id,
     String? firstName,
     String? lastName,
-    String? phoneNumber,
+    String? emailAddress,
     bool? parentSignUp,
     String? parentFirstName,
     String? parentLastName,
@@ -36,7 +36,7 @@ class UserData {
       admin: admin,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
+      emailAddress: emailAddress ?? this.emailAddress,
       parentSignUp: parentSignUp ?? this.parentSignUp,
       parentFirstName: parentFirstName ?? this.parentFirstName,
       parentLastName: parentLastName ?? this.parentLastName,
@@ -48,7 +48,7 @@ class UserData {
       id: id,
       firstName: firstName,
       lastName: lastName,
-      phoneNumber: phoneNumber,
+      phoneNumber: emailAddress,
       checkedIn: false,
     );
   }
@@ -60,7 +60,7 @@ class UserData {
       'firstName': firstName,
       'searchName': firstName.toLowerCase(),
       'lastName': lastName,
-      'phoneNumber': phoneNumber,
+      'emailAddress': emailAddress,
       'parentSignUp': parentSignUp,
       'parentFirstName': parentFirstName,
       'parentLastName': parentLastName,
@@ -73,7 +73,7 @@ class UserData {
       admin: map['admin'] ?? false,
       firstName: map['firstName'],
       lastName: map['lastName'],
-      phoneNumber: map['phoneNumber'],
+      emailAddress: map['emailAddress'],
       parentSignUp: map['parentSignUp'],
       parentFirstName: map['parentFirstName'],
       parentLastName: map['parentLastName'],
@@ -87,7 +87,7 @@ class UserData {
 
   @override
   String toString() {
-    return 'UserData(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, parentSignUp: $parentSignUp, parentFirstName: $parentFirstName, parentLastName: $parentLastName)';
+    return 'UserData(id: $id, firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, parentSignUp: $parentSignUp, parentFirstName: $parentFirstName, parentLastName: $parentLastName)';
   }
 
   @override
@@ -98,7 +98,7 @@ class UserData {
         other.id == id &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        other.phoneNumber == phoneNumber &&
+        other.emailAddress == emailAddress &&
         other.parentSignUp == parentSignUp &&
         other.parentFirstName == parentFirstName &&
         other.parentLastName == parentLastName;
@@ -109,7 +109,7 @@ class UserData {
     return id.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
-        phoneNumber.hashCode ^
+        emailAddress.hashCode ^
         parentSignUp.hashCode ^
         parentFirstName.hashCode ^
         parentLastName.hashCode;

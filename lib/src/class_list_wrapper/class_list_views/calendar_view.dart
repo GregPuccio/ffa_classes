@@ -120,7 +120,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                       final FClass fClass = fClasses[index];
                       return Card(
                         child: ListTile(
-                          title: Text("${fClass.title} Class"),
+                          title: Text(fClass.title),
                           subtitle: Text(
                               "${fClass.startTime.format(context)}-${fClass.endTime.format(context)}"),
                           trailing: Text("${fClass.fencers.length} fencers"),

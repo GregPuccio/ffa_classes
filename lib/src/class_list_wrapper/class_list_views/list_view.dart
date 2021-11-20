@@ -14,7 +14,14 @@ class ClassListView extends StatefulWidget {
 }
 
 class _ClassListViewState extends State<ClassListView> {
-  List<String> filters = ["All", "Foundation", "Youth", "Mixed", "Advanced"];
+  List<String> filters = [
+    "All",
+    "Foundation",
+    "Youth",
+    "Mixed",
+    "Advanced",
+    "Custom"
+  ];
 
   int currentFilter = -1;
 
@@ -35,6 +42,9 @@ class _ClassListViewState extends State<ClassListView> {
           break;
         case "Advanced":
           currentFilter = 3;
+          break;
+        case "Custom":
+          currentFilter = 4;
           break;
       }
     });
@@ -85,7 +95,7 @@ class _ClassListViewState extends State<ClassListView> {
                         FClass fClass = classes[index];
                         return Card(
                           child: ListTile(
-                            title: Text("${fClass.title} Class"),
+                            title: Text(fClass.title),
                             subtitle: Text(
                               "${fClass.writtenDate} - ${fClass.startTime.format(context)}",
                             ),

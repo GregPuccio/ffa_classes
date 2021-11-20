@@ -5,15 +5,15 @@ import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class CreateAccount extends StatefulWidget {
+class AccountSetup extends StatefulWidget {
   final User user;
-  const CreateAccount({Key? key, required this.user}) : super(key: key);
+  const AccountSetup({Key? key, required this.user}) : super(key: key);
 
   @override
-  _CreateAccountState createState() => _CreateAccountState();
+  _AccountSetupState createState() => _AccountSetupState();
 }
 
-class _CreateAccountState extends State<CreateAccount> {
+class _AccountSetupState extends State<AccountSetup> {
   late TextEditingController firstName;
   late TextEditingController lastName;
   late bool parentSignUp;
@@ -127,7 +127,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   admin: false,
                   firstName: firstName.text,
                   lastName: lastName.text,
-                  phoneNumber: widget.user.phoneNumber!,
+                  emailAddress: widget.user.email!,
                   parentSignUp: parentSignUp,
                   parentFirstName: parentFirstName.text,
                   parentLastName: parentLastName.text,

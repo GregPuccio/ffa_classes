@@ -112,7 +112,7 @@ class LoggedInWrapper extends ConsumerWidget {
       if (userData != null) {
         return const ClassListWrapper();
       } else {
-        return CreateAccount(user: user);
+        return AccountSetup(user: user);
       }
     }
 

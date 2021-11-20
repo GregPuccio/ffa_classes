@@ -1,1 +1,7 @@
-const List<String> classTypes = ['Foundation', 'Youth', 'Mixed', 'Advanced'];
+const List<String> classTypes = [
+  'Foundation',
+  'Youth',
+  'Mixed',
+  'Advanced',
+  'Custom',
+];

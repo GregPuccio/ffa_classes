@@ -1,11 +1,13 @@
+import 'package:ffaclasses/src/auth_feature/auth_service.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
+import 'package:email_validator/email_validator.dart';
 
-enum MobileVerificationState {
-  mobileFormState,
-  otpFormState,
+enum AuthScreenState {
+  signIn,
+  register,
 }
 
 class LoginScreen extends StatefulWidget {
@@ -15,61 +17,37 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
-Stream<User?> authChanges() {
-  return _auth.authStateChanges();
-}
-
-void signOut() async {
-  return _auth.signOut();
-}
-
 class _LoginScreenState extends State<LoginScreen> {
-  MobileVerificationState currentState =
-      MobileVerificationState.mobileFormState;
+  AuthScreenState currentState = AuthScreenState.signIn;
 
-  final phoneController = TextEditingController();
-  final otpController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   late String verificationId;
   late ConfirmationResult result;
 
   bool showLoading = false;
 
-  void signInWithPhoneAuthCredential(
-      AuthCredential? phoneAuthCredential) async {
-    if (phoneAuthCredential != null) {
-      setState(() {
-        showLoading = true;
-      });
-      try {
-        final authCredential =
-            await _auth.signInWithCredential(phoneAuthCredential);
+  void registerAccount() async {
+    try {
+      final authCredential = await AuthService()
+          .register(emailController.text, passwordController.text);
 
-        if (authCredential.user == null) {
-          setState(() {
-            showLoading = false;
-          });
-        }
-      } on FirebaseAuthException catch (e) {
+      if (authCredential.user == null) {
         setState(() {
           showLoading = false;
         });
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.message!)));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Please input sms code received after verifying phone number'),
-        ),
-      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        showLoading = false;
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message!)));
     }
   }
 
-  Widget getMobileFormWidget(context) {
+  Widget getSignIn(context) {
     return Column(
       children: [
         const Spacer(),
@@ -79,81 +57,70 @@ class _LoginScreenState extends State<LoginScreen> {
           style: Theme.of(context).textTheme.headline3,
         ),
         const SizedBox(height: 16),
-        InternationalPhoneNumberInput(
-          initialValue: PhoneNumber(isoCode: 'US'),
-          onInputChanged: (PhoneNumber value) {
-            phoneController.text = "${value.dialCode}${value.parseNumber()}";
-          },
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: emailController,
+            decoration: const InputDecoration(
+              labelText: "Email",
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(
+              labelText: "Password",
+              border: OutlineInputBorder(),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         InkButton(
           onPressed: () async {
-            if (phoneController.text.length < 12) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Phone number entered incorrectly!"),
-                ),
-              );
-            } else {
+            if (EmailValidator.validate(emailController.text)) {
               setState(() {
                 showLoading = true;
               });
-
-              if (identical(0, 0.0)) {
-                try {
-                  result = await _auth.signInWithPhoneNumber(
-                    phoneController.text,
-                  );
-                  setState(() {
-                    showLoading = false;
-                    currentState = MobileVerificationState.otpFormState;
-                  });
-                } on FirebaseAuthException catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.message!),
-                    ),
-                  );
-                  setState(() {
-                    showLoading = false;
-                  });
-                }
-              } else {
-                await _auth.verifyPhoneNumber(
-                  phoneNumber: phoneController.text,
-                  verificationCompleted: (phoneAuthCredential) async {
-                    setState(() {
-                      showLoading = false;
-                    });
-                    signInWithPhoneAuthCredential(phoneAuthCredential);
-                  },
-                  verificationFailed: (verificationFailed) async {
-                    setState(() {
-                      showLoading = false;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(verificationFailed.message!)));
-                  },
-                  codeSent: (verificationId, resendingToken) async {
-                    setState(() {
-                      showLoading = false;
-                      currentState = MobileVerificationState.otpFormState;
-                      this.verificationId = verificationId;
-                    });
-                  },
-                  codeAutoRetrievalTimeout: (verificationId) async {},
+              dynamic result = await AuthService()
+                  .signIn(emailController.text, passwordController.text);
+              if (result.runtimeType == String) {
+                setState(() {
+                  showLoading = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(result),
+                  ),
                 );
               }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Email address is badly formatted."),
+                ),
+              );
             }
           },
-          text: "Continue",
+          text: "Sign In",
         ),
         const Spacer(),
+        SecondaryButton(
+          text: "Create an account",
+          active: true,
+          onPressed: () {
+            setState(() {
+              currentState = AuthScreenState.register;
+            });
+          },
+        ),
       ],
     );
   }
 
-  Widget getOtpFormWidget(context) {
+  Widget getRegistration(context) {
     return Column(
       children: [
         const Spacer(),
@@ -166,10 +133,31 @@ class _LoginScreenState extends State<LoginScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
-            controller: otpController,
+            controller: emailController,
             decoration: const InputDecoration(
-              hintText: "Enter OTP",
+              labelText: "Email",
+              border: OutlineInputBorder(),
             ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(
+              labelText: "Password",
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FlutterPwValidator(
+            controller: passwordController,
+            minLength: 6,
+            width: 400,
+            height: 30,
+            onSuccess: () {},
           ),
         ),
         const SizedBox(
@@ -177,29 +165,43 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         InkButton(
           onPressed: () async {
-            if (identical(0, 0.0)) {
-              await result.confirm(otpController.text);
+            if (EmailValidator.validate(emailController.text)) {
+              if (passwordController.text.length >= 6) {
+                dynamic result = await AuthService()
+                    .register(emailController.text, passwordController.text);
+                if (result.runtimeType == String) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(result)),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content:
+                        Text("Please meet the minimum password requirements."),
+                  ),
+                );
+              }
             } else {
-              PhoneAuthCredential phoneAuthCredential =
-                  PhoneAuthProvider.credential(
-                      verificationId: verificationId,
-                      smsCode: otpController.text);
-
-              signInWithPhoneAuthCredential(phoneAuthCredential);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Please enter a valid email address."),
+                ),
+              );
             }
           },
-          text: "Verify",
+          text: "Register",
         ),
+        const Spacer(),
         SecondaryButton(
-          text: 'Go back',
+          text: 'Already have an account?',
           active: true,
           onPressed: () {
             setState(() {
-              currentState = MobileVerificationState.mobileFormState;
+              currentState = AuthScreenState.signIn;
             });
           },
         ),
-        const Spacer(),
       ],
     );
   }
@@ -208,8 +210,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    phoneController.dispose();
-    otpController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -227,9 +229,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : currentState == MobileVerificationState.mobileFormState
-                  ? getMobileFormWidget(context)
-                  : getOtpFormWidget(context),
+              : currentState == AuthScreenState.signIn
+                  ? getSignIn(context)
+                  : getRegistration(context),
         ),
       ),
     );

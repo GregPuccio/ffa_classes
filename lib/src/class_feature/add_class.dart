@@ -21,17 +21,26 @@ class AddClass extends StatefulWidget {
 class _AddClassState extends State<AddClass> {
   late FClass fClass;
   late bool repeat;
+  late TextEditingController customClassTypeController;
+  late TextEditingController customClassDescriptionController;
+  late TextEditingController customMaxNumberController;
+  late TextEditingController costController;
   @override
   void initState() {
     fClass = FClass(
       id: 'id',
-      date: DateTime.utc(DateTime.now().year, DateTime.now().month),
+      date: DateTime.utc(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day),
       startTime: const TimeOfDay(hour: 16, minute: 30),
       endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: widget.classType ?? ClassType.foundation,
       fencers: [],
     );
     repeat = true;
+    customClassTypeController = TextEditingController();
+    customClassDescriptionController = TextEditingController();
+    customMaxNumberController = TextEditingController();
+    costController = TextEditingController();
     super.initState();
   }
 
@@ -50,6 +59,12 @@ class _AddClassState extends State<AddClass> {
   }
 
   @override
+  void dispose() {
+    customClassTypeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -64,15 +79,54 @@ class _AddClassState extends State<AddClass> {
           child: ListView(
             children: [
               MultiSelectChip(
+                horizScroll: true,
                 itemList: classTypes,
-                initialChoices: [fClass.title],
+                initialChoices: [classTypes.first],
                 onSelectionChanged: (val) => setState(() {
                   if (val.isNotEmpty) {
                     fClass = fClass.copyWith(classType: val.first);
+                    if (val.first == classTypes.last) {
+                      repeat = false;
+                    }
                   }
                 }),
                 multi: false,
               ),
+              if (fClass.classType == fClass.trueClassType(classTypes.last))
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: customClassTypeController,
+                        decoration: const InputDecoration(
+                          labelText: "Title",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: customClassDescriptionController,
+                        decoration: const InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: customMaxNumberController,
+                        decoration: const InputDecoration(
+                          labelText: "Maximum number of fencers",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               SecondaryButton(
                 active: true,
                 onPressed: showDateChooser,
@@ -103,33 +157,46 @@ class _AddClassState extends State<AddClass> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  controller: costController,
                   decoration: InputDecoration(
+                    labelText: fClass.classCost ?? "Custom class cost",
                     hintText: fClass.classCost,
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.attach_money),
                   ),
-                  readOnly: true,
+                  readOnly:
+                      fClass.classType != fClass.trueClassType(classTypes.last),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: CheckboxListTile(
-                    title: const Text('Repeat for the full month?'),
-                    value: repeat,
-                    onChanged: (val) {
-                      setState(() {
-                        repeat = !repeat;
-                      });
-                    },
+              if (fClass.classType != fClass.trueClassType(classTypes.last))
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: CheckboxListTile(
+                      title: const Text('Repeat for the rest of the month?'),
+                      value: repeat,
+                      onChanged: (val) {
+                        setState(() {
+                          repeat = !repeat;
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
               InkButton(
                 text: 'Create class${repeat ? 'es' : ''}',
                 onPressed: () {
+                  fClass = fClass.copyWith(
+                    customClassTitle: customClassTypeController.text,
+                    customClassDescription:
+                        customClassDescriptionController.text,
+                    customMaxFencers: customMaxNumberController.text,
+                    customCost: costController.text,
+                  );
                   List<FClass> classes = [fClass];
-                  if (repeat) {
+                  if (repeat &&
+                      fClass.classType !=
+                          fClass.trueClassType(classTypes.last)) {
                     DateTime newDate = DateTime.utc(fClass.date.year,
                         fClass.date.month, fClass.date.day + 7);
                     while (newDate.month == fClass.date.month) {
@@ -149,7 +216,7 @@ class _AddClassState extends State<AddClass> {
                           const Text(
                               'Are you sure you would like to create the following:'),
                           Text(
-                              "${classes.length} ${fClass.title} Class${classes.length > 1 ? 'es' : ''}"),
+                              "${classes.length} ${fClass.title.isEmpty ? 'Custom Event' : fClass.title}${classes.length > 1 ? 'es' : ''}"),
                           Text(
                               "On ${classes.length > 1 ? "${DateFormat('EEEE').format(fClass.date)}s" : fClass.writtenDate}"),
                           Text(

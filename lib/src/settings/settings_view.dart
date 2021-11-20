@@ -1,4 +1,4 @@
-import 'package:ffaclasses/src/auth_feature/auth.dart';
+import 'package:ffaclasses/src/auth_feature/auth_service.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +54,7 @@ class SettingsView extends StatelessWidget {
                 active: true,
                 onPressed: () {
                   Navigator.pop(context);
-                  signOut();
+                  AuthService().signOut();
                 },
               ),
             ],

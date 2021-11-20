@@ -28,21 +28,22 @@ class _FClassDetailsState extends State<FClassDetails> {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-                "${fClass.title} Class ${fClass.fencers.length}/${fClass.maxFencerNumber}"),
+                "${fClass.title} ${fClass.fencers.length}/${fClass.maxFencerNumber}"),
             actions: [
               if (userData.admin)
                 IconButton(
-                    onPressed: () async {
-                      final result = await Navigator.pushNamed(
-                        context,
-                        FencerSearch.routeName,
-                        arguments: ScreenArgs(fClass: fClass),
-                      );
-                      setState(() {
-                        fClass = result as FClass;
-                      });
-                    },
-                    icon: const Icon(Icons.person_add)),
+                  onPressed: () async {
+                    final result = await Navigator.pushNamed(
+                      context,
+                      FencerSearch.routeName,
+                      arguments: ScreenArgs(fClass: fClass),
+                    );
+                    setState(() {
+                      fClass = result as FClass;
+                    });
+                  },
+                  icon: const Icon(Icons.person_add),
+                ),
             ],
           ),
           body: Column(
@@ -123,7 +124,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                 ),
               if (!userData.admin)
                 InkButton(
-                  active: fClass.date.isBefore(DateTime.now()),
+                  active: fClass.date.isAfter(DateTime.now()),
                   text: fClass.fencers.contains(userData.toFencer())
                       ? 'Remove registration'
                       : 'Sign up for class',
