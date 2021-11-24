@@ -26,6 +26,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shortcuts = WidgetsApp.defaultShortcuts;
+    shortcuts.remove(LogicalKeySet(LogicalKeyboardKey.space));
     // Glue the SettingsController to the MaterialApp.
     //
     // The AnimatedBuilder Widget listens to the SettingsController for changes.
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
+          shortcuts: shortcuts,
           // Providing a restorationScopeId allows the Navigator built by the
           // MaterialApp to restore the navigation stack when a user leaves and
           // returns to the app after it has been killed while running in the
@@ -42,9 +45,6 @@ class MyApp extends StatelessWidget {
           supportedLocales: const [
             Locale('en', ''), // English, no country code
           ],
-          shortcuts: {
-            LogicalKeySet(LogicalKeyboardKey.space): const ActivateIntent(),
-          },
 
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
