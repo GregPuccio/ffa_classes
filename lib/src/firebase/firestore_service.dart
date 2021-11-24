@@ -213,6 +213,11 @@ class FirestoreService {
           if (day.difference(fClass.date).inDays < 1 &&
               day.difference(fClass.date).inDays > -1) {
             fClasssOnDay.add(fClass);
+          } else if (fClass.campDays != null &&
+              fClass.campDays!.any((campDay) =>
+                  day.difference(campDay.date).inDays < 1 &&
+                  day.difference(fClass.date).inDays > -1)) {
+            fClasssOnDay.add(fClass);
           }
         }
         if (fClasssOnDay.isNotEmpty) {

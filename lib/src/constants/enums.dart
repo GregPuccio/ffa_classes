@@ -3,5 +3,5 @@ enum ClassType {
   youth,
   mixed,
   advanced,
-  custom,
+  camp,
 }

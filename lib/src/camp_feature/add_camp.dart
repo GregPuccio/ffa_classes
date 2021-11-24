@@ -28,7 +28,7 @@ class _AddCampState extends State<AddCamp> {
           DateTime.now().year, DateTime.now().month, DateTime.now().day),
       startTime: const TimeOfDay(hour: 16, minute: 30),
       endTime: const TimeOfDay(hour: 18, minute: 00),
-      classType: ClassType.custom,
+      classType: ClassType.camp,
       fencers: [],
     );
     customClassTypeController = TextEditingController();
@@ -173,6 +173,7 @@ class _AddCampState extends State<AddCamp> {
                       newDate = DateTime.utc(
                           newDate.year, newDate.month, newDate.day + 1);
                     }
+                    fClass.copyWith(campDays: classes);
                   }
                   showDialog(
                     context: context,
@@ -201,11 +202,9 @@ class _AddCampState extends State<AddCamp> {
                         ),
                         TextButton(
                           onPressed: () {
-                            for (var fClass in classes) {
-                              FirestoreService().addData(
-                                  path: FirestorePath.fClasses(),
-                                  data: fClass.toMap());
-                            }
+                            FirestoreService().addData(
+                                path: FirestorePath.fClasses(),
+                                data: fClass.toMap());
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },

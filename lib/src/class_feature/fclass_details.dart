@@ -1,4 +1,5 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
@@ -19,6 +20,8 @@ class FClassDetails extends StatefulWidget {
 
 class _FClassDetailsState extends State<FClassDetails> {
   bool edited = false;
+  List<Widget> dates = [];
+  List<bool> isSelected = [];
   @override
   Widget build(BuildContext context) {
     ScreenArgs args = ModalRoute.of(context)!.settings.arguments! as ScreenArgs;
@@ -153,8 +156,57 @@ class _FClassDetailsState extends State<FClassDetails> {
                       active: fClass.date.isAfter(DateTime.now()),
                       text: fClass.fencers.contains(userData.toFencer())
                           ? 'Remove registration'
-                          : 'Sign up for class',
+                          : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
                       onPressed: () {
+                        if (fClass.classType == ClassType.camp) {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                if (fClass.endDate != null) {
+                                  dates.addAll(
+                                    List.generate(
+                                        daysBetween(
+                                            fClass.date, fClass.endDate!),
+                                        (index) => Text(fClass.date
+                                            .add(Duration(days: index))
+                                            .toString())),
+                                  );
+                                  isSelected.addAll(List.generate(
+                                      daysBetween(fClass.date, fClass.endDate!),
+                                      (index) => false));
+                                }
+                                return StatefulBuilder(
+                                    builder: (context, setState) {
+                                  return AlertDialog(
+                                    title: const Text("Camp Days"),
+                                    content: Column(
+                                      children: [
+                                        const Text(
+                                            "Choose the camp days you would like to sign up for."),
+                                        ToggleButtons(
+                                          children: dates,
+                                          isSelected: isSelected,
+                                          onPressed: (val) {
+                                            setState(() {
+                                              isSelected[val] =
+                                                  !isSelected[val];
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Confirm"),
+                                      ),
+                                    ],
+                                  );
+                                });
+                              });
+                        }
                         setState(() {
                           if (fClass.fencers.contains(userData.toFencer())) {
                             fClass.fencers.remove(userData.toFencer());
@@ -198,4 +250,10 @@ class _FClassDetailsState extends State<FClassDetails> {
       },
     );
   }
+}
+
+int daysBetween(DateTime from, DateTime to) {
+  from = DateTime(from.year, from.month, from.day);
+  to = DateTime(to.year, to.month, to.day);
+  return (to.difference(from).inHours / 24).round();
 }

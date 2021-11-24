@@ -19,6 +19,7 @@ class FClass {
   final String? customMaxFencers;
   final String? customCost;
   final List<Fencer> fencers;
+  final List<FClass>? campDays;
   FClass({
     required this.id,
     required this.date,
@@ -31,11 +32,12 @@ class FClass {
     this.customMaxFencers,
     this.customCost,
     required this.fencers,
+    this.campDays,
   });
 
   String get title {
     switch (classType) {
-      case ClassType.custom:
+      case ClassType.camp:
         return customClassTitle ?? 'Custom Event';
       case ClassType.foundation:
         return "Foundation Class";
@@ -53,7 +55,7 @@ class FClass {
 
   String get description {
     switch (classType) {
-      case ClassType.custom:
+      case ClassType.camp:
         return customClassDescription ?? 'Custom Class Description';
       case ClassType.foundation:
         return "The class most suitable for younger and newer fencers (age 7-11) or by Coach invitation. This class focuses on coordination, fundamentals, and physical strategy games to build a correct technical base and to have fun and exercise! 12 max per class";
@@ -79,7 +81,7 @@ class FClass {
 
   String get maxFencerNumber {
     switch (classType) {
-      case ClassType.custom:
+      case ClassType.camp:
         return customMaxFencers ?? "XX";
       case ClassType.foundation:
         return "12";
@@ -105,6 +107,7 @@ class FClass {
     String? customMaxFencers,
     String? customCost,
     List<Fencer>? fencers,
+    List<FClass>? campDays,
   }) {
     return FClass(
       id: id ?? this.id,
@@ -119,6 +122,7 @@ class FClass {
       customMaxFencers: customMaxFencers ?? this.customMaxFencers,
       customCost: customCost ?? this.customCost,
       fencers: fencers ?? this.fencers,
+      campDays: campDays ?? this.campDays,
     );
   }
 
@@ -133,7 +137,7 @@ class FClass {
       case 'Advanced':
         return ClassType.advanced;
       case 'Custom':
-        return ClassType.custom;
+        return ClassType.camp;
 
       default:
         return null;
@@ -150,7 +154,7 @@ class FClass {
         return 'Member: \$40 - Non Member: \$50';
       case ClassType.advanced:
         return 'Member: \$40 - Non Member: \$50';
-      case ClassType.custom:
+      case ClassType.camp:
         return customCost;
 
       default:
@@ -174,6 +178,7 @@ class FClass {
       'customMaxFencers': customMaxFencers,
       'customCost': customCost,
       'fencers': fencers.map((x) => x.toMap()).toList(),
+      'campDays': campDays?.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -196,6 +201,8 @@ class FClass {
       customMaxFencers: map['customMaxFencers'],
       customCost: map['customCost'],
       fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
+      campDays:
+          List<FClass>.from(map['campDays']?.map((x) => FClass.fromMap(x))),
     );
   }
 
