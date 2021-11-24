@@ -90,6 +90,9 @@ class _FencerSearchState extends State<FencerSearch> {
                 path: FirestorePath.fClass(fClass.id),
                 data: fClass.toMap(),
               );
+              setState(() {
+                edited = false;
+              });
             },
           ),
         ],

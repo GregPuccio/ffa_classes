@@ -88,6 +88,7 @@ class _AddCampState extends State<AddCamp> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  textCapitalization: TextCapitalization.words,
                   controller: customClassTypeController,
                   decoration: const InputDecoration(
                     labelText: "Title",
@@ -98,6 +99,7 @@ class _AddCampState extends State<AddCamp> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  textCapitalization: TextCapitalization.sentences,
                   controller: customClassDescriptionController,
                   decoration: const InputDecoration(
                     labelText: "Description",
@@ -108,6 +110,8 @@ class _AddCampState extends State<AddCamp> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  keyboardType:
+                      const TextInputType.numberWithOptions(signed: true),
                   controller: customMaxNumberController,
                   decoration: const InputDecoration(
                     labelText: "Maximum number of fencers",
