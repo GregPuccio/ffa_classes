@@ -26,8 +26,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shortcuts = WidgetsApp.defaultShortcuts;
-    shortcuts.remove(LogicalKeySet(LogicalKeyboardKey.space));
+    Map<ShortcutActivator, Intent> shortcuts =
+        Map.from(WidgetsApp.defaultShortcuts);
+    shortcuts.remove(const SingleActivator(LogicalKeyboardKey.space));
     // Glue the SettingsController to the MaterialApp.
     //
     // The AnimatedBuilder Widget listens to the SettingsController for changes.
