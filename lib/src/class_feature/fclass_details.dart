@@ -8,6 +8,7 @@ import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FClassDetails extends StatefulWidget {
@@ -159,7 +160,13 @@ class _FClassDetailsState extends State<FClassDetails> {
                           : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
                       onPressed: () {
                         if (fClass.classType == ClassType.camp) {
-                          showDialog(
+                          if (fClass.fencers.contains(userData.toFencer())) {
+                            fClass.fencers.remove(userData.toFencer());
+                            for (var day in fClass.campDays!) {
+                              day.fencers.remove(userData.toFencer());
+                            }
+                          } else {
+                            showDialog(
                               context: context,
                               builder: (context) {
                                 if (fClass.endDate != null) {
@@ -167,53 +174,73 @@ class _FClassDetailsState extends State<FClassDetails> {
                                     List.generate(
                                         daysBetween(
                                             fClass.date, fClass.endDate!),
-                                        (index) => Text(fClass.date
-                                            .add(Duration(days: index))
-                                            .toString())),
+                                        (index) {
+                                      DateTime date = fClass.date
+                                          .add(Duration(days: index));
+                                      return Text(
+                                          "${DateFormat('E').format(date)} ${date.month}/${date.day}");
+                                    }),
                                   );
                                   isSelected.addAll(List.generate(
                                       daysBetween(fClass.date, fClass.endDate!),
                                       (index) => false));
                                 }
                                 return StatefulBuilder(
-                                    builder: (context, setState) {
-                                  return AlertDialog(
-                                    title: const Text("Camp Days"),
-                                    content: Column(
-                                      children: [
-                                        const Text(
-                                            "Choose the camp days you would like to sign up for."),
-                                        ToggleButtons(
-                                          children: dates,
-                                          isSelected: isSelected,
-                                          onPressed: (val) {
+                                  builder: (context, setState) {
+                                    return AlertDialog(
+                                      title: const Text("Camp Days"),
+                                      content: Column(
+                                        children: [
+                                          const Text(
+                                              "Choose the camp days you would like to sign up for."),
+                                          ToggleButtons(
+                                            children: dates,
+                                            isSelected: isSelected,
+                                            onPressed: (val) {
+                                              setState(() {
+                                                isSelected[val] =
+                                                    !isSelected[val];
+                                              });
+                                            },
+                                          ),
+                                          Text(
+                                              "Total Cost: ${totalCost(isSelected)}")
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
                                             setState(() {
-                                              isSelected[val] =
-                                                  !isSelected[val];
+                                              fClass.fencers
+                                                  .add(userData.toFencer());
+                                              fClass.campDays?.forEach((day) {
+                                                if (isSelected[fClass.campDays!
+                                                    .indexOf(day)]) {
+                                                  day.fencers
+                                                      .add(userData.toFencer());
+                                                }
+                                              });
                                             });
+                                            Navigator.pop(context);
                                           },
+                                          child: const Text("Confirm"),
                                         ),
                                       ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Confirm"),
-                                      ),
-                                    ],
-                                  );
-                                });
-                              });
-                        }
-                        setState(() {
-                          if (fClass.fencers.contains(userData.toFencer())) {
-                            fClass.fencers.remove(userData.toFencer());
-                          } else {
-                            fClass.fencers.add(userData.toFencer());
+                                    );
+                                  },
+                                );
+                              },
+                            );
                           }
-                        });
+                        } else {
+                          setState(() {
+                            if (fClass.fencers.contains(userData.toFencer())) {
+                              fClass.fencers.remove(userData.toFencer());
+                            } else {
+                              fClass.fencers.add(userData.toFencer());
+                            }
+                          });
+                        }
                         FirestoreService().updateData(
                           path: FirestorePath.fClass(fClass.id),
                           data: fClass.toMap(),
@@ -256,4 +283,11 @@ int daysBetween(DateTime from, DateTime to) {
   from = DateTime(from.year, from.month, from.day);
   to = DateTime(to.year, to.month, to.day);
   return (to.difference(from).inHours / 24).round();
+}
+
+int totalCost(List<bool> isSelected) {
+  int totalLength = isSelected.length;
+  int numTrue = isSelected.where((val) => val == true).length;
+  bool discountPrice = totalLength == numTrue;
+  return discountPrice ? 500 : 110 * numTrue;
 }
