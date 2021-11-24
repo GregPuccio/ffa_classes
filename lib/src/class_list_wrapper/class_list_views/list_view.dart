@@ -43,7 +43,7 @@ class _ClassListViewState extends State<ClassListView> {
         case "Advanced":
           currentFilter = 3;
           break;
-        case "Custom":
+        case "Camps":
           currentFilter = 4;
           break;
       }
@@ -73,6 +73,7 @@ class _ClassListViewState extends State<ClassListView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<FClass> classes = snapshot.data!;
+
           return Center(
             child: Container(
               alignment: Alignment.topCenter,

@@ -66,13 +66,13 @@ class _FencerSearchState extends State<FencerSearch> {
                             if (edited == false) {
                               edited = true;
                             }
-                            if (val == true) {
-                              setState(() {
+                            setState(() {
+                              if (val == true) {
                                 fencersToAdd.add(fencer);
-                              });
-                            } else {
-                              fencersToAdd.remove(fencer);
-                            }
+                              } else {
+                                fencersToAdd.remove(fencer);
+                              }
+                            });
                           },
                         ),
                       );

@@ -25,125 +25,150 @@ class _FClassDetailsState extends State<FClassDetails> {
     FClass fClass = args.fClass!;
     Widget whenData(UserData? userData) {
       if (userData != null) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-                "${fClass.title} ${fClass.fencers.length}/${fClass.maxFencerNumber}"),
-            actions: [
-              if (userData.admin)
-                IconButton(
-                  onPressed: () async {
-                    final result = await Navigator.pushNamed(
-                      context,
-                      FencerSearch.routeName,
-                      arguments: ScreenArgs(fClass: fClass),
-                    );
-                    setState(() {
-                      fClass = result as FClass;
-                    });
-                  },
-                  icon: const Icon(Icons.person_add),
-                ),
-            ],
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Container(
-                    alignment: Alignment.topCenter,
-                    width: MediaQuery.of(context).orientation ==
-                            Orientation.landscape
-                        ? 600
-                        : null,
-                    child: ListView.builder(
-                      itemCount: fClass.fencers.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "${fClass.writtenDate}  ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1),
-                                  const Divider(),
-                                  Text(fClass.description,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle2),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Card(
-                            child: CheckboxListTile(
-                              title: Text(fClass.fencers[index - 1].name),
-                              value: fClass.fencers[index - 1].checkedIn,
-                              onChanged: userData.admin
-                                  ? (val) {
-                                      setState(() {
-                                        if (edited == false) {
-                                          edited = true;
-                                        }
-                                        fClass.fencers[index - 1] =
-                                            fClass.fencers[index - 1].copyWith(
-                                                checkedIn: !fClass
-                                                    .fencers[index - 1]
-                                                    .checkedIn);
-                                      });
-                                    }
-                                  : null,
-                            ),
-                          );
-                        }
+        return StreamBuilder<FClass>(
+          stream: FirestoreService().documentStream(
+              path: FirestorePath.fClass(fClass.id),
+              builder: (map, docID) => FClass.fromMap(map!)),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              fClass = snapshot.data!;
+            }
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(
+                    "${fClass.title} ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber}"),
+                actions: [
+                  if (userData.admin)
+                    IconButton(
+                      onPressed: () async {
+                        final result = await Navigator.pushNamed(
+                          context,
+                          FencerSearch.routeName,
+                          arguments: ScreenArgs(fClass: fClass),
+                        );
+                        setState(() {
+                          fClass = result as FClass;
+                        });
                       },
+                      icon: const Icon(Icons.person_add),
+                    ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Container(
+                        alignment: Alignment.topCenter,
+                        width: MediaQuery.of(context).orientation ==
+                                Orientation.landscape
+                            ? 600
+                            : null,
+                        child: ListView.builder(
+                          itemCount: fClass.fencers.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Column(
+                                children: [
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              "${fClass.writtenDate}  ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle1),
+                                          const Divider(),
+                                          Text(fClass.description,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .subtitle2),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Text("Cost: ${fClass.classCost}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle1),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return Card(
+                                child: CheckboxListTile(
+                                  title: Text(fClass.fencers[index - 1].name),
+                                  value: fClass.fencers[index - 1].checkedIn,
+                                  onChanged: userData.admin
+                                      ? (val) {
+                                          setState(() {
+                                            if (edited == false) {
+                                              edited = true;
+                                            }
+                                            fClass.fencers[index - 1] = fClass
+                                                .fencers[index - 1]
+                                                .copyWith(
+                                                    checkedIn: !fClass
+                                                        .fencers[index - 1]
+                                                        .checkedIn);
+                                          });
+                                        }
+                                      : null,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  if (userData.admin)
+                    InkButton(
+                      active: edited,
+                      text: edited ? "Save changes" : "No changes made",
+                      onPressed: () {
+                        FirestoreService().updateData(
+                          path: FirestorePath.fClass(fClass.id),
+                          data: fClass.toMap(),
+                        );
+                        setState(() {
+                          edited = false;
+                        });
+                      },
+                    ),
+                  if (!userData.admin)
+                    InkButton(
+                      active: fClass.date.isAfter(DateTime.now()),
+                      text: fClass.fencers.contains(userData.toFencer())
+                          ? 'Remove registration'
+                          : 'Sign up for class',
+                      onPressed: () {
+                        setState(() {
+                          if (fClass.fencers.contains(userData.toFencer())) {
+                            fClass.fencers.remove(userData.toFencer());
+                          } else {
+                            fClass.fencers.add(userData.toFencer());
+                          }
+                        });
+                        FirestoreService().updateData(
+                          path: FirestorePath.fClass(fClass.id),
+                          data: fClass.toMap(),
+                        );
+                      },
+                    )
+                ],
               ),
-              if (userData.admin)
-                InkButton(
-                  active: edited,
-                  text: edited ? "Save changes" : "No changes made",
-                  onPressed: () {
-                    FirestoreService().updateData(
-                      path: FirestorePath.fClass(fClass.id),
-                      data: fClass.toMap(),
-                    );
-                    setState(() {
-                      edited = false;
-                    });
-                  },
-                ),
-              if (!userData.admin)
-                InkButton(
-                  active: fClass.date.isAfter(DateTime.now()),
-                  text: fClass.fencers.contains(userData.toFencer())
-                      ? 'Remove registration'
-                      : 'Sign up for class',
-                  onPressed: () {
-                    setState(() {
-                      if (fClass.fencers.contains(userData.toFencer())) {
-                        fClass.fencers.remove(userData.toFencer());
-                      } else {
-                        fClass.fencers.add(userData.toFencer());
-                      }
-                    });
-                    FirestoreService().updateData(
-                      path: FirestorePath.fClass(fClass.id),
-                      data: fClass.toMap(),
-                    );
-                  },
-                )
-            ],
-          ),
+            );
+          },
         );
       } else {
         return Center(
