@@ -8,6 +8,7 @@ import 'package:ffaclasses/src/user_feature/create_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'camp_feature/add_camp.dart';
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
           supportedLocales: const [
             Locale('en', ''), // English, no country code
           ],
+          shortcuts: {
+            LogicalKeySet(LogicalKeyboardKey.space): const ActivateIntent(),
+          },
 
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
