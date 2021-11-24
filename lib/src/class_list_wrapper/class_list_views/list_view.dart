@@ -20,7 +20,7 @@ class _ClassListViewState extends State<ClassListView> {
     "Youth",
     "Mixed",
     "Advanced",
-    "Custom"
+    "Camps"
   ];
 
   int currentFilter = -1;

@@ -28,7 +28,8 @@ class _FClassDetailsState extends State<FClassDetails> {
         return StreamBuilder<FClass>(
           stream: FirestoreService().documentStream(
               path: FirestorePath.fClass(fClass.id),
-              builder: (map, docID) => FClass.fromMap(map!)),
+              builder: (map, docID) =>
+                  FClass.fromMap(map!).copyWith(id: docID)),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               fClass = snapshot.data!;
@@ -93,12 +94,14 @@ class _FClassDetailsState extends State<FClassDetails> {
                                     ),
                                   ),
                                   Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Text("Cost: ${fClass.classCost}",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .subtitle1),
+                                    child: ListTile(
+                                      title: Text(
+                                        "Cost: ${fClass.classCost}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1,
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
                                 ],
