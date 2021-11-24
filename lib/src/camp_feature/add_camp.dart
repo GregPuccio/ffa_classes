@@ -173,7 +173,7 @@ class _AddCampState extends State<AddCamp> {
                       newDate = DateTime.utc(
                           newDate.year, newDate.month, newDate.day + 1);
                     }
-                    fClass.copyWith(campDays: classes);
+                    fClass = fClass.copyWith(campDays: classes);
                   }
                   showDialog(
                     context: context,
