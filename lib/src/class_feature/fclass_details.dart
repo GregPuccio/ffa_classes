@@ -45,7 +45,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                   }),
                 );
               }
-              bool fencerCheckedIn = fencer.checkedIn;
+              bool fencerPaid = fencer.checkedIn;
               return StatefulBuilder(
                 builder: (context, setState) {
                   return AlertDialog(
@@ -69,11 +69,11 @@ class _FClassDetailsState extends State<FClassDetails> {
                         if (userData.admin)
                           CheckboxListTile(
                             title: Text(
-                                "Fencer is ${fencerCheckedIn ? "" : "not "}checked in"),
-                            value: fencerCheckedIn,
+                                "Fencer has ${fencerPaid ? "" : "not "}paid"),
+                            value: fencerPaid,
                             onChanged: (val) {
                               setState(() {
-                                fencerCheckedIn = !fencerCheckedIn;
+                                fencerPaid = !fencerPaid;
                               });
                             },
                           )
@@ -83,8 +83,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                       TextButton(
                         onPressed: () {
                           if (selectedDates.isNotEmpty) {
-                            fencer =
-                                fencer.copyWith(checkedIn: fencerCheckedIn);
+                            fencer = fencer.copyWith(checkedIn: fencerPaid);
 
                             if (!fClass.fencers.contains(fencer)) {
                               fClass.fencers.add(fencer);
