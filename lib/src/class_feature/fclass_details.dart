@@ -137,7 +137,8 @@ class _FClassDetailsState extends State<FClassDetails> {
                                               if (edited == false) {
                                                 edited = true;
                                               }
-                                              fencer = fClass.fencers[index - 1]
+                                              fClass.fencers[index - 1] = fClass
+                                                  .fencers[index - 1]
                                                   .copyWith(
                                                       checkedIn: !fClass
                                                           .fencers[index - 1]
@@ -177,9 +178,9 @@ class _FClassDetailsState extends State<FClassDetails> {
                                   : "Remove") +
                               " registration"
                           : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
-                      onPressed: () {
+                      onPressed: () async {
                         if (fClass.classType == ClassType.camp) {
-                          showDialog(
+                          dynamic result = await showDialog(
                             context: context,
                             builder: (context) {
                               if (fClass.endDate != null) {
@@ -251,7 +252,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             data: fClass.toMap(),
                                           );
 
-                                          Navigator.pop(context);
+                                          Navigator.pop(context, true);
                                         },
                                         child: const Text("Confirm"),
                                       ),
@@ -261,6 +262,23 @@ class _FClassDetailsState extends State<FClassDetails> {
                               );
                             },
                           );
+                          if (result != null && result == true) {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("All set!"),
+                                    content: Text(
+                                        "You are now registered for ${fClass.title}, payments can be given to any coach directly and then your status will be updated to paid. Thank you!"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text("Ok"))
+                                    ],
+                                  );
+                                });
+                          }
                         } else {
                           setState(() {
                             if (fClass.fencers.contains(userData.toFencer())) {

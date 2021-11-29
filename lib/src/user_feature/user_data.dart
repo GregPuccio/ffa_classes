@@ -48,7 +48,7 @@ class UserData {
       id: id,
       firstName: firstName,
       lastName: lastName,
-      phoneNumber: emailAddress,
+      emailAddress: emailAddress,
       checkedIn: false,
     );
   }

@@ -4,13 +4,13 @@ class Fencer {
   final String id;
   final String firstName;
   final String lastName;
-  final String phoneNumber;
+  final String emailAddress;
   final bool checkedIn;
   Fencer({
     required this.id,
     required this.firstName,
     required this.lastName,
-    required this.phoneNumber,
+    required this.emailAddress,
     required this.checkedIn,
   });
 
@@ -18,14 +18,14 @@ class Fencer {
     String? id,
     String? firstName,
     String? lastName,
-    String? phoneNumber,
+    String? emailAddress,
     bool? checkedIn,
   }) {
     return Fencer(
       id: id ?? this.id,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
+      emailAddress: emailAddress ?? this.emailAddress,
       checkedIn: checkedIn ?? this.checkedIn,
     );
   }
@@ -40,7 +40,7 @@ class Fencer {
       'firstName': firstName,
       'searchName': firstName.toLowerCase(),
       'lastName': lastName,
-      'phoneNumber': phoneNumber,
+      'emailAddress': emailAddress,
       'checkedIn': checkedIn,
     };
   }
@@ -50,7 +50,7 @@ class Fencer {
       id: map['id'],
       firstName: map['firstName'],
       lastName: map['lastName'],
-      phoneNumber: map['phoneNumber'],
+      emailAddress: map['emailAddress'],
       checkedIn: map['checkedIn'] ?? false,
     );
   }
@@ -61,7 +61,7 @@ class Fencer {
 
   @override
   String toString() {
-    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, checkedIn: $checkedIn)';
+    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, checkedIn: $checkedIn)';
   }
 
   @override
@@ -72,7 +72,7 @@ class Fencer {
         other.id == id &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        other.phoneNumber == phoneNumber;
+        other.emailAddress == emailAddress;
   }
 
   @override
@@ -80,7 +80,7 @@ class Fencer {
     return id.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
-        phoneNumber.hashCode ^
+        emailAddress.hashCode ^
         checkedIn.hashCode;
   }
 }
