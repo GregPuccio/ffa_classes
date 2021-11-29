@@ -47,6 +47,7 @@ class _FencerSearchState extends State<FencerSearch> {
                     .orderBy('searchName')
                     .where('searchName',
                         isGreaterThanOrEqualTo: controller.text)
+                    .where('admin', isEqualTo: false)
                     .limit(20),
               ),
               builder: (context, snapshot) {

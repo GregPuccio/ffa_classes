@@ -73,7 +73,6 @@ class _ClassListViewState extends State<ClassListView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<FClass> classes = snapshot.data!;
-
           return Center(
             child: Container(
               alignment: Alignment.topCenter,
@@ -98,7 +97,7 @@ class _ClassListViewState extends State<ClassListView> {
                           child: ListTile(
                             title: Text(fClass.title),
                             subtitle: Text(
-                              "${fClass.writtenDate} - ${fClass.startTime.format(context)}",
+                              "${fClass.dateRange} | ${fClass.startTime.format(context)}",
                             ),
                             trailing: Text("${fClass.fencers.length} fencers"),
                             onTap: () {

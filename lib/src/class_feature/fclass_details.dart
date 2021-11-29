@@ -1,6 +1,8 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
+import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
+import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
@@ -21,8 +23,8 @@ class FClassDetails extends StatefulWidget {
 
 class _FClassDetailsState extends State<FClassDetails> {
   bool edited = false;
-  List<Widget> dates = [];
-  List<bool> isSelected = [];
+  List<String> dates = [];
+  List<String> selectedDates = [];
   @override
   Widget build(BuildContext context) {
     ScreenArgs args = ModalRoute.of(context)!.settings.arguments! as ScreenArgs;
@@ -38,6 +40,7 @@ class _FClassDetailsState extends State<FClassDetails> {
             if (snapshot.hasData) {
               fClass = snapshot.data!;
             }
+            selectedDates = fClass.findFencerCampDays(userData.toFencer());
             return Scaffold(
               appBar: AppBar(
                 title: Text(
@@ -45,15 +48,12 @@ class _FClassDetailsState extends State<FClassDetails> {
                 actions: [
                   if (userData.admin)
                     IconButton(
-                      onPressed: () async {
-                        final result = await Navigator.pushNamed(
+                      onPressed: () {
+                        Navigator.pushNamed(
                           context,
                           FencerSearch.routeName,
                           arguments: ScreenArgs(fClass: fClass),
                         );
-                        setState(() {
-                          fClass = result as FClass;
-                        });
                       },
                       icon: const Icon(Icons.person_add),
                     ),
@@ -84,10 +84,17 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                              "${fClass.writtenDate}  ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
+                                              "When: ${fClass.dateRange} | ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .subtitle1),
+                                          const Divider(),
+                                          Text(
+                                            "Cost: ${fClass.classCost}",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .subtitle1,
+                                          ),
                                           const Divider(),
                                           Text(fClass.description,
                                               style: Theme.of(context)
@@ -97,41 +104,50 @@ class _FClassDetailsState extends State<FClassDetails> {
                                       ),
                                     ),
                                   ),
-                                  Card(
-                                    child: ListTile(
-                                      title: Text(
-                                        "Cost: ${fClass.classCost}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .subtitle1,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               );
                             } else {
-                              return Card(
-                                child: CheckboxListTile(
-                                  title: Text(fClass.fencers[index - 1].name),
-                                  value: fClass.fencers[index - 1].checkedIn,
-                                  onChanged: userData.admin
-                                      ? (val) {
-                                          setState(() {
-                                            if (edited == false) {
-                                              edited = true;
-                                            }
-                                            fClass.fencers[index - 1] = fClass
-                                                .fencers[index - 1]
-                                                .copyWith(
-                                                    checkedIn: !fClass
-                                                        .fencers[index - 1]
-                                                        .checkedIn);
-                                          });
-                                        }
-                                      : null,
-                                ),
-                              );
+                              Fencer fencer = fClass.fencers[index - 1];
+                              Widget? subtitle;
+                              String text = "";
+                              if (fClass.classType == ClassType.camp &&
+                                  fClass.campDays != null) {
+                                for (var day in fClass.campDays!) {
+                                  if (day.fencers.contains(fencer)) {
+                                    text = text +
+                                        "${DateFormat("E M/d").format(day.date)} | ";
+                                  }
+                                }
+                                subtitle = Text(text);
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(fencer.name),
+                                    subtitle: subtitle,
+                                  ),
+                                );
+                              } else {
+                                return Card(
+                                  child: CheckboxListTile(
+                                    title: Text(fencer.name),
+                                    subtitle: subtitle,
+                                    value: fencer.checkedIn,
+                                    onChanged: userData.admin
+                                        ? (val) {
+                                            setState(() {
+                                              if (edited == false) {
+                                                edited = true;
+                                              }
+                                              fencer = fClass.fencers[index - 1]
+                                                  .copyWith(
+                                                      checkedIn: !fClass
+                                                          .fencers[index - 1]
+                                                          .checkedIn);
+                                            });
+                                          }
+                                        : null,
+                                  ),
+                                );
+                              }
                             }
                           },
                         ),
@@ -156,82 +172,95 @@ class _FClassDetailsState extends State<FClassDetails> {
                     InkButton(
                       active: fClass.date.isAfter(DateTime.now()),
                       text: fClass.fencers.contains(userData.toFencer())
-                          ? 'Remove registration'
+                          ? (fClass.classType == ClassType.camp
+                                  ? "Edit"
+                                  : "Remove") +
+                              " registration"
                           : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
                       onPressed: () {
                         if (fClass.classType == ClassType.camp) {
-                          if (fClass.fencers.contains(userData.toFencer())) {
-                            fClass.fencers.remove(userData.toFencer());
-                            for (var day in fClass.campDays!) {
-                              day.fencers.remove(userData.toFencer());
-                            }
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                if (fClass.endDate != null) {
-                                  dates.addAll(
-                                    List.generate(
-                                        daysBetween(
-                                            fClass.date, fClass.endDate!),
-                                        (index) {
-                                      DateTime date = fClass.date
-                                          .add(Duration(days: index));
-                                      return Text(
-                                          "${DateFormat('E').format(date)} ${date.month}/${date.day}");
-                                    }),
-                                  );
-                                  isSelected.addAll(List.generate(
-                                      daysBetween(fClass.date, fClass.endDate!),
-                                      (index) => false));
-                                }
-                                return StatefulBuilder(
-                                  builder: (context, setState) {
-                                    return AlertDialog(
-                                      title: const Text("Camp Days"),
-                                      content: Column(
-                                        children: [
-                                          const Text(
-                                              "Choose the camp days you would like to sign up for."),
-                                          ToggleButtons(
-                                            children: dates,
-                                            isSelected: isSelected,
-                                            onPressed: (val) {
-                                              setState(() {
-                                                isSelected[val] =
-                                                    !isSelected[val];
-                                              });
-                                            },
-                                          ),
-                                          Text(
-                                              "Total Cost: ${totalCost(isSelected)}")
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              if (fClass.endDate != null) {
+                                dates = [];
+                                dates.addAll(
+                                  List.generate(fClass.campDays?.length ?? 0,
+                                      (index) {
+                                    DateTime date =
+                                        fClass.date.add(Duration(days: index));
+                                    return DateFormat('E M/d').format(date);
+                                  }),
+                                );
+                              }
+                              return StatefulBuilder(
+                                builder: (context, setState) {
+                                  return AlertDialog(
+                                    title: const Text("Camp Days"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                            "Choose the camp days you would like to sign up for."),
+                                        MultiSelectChip(
+                                          itemList: dates,
+                                          initialChoices: selectedDates,
+                                          onSelectionChanged: (val) {
                                             setState(() {
+                                              selectedDates = val;
+                                            });
+                                          },
+                                        ),
+                                        Text(
+                                            "Total Cost: \$${totalCost(dates, selectedDates)}")
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          if (selectedDates.isNotEmpty) {
+                                            if (!fClass.fencers.contains(
+                                                userData.toFencer())) {
                                               fClass.fencers
                                                   .add(userData.toFencer());
-                                              fClass.campDays?.forEach((day) {
-                                                if (isSelected[fClass.campDays!
-                                                    .indexOf(day)]) {
-                                                  day.fencers
-                                                      .add(userData.toFencer());
-                                                }
-                                              });
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Confirm"),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          }
+                                            }
+                                          } else {
+                                            fClass.fencers
+                                                .remove(userData.toFencer());
+                                          }
+                                          fClass.campDays?.forEach((day) {
+                                            DateTime date = day.date;
+                                            String dateString =
+                                                DateFormat('E M/d')
+                                                    .format(date);
+                                            if (selectedDates.any(
+                                                (date) => date == dateString)) {
+                                              if (!day.fencers.contains(
+                                                  userData.toFencer())) {
+                                                day.fencers
+                                                    .add(userData.toFencer());
+                                              }
+                                            } else {
+                                              day.fencers
+                                                  .remove(userData.toFencer());
+                                            }
+                                          });
+                                          FirestoreService().updateData(
+                                            path:
+                                                FirestorePath.fClass(fClass.id),
+                                            data: fClass.toMap(),
+                                          );
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Confirm"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          );
                         } else {
                           setState(() {
                             if (fClass.fencers.contains(userData.toFencer())) {
@@ -240,11 +269,11 @@ class _FClassDetailsState extends State<FClassDetails> {
                               fClass.fencers.add(userData.toFencer());
                             }
                           });
+                          FirestoreService().updateData(
+                            path: FirestorePath.fClass(fClass.id),
+                            data: fClass.toMap(),
+                          );
                         }
-                        FirestoreService().updateData(
-                          path: FirestorePath.fClass(fClass.id),
-                          data: fClass.toMap(),
-                        );
                       },
                     )
                 ],
@@ -279,15 +308,9 @@ class _FClassDetailsState extends State<FClassDetails> {
   }
 }
 
-int daysBetween(DateTime from, DateTime to) {
-  from = DateTime(from.year, from.month, from.day);
-  to = DateTime(to.year, to.month, to.day);
-  return (to.difference(from).inHours / 24).round();
-}
-
-int totalCost(List<bool> isSelected) {
-  int totalLength = isSelected.length;
-  int numTrue = isSelected.where((val) => val == true).length;
+int totalCost(List<String> dates, List<String> selectedDates) {
+  int totalLength = dates.length;
+  int numTrue = selectedDates.length;
   bool discountPrice = totalLength == numTrue;
   return discountPrice ? 500 : 110 * numTrue;
 }

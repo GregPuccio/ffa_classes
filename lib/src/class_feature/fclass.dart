@@ -76,7 +76,7 @@ class FClass {
   }
 
   String get dateRange {
-    return "${DateFormat('E').format(date)} ${date.month}/${date.day}${endDate != null && endDate != date ? "-${DateFormat('E').format(endDate!)} ${endDate!.month}/${endDate!.day}" : ''}";
+    return "${DateFormat('E').format(date)} ${date.month}/${date.day}${endDate != null && endDate != date ? " - ${DateFormat('E').format(endDate!)} ${endDate!.month}/${endDate!.day}" : ''}";
   }
 
   String get maxFencerNumber {
@@ -93,6 +93,18 @@ class FClass {
       default:
         return "XX";
     }
+  }
+
+  List<String> findFencerCampDays(Fencer fencer) {
+    List<String> days = [];
+    if (campDays != null) {
+      for (var day in campDays!) {
+        if (day.fencers.contains(fencer)) {
+          days.add(DateFormat('E M/d').format(day.date));
+        }
+      }
+    }
+    return days;
   }
 
   FClass copyWith({
@@ -185,12 +197,16 @@ class FClass {
   factory FClass.fromMap(Map<String, dynamic> map) {
     DateTime date =
         DateTime.fromMillisecondsSinceEpoch(map['date'], isUtc: true);
-    DateTime endDate =
-        DateTime.fromMillisecondsSinceEpoch(map['endDate'] ?? 0, isUtc: true);
+    DateTime? endDate;
+    if (map['endDate'] != null) {
+      endDate =
+          DateTime.fromMillisecondsSinceEpoch(map['endDate'], isUtc: true);
+      endDate = DateTime.utc(endDate.year, endDate.month, endDate.day);
+    }
     return FClass(
       id: '',
       date: DateTime.utc(date.year, date.month, date.day),
-      endDate: DateTime.utc(endDate.year, endDate.month, endDate.day),
+      endDate: endDate,
       startTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
       endTime: TimeOfDay.fromDateTime(

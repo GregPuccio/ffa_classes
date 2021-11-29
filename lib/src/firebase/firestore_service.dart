@@ -210,13 +210,15 @@ class FirestoreService {
       while (endDate.isAfter(day)) {
         final List<FClass> fClasssOnDay = [];
         for (final fClass in result) {
-          if (day.difference(fClass.date).inDays < 1 &&
+          if (fClass.campDays != null) {
+            for (var campDay in fClass.campDays!) {
+              if (day.difference(campDay.date).inHours < 1 &&
+                  day.difference(campDay.date).inHours > -1) {
+                fClasssOnDay.add(campDay.copyWith(id: fClass.id));
+              }
+            }
+          } else if (day.difference(fClass.date).inDays < 1 &&
               day.difference(fClass.date).inDays > -1) {
-            fClasssOnDay.add(fClass);
-          } else if (fClass.campDays != null &&
-              fClass.campDays!.any((campDay) =>
-                  day.difference(campDay.date).inDays < 1 &&
-                  day.difference(fClass.date).inDays > -1)) {
             fClasssOnDay.add(fClass);
           }
         }
