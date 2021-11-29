@@ -22,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool obscure = true;
 
   late String verificationId;
   late ConfirmationResult result;
@@ -63,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: emailController,
             decoration: const InputDecoration(
               labelText: "Email",
+              prefixIcon: Icon(Icons.mail),
               border: OutlineInputBorder(),
             ),
           ),
@@ -71,10 +73,22 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.all(8.0),
           child: TextField(
             controller: passwordController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: "Password",
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.lock),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  obscure ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    obscure = !obscure;
+                  });
+                },
+              ),
             ),
+            obscureText: obscure,
           ),
         ),
         const SizedBox(height: 16),
@@ -136,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: emailController,
             decoration: const InputDecoration(
               labelText: "Email",
+              prefixIcon: Icon(Icons.mail),
               border: OutlineInputBorder(),
             ),
           ),
@@ -144,10 +159,21 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.all(8.0),
           child: TextField(
             controller: passwordController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: "Password",
-              border: OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.lock),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  obscure ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    obscure = !obscure;
+                  });
+                },
+              ),
             ),
+            obscureText: obscure,
           ),
         ),
         Padding(

@@ -27,27 +27,34 @@ class SettingsView extends StatelessWidget {
           width: MediaQuery.of(context).orientation == Orientation.landscape
               ? 600
               : null,
-          child: ListView(
+          child: Column(
             children: [
-              DropdownButton<ThemeMode>(
-                // Read the selected themeMode from the controller
-                value: controller.themeMode,
-                // Call the updateThemeMode method any time the user selects a theme.
-                onChanged: controller.updateThemeMode,
-                items: const [
-                  DropdownMenuItem(
-                    value: ThemeMode.system,
-                    child: Text('System Theme'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField<ThemeMode>(
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
                   ),
-                  DropdownMenuItem(
-                    value: ThemeMode.light,
-                    child: Text('Light Theme'),
-                  ),
-                  DropdownMenuItem(
-                    value: ThemeMode.dark,
-                    child: Text('Dark Theme'),
-                  )
-                ],
+                  isExpanded: true,
+                  // Read the selected themeMode from the controller
+                  value: controller.themeMode,
+                  // Call the updateThemeMode method any time the user selects a theme.
+                  onChanged: controller.updateThemeMode,
+                  items: const [
+                    DropdownMenuItem(
+                      value: ThemeMode.system,
+                      child: Text('System Theme'),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.light,
+                      child: Text('Light Theme'),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.dark,
+                      child: Text('Dark Theme'),
+                    )
+                  ],
+                ),
               ),
               SecondaryButton(
                 text: "Logout",

@@ -85,7 +85,7 @@ class _FencerSearchState extends State<FencerSearch> {
           ),
           InkButton(
             active: edited,
-            text: "Save changes",
+            text: edited ? "Save changes" : "No changes made",
             onPressed: () {
               FirestoreService().updateData(
                 path: FirestorePath.fClass(fClass.id),

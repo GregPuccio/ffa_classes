@@ -1,9 +1,11 @@
 import 'package:ffaclasses/src/auth_feature/auth.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
+import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
+import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/create_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,6 +71,9 @@ class MyApp extends StatelessWidget {
                     return const AddClass();
                   case AddCamp.routeName:
                     return const AddCamp();
+                  case EditCamp.routeName:
+                    return EditCamp(
+                        args: routeSettings.arguments as ScreenArgs);
                   case FencerSearch.routeName:
                     return const FencerSearch();
                   case SettingsView.routeName:

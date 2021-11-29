@@ -107,33 +107,6 @@ class _ClassListViewState extends State<ClassListView> {
                                 arguments: ScreenArgs(fClass: fClass),
                               );
                             },
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Class Deletion'),
-                                  content: const Text(
-                                      'Would you like to delete this class?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        FirestoreService().deleteData(
-                                            path: FirestorePath.fClass(
-                                                fClass.id));
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Delete'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
                           ),
                         );
                       },

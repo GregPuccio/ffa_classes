@@ -16,7 +16,7 @@ class AddCamp extends StatefulWidget {
 
 class _AddCampState extends State<AddCamp> {
   late FClass fClass;
-  late TextEditingController customClassTypeController;
+  late TextEditingController customCampTitleController;
   late TextEditingController customClassDescriptionController;
   late TextEditingController customMaxNumberController;
   late TextEditingController costController;
@@ -31,7 +31,7 @@ class _AddCampState extends State<AddCamp> {
       classType: ClassType.camp,
       fencers: [],
     );
-    customClassTypeController = TextEditingController();
+    customCampTitleController = TextEditingController();
     customClassDescriptionController = TextEditingController();
     customMaxNumberController = TextEditingController();
     costController = TextEditingController();
@@ -52,22 +52,14 @@ class _AddCampState extends State<AddCamp> {
             date: newRange.start.toUtc(), endDate: newRange.end.toUtc());
       });
     }
-    // DateTime? newDate = await showDatePicker(
-    //   context: context,
-    //   initialDate: fClass.date,
-    //   firstDate: DateTime.now().subtract(const Duration(days: 31)),
-    //   lastDate: DateTime.now().add(const Duration(days: 100)),
-    // );
-    // if (newDate != null) {
-    //   setState(() {
-    //     fClass = fClass.copyWith(date: newDate.toUtc());
-    //   });
-    // }
   }
 
   @override
   void dispose() {
-    customClassTypeController.dispose();
+    customCampTitleController.dispose();
+    customClassDescriptionController.dispose();
+    customMaxNumberController.dispose();
+    costController.dispose();
     super.dispose();
   }
 
@@ -89,7 +81,7 @@ class _AddCampState extends State<AddCamp> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   textCapitalization: TextCapitalization.words,
-                  controller: customClassTypeController,
+                  controller: customCampTitleController,
                   decoration: const InputDecoration(
                     labelText: "Title",
                     border: OutlineInputBorder(),
@@ -162,7 +154,7 @@ class _AddCampState extends State<AddCamp> {
                 text: 'Create camp',
                 onPressed: () {
                   fClass = fClass.copyWith(
-                    customClassTitle: customClassTypeController.text,
+                    customClassTitle: customCampTitleController.text,
                     customClassDescription:
                         customClassDescriptionController.text,
                     customMaxFencers: customMaxNumberController.text,

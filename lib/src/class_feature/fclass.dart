@@ -216,7 +216,7 @@ class FClass {
       customClassDescription: map['customClassDescription'],
       customMaxFencers: map['customMaxFencers'],
       customCost: map['customCost'],
-      fencers: [], //List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
+      fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
       campDays: map['campDays'] != null
           ? List<FClass>.from(map['campDays'].map((x) => FClass.fromMap(x)))
           : null,
