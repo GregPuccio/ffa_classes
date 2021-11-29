@@ -178,10 +178,10 @@ class FClass {
     return {
       'date': date.millisecondsSinceEpoch,
       'endDate': endDate?.millisecondsSinceEpoch,
-      'startTime': DateTime(1)
+      'startTime': DateTime.utc(1)
           .add(Duration(hours: startTime.hour, minutes: startTime.minute))
           .millisecondsSinceEpoch,
-      'endTime': DateTime(1)
+      'endTime': DateTime.utc(1)
           .add(Duration(hours: endTime.hour, minutes: endTime.minute))
           .millisecondsSinceEpoch,
       'classType': classType.index,
@@ -208,9 +208,9 @@ class FClass {
       date: DateTime.utc(date.year, date.month, date.day),
       endDate: endDate,
       startTime: TimeOfDay.fromDateTime(
-          DateTime.fromMillisecondsSinceEpoch(map['startTime'])),
+          DateTime.fromMillisecondsSinceEpoch(map['startTime'], isUtc: true)),
       endTime: TimeOfDay.fromDateTime(
-          DateTime.fromMillisecondsSinceEpoch(map['endTime'])),
+          DateTime.fromMillisecondsSinceEpoch(map['endTime'], isUtc: true)),
       classType: ClassType.values[map['classType']],
       customClassTitle: map['customClassTitle'],
       customClassDescription: map['customClassDescription'],
