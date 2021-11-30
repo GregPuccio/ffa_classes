@@ -19,7 +19,11 @@ class _AddCampState extends State<AddCamp> {
   late TextEditingController customCampTitleController;
   late TextEditingController customClassDescriptionController;
   late TextEditingController customMaxNumberController;
-  late TextEditingController costController;
+  late TextEditingController regRateController;
+  late TextEditingController unlimRateController;
+  late TextEditingController regDiscountController;
+  late TextEditingController unlimDiscountController;
+
   @override
   void initState() {
     fClass = FClass(
@@ -34,7 +38,10 @@ class _AddCampState extends State<AddCamp> {
     customCampTitleController = TextEditingController();
     customClassDescriptionController = TextEditingController();
     customMaxNumberController = TextEditingController();
-    costController = TextEditingController();
+    regRateController = TextEditingController();
+    unlimRateController = TextEditingController();
+    regDiscountController = TextEditingController();
+    unlimDiscountController = TextEditingController();
     super.initState();
   }
 
@@ -59,7 +66,10 @@ class _AddCampState extends State<AddCamp> {
     customCampTitleController.dispose();
     customClassDescriptionController.dispose();
     customMaxNumberController.dispose();
-    costController.dispose();
+    regRateController.dispose();
+    unlimRateController.dispose();
+    regDiscountController.dispose();
+    unlimDiscountController.dispose();
     super.dispose();
   }
 
@@ -140,14 +150,56 @@ class _AddCampState extends State<AddCamp> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: costController,
-                  decoration: InputDecoration(
-                    labelText: "Camp cost",
-                    hintText: fClass.classCost,
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.attach_money),
-                  ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: regRateController,
+                        decoration: const InputDecoration(
+                          labelText: "Reg Rate/Day",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: TextField(
+                        controller: regDiscountController,
+                        decoration: const InputDecoration(
+                          labelText: "Discount",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.remove),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: unlimRateController,
+                        decoration: const InputDecoration(
+                          labelText: "Unlim Rate/Day",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: TextField(
+                        controller: unlimDiscountController,
+                        decoration: const InputDecoration(
+                          labelText: "Discount",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.remove),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               InkButton(
@@ -158,7 +210,10 @@ class _AddCampState extends State<AddCamp> {
                     customClassDescription:
                         customClassDescriptionController.text,
                     customMaxFencers: customMaxNumberController.text,
-                    customCost: costController.text,
+                    customRegRate: regRateController.text,
+                    customRegDiscount: regDiscountController.text,
+                    customUnlimRate: unlimRateController.text,
+                    customUnlimDiscount: unlimDiscountController.text,
                   );
                   List<FClass> classes = [fClass];
                   if (fClass.endDate != null && fClass.date != fClass.endDate) {

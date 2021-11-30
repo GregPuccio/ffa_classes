@@ -20,7 +20,10 @@ class _EditCampState extends State<EditCamp> {
   late TextEditingController customClassTitleController;
   late TextEditingController customClassDescriptionController;
   late TextEditingController customMaxNumberController;
-  late TextEditingController costController;
+  late TextEditingController regRateController;
+  late TextEditingController unlimRateController;
+  late TextEditingController regDiscountController;
+  late TextEditingController unlimDiscountController;
   late FClass fClass;
 
   @override
@@ -32,7 +35,11 @@ class _EditCampState extends State<EditCamp> {
         TextEditingController(text: fClass.customClassDescription);
     customMaxNumberController =
         TextEditingController(text: fClass.customMaxFencers);
-    costController = TextEditingController(text: fClass.customCost);
+    regRateController = TextEditingController(text: fClass.customRegRate);
+    unlimRateController = TextEditingController(text: fClass.customRegDiscount);
+    regDiscountController = TextEditingController(text: fClass.customUnlimRate);
+    unlimDiscountController =
+        TextEditingController(text: fClass.customUnlimDiscount);
     super.initState();
   }
 
@@ -41,7 +48,10 @@ class _EditCampState extends State<EditCamp> {
     customClassTitleController.dispose();
     customClassDescriptionController.dispose();
     customMaxNumberController.dispose();
-    costController.dispose();
+    regRateController.dispose();
+    unlimRateController.dispose();
+    regDiscountController.dispose();
+    unlimDiscountController.dispose();
     super.dispose();
   }
 
@@ -74,7 +84,10 @@ class _EditCampState extends State<EditCamp> {
                 customClassTitle: customClassTitleController.text,
                 customClassDescription: customClassDescriptionController.text,
                 customMaxFencers: customMaxNumberController.text,
-                customCost: costController.text,
+                customRegRate: regRateController.text,
+                customRegDiscount: regDiscountController.text,
+                customUnlimRate: unlimRateController.text,
+                customUnlimDiscount: unlimDiscountController.text,
               );
               showDialog(
                 context: context,
@@ -195,14 +208,56 @@ class _EditCampState extends State<EditCamp> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: costController,
-                  decoration: InputDecoration(
-                    labelText: "Camp cost",
-                    hintText: fClass.classCost,
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.attach_money),
-                  ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: regRateController,
+                        decoration: const InputDecoration(
+                          labelText: "Reg Rate/Day",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: TextField(
+                        controller: regDiscountController,
+                        decoration: const InputDecoration(
+                          labelText: "Discount",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.remove),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: unlimRateController,
+                        decoration: const InputDecoration(
+                          labelText: "Unlim Rate/Day",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: TextField(
+                        controller: unlimDiscountController,
+                        decoration: const InputDecoration(
+                          labelText: "Discount",
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.remove),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

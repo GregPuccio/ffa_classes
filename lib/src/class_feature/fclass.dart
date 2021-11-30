@@ -17,7 +17,10 @@ class FClass {
   final String? customClassTitle;
   final String? customClassDescription;
   final String? customMaxFencers;
-  final String? customCost;
+  final String? customRegRate;
+  final String? customRegDiscount;
+  final String? customUnlimRate;
+  final String? customUnlimDiscount;
   final List<Fencer> fencers;
   final List<FClass>? campDays;
   FClass({
@@ -30,7 +33,10 @@ class FClass {
     this.customClassTitle,
     this.customClassDescription,
     this.customMaxFencers,
-    this.customCost,
+    this.customRegRate,
+    this.customRegDiscount,
+    this.customUnlimRate,
+    this.customUnlimDiscount,
     required this.fencers,
     this.campDays,
   });
@@ -117,7 +123,10 @@ class FClass {
     String? customClassTitle,
     String? customClassDescription,
     String? customMaxFencers,
-    String? customCost,
+    String? customRegRate,
+    String? customRegDiscount,
+    String? customUnlimRate,
+    String? customUnlimDiscount,
     List<Fencer>? fencers,
     List<FClass>? campDays,
   }) {
@@ -132,7 +141,10 @@ class FClass {
       customClassDescription:
           customClassDescription ?? this.customClassDescription,
       customMaxFencers: customMaxFencers ?? this.customMaxFencers,
-      customCost: customCost ?? this.customCost,
+      customRegRate: customRegRate ?? this.customRegRate,
+      customRegDiscount: customRegDiscount ?? this.customRegDiscount,
+      customUnlimRate: customUnlimRate ?? this.customUnlimRate,
+      customUnlimDiscount: customUnlimDiscount ?? this.customUnlimDiscount,
       fencers: fencers ?? this.fencers,
       campDays: campDays ?? this.campDays,
     );
@@ -167,7 +179,7 @@ class FClass {
       case ClassType.advanced:
         return 'Member: \$40 - Non Member: \$50';
       case ClassType.camp:
-        return customCost;
+        return "\nRegular: $customRegRate/day $customRegDiscount\nUnlimited: $customUnlimRate/day $customUnlimDiscount";
 
       default:
         return null;
@@ -188,7 +200,10 @@ class FClass {
       'customClassTitle': customClassTitle,
       'customClassDescription': customClassDescription,
       'customMaxFencers': customMaxFencers,
-      'customCost': customCost,
+      'customRegRate': customRegRate,
+      'customRegDiscount': customRegDiscount,
+      'customUnlimRate': customUnlimRate,
+      'customUnlimDiscount': customUnlimDiscount,
       'fencers': fencers.map((x) => x.toMap()).toList(),
       'campDays': campDays?.map((e) => e.toMap()).toList(),
     };
@@ -215,7 +230,10 @@ class FClass {
       customClassTitle: map['customClassTitle'],
       customClassDescription: map['customClassDescription'],
       customMaxFencers: map['customMaxFencers'],
-      customCost: map['customCost'],
+      customRegRate: map['customRegRate'],
+      customRegDiscount: map['customRegDiscount'],
+      customUnlimRate: map['customUnlimRate'],
+      customUnlimDiscount: map['customUnlimDiscount'],
       fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
       campDays: map['campDays'] != null
           ? List<FClass>.from(map['campDays'].map((x) => FClass.fromMap(x)))

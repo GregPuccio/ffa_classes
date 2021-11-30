@@ -65,7 +65,9 @@ class _FClassDetailsState extends State<FClassDetails> {
                           },
                         ),
                         Text(
-                            "Total Cost: \$${totalCost(dates, selectedDates)}"),
+                            "Regular Membership Cost: \$${totalRegularCost(dates, selectedDates)}"),
+                        Text(
+                            "Unlimited Membership Cost: \$${totalUnlimitedCost(dates, selectedDates)}"),
                         if (userData.admin)
                           CheckboxListTile(
                             title: Text(
@@ -113,7 +115,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                             data: fClass.toMap(),
                           );
 
-                          Navigator.pop(context, true);
+                          Navigator.pop(context, selectedDates.isNotEmpty);
                         },
                         child: const Text("Confirm"),
                       ),
@@ -370,9 +372,16 @@ class _FClassDetailsState extends State<FClassDetails> {
   }
 }
 
-int totalCost(List<String> dates, List<String> selectedDates) {
+int totalRegularCost(List<String> dates, List<String> selectedDates) {
   int totalLength = dates.length;
   int numTrue = selectedDates.length;
   bool discountPrice = totalLength == numTrue;
-  return discountPrice ? 500 : 110 * numTrue;
+  return discountPrice ? 550 : 110 * numTrue;
+}
+
+int totalUnlimitedCost(List<String> dates, List<String> selectedDates) {
+  int totalLength = dates.length;
+  int numTrue = selectedDates.length;
+  bool discountPrice = totalLength == numTrue;
+  return discountPrice ? 500 : 100 * numTrue;
 }
