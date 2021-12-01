@@ -160,11 +160,26 @@ class FClass {
         return ClassType.mixed;
       case 'Advanced':
         return ClassType.advanced;
-      case 'Custom':
+      case 'Camp':
         return ClassType.camp;
 
       default:
         return null;
+    }
+  }
+
+  String get writtenClassType {
+    switch (classType) {
+      case ClassType.foundation:
+        return 'Foundation';
+      case ClassType.youth:
+        return 'Youth';
+      case ClassType.mixed:
+        return 'Mixed';
+      case ClassType.advanced:
+        return 'Advanced';
+      case ClassType.camp:
+        return "Camp";
     }
   }
 

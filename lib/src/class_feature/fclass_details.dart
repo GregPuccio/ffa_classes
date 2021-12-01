@@ -1,4 +1,5 @@
 import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
+import 'package:ffaclasses/src/class_feature/edit_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
@@ -155,17 +156,18 @@ class _FClassDetailsState extends State<FClassDetails> {
                           },
                           icon: const Icon(Icons.person_add),
                         ),
-                        if (fClass.classType == ClassType.camp)
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                context,
-                                EditCamp.routeName,
-                                arguments: ScreenArgs(fClass: fClass),
-                              );
-                            },
-                            icon: const Icon(Icons.settings),
-                          ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              fClass.classType == ClassType.camp
+                                  ? EditCamp.routeName
+                                  : EditClass.routeName,
+                              arguments: ScreenArgs(fClass: fClass),
+                            );
+                          },
+                          icon: const Icon(Icons.settings),
+                        ),
                       ]
                     : null,
               ),

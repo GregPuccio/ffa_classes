@@ -1,6 +1,7 @@
 import 'package:ffaclasses/src/auth_feature/auth.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
+import 'package:ffaclasses/src/class_feature/edit_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
@@ -69,6 +70,9 @@ class MyApp extends StatelessWidget {
                     return const FClassDetails();
                   case AddClass.routeName:
                     return const AddClass();
+                  case EditClass.routeName:
+                    return EditClass(
+                        args: routeSettings.arguments as ScreenArgs);
                   case AddCamp.routeName:
                     return const AddCamp();
                   case EditCamp.routeName:

@@ -1,5 +1,4 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
-import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
@@ -76,8 +75,7 @@ class _EditCampState extends State<EditCamp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            "Edit ${fClass.classType == ClassType.camp ? "Camp" : "Class"}"),
+        title: const Text("Edit Camp"),
         actions: [
           TextButton(
             onPressed: () {
@@ -290,9 +288,6 @@ class _EditCampState extends State<EditCamp> {
                             ),
                             TextButton(
                               onPressed: () {
-                                FirestoreService().deleteData(
-                                  path: FirestorePath.fClass(fClass.id),
-                                );
                                 Navigator.pop(context);
                               },
                               child: const Text("Cancel"),
