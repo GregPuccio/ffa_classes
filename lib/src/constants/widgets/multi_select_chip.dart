@@ -70,7 +70,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
     if (widget.horizScroll) {
       return Container(
         alignment: Alignment.centerLeft,
-        height: 60,
+        height: 55,
         child: ListView(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
