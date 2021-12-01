@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
-import 'src/web_configure/configure_nonweb.dart'
-    if (dart.library.html) 'src/web_configure/configure_web.dart';
 
 void main() async {
   // Set up the SettingsController, which will glue user settings to multiple
@@ -19,7 +17,6 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  configureApp();
 
   // Run the app and pass in the SettingsController. The app listens to the
   // SettingsController for changes, then passes it further down to the

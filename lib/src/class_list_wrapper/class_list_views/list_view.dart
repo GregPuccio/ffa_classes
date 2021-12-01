@@ -1,9 +1,11 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
+import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClassListView extends StatefulWidget {
   const ClassListView({Key? key}) : super(key: key);
@@ -81,6 +83,15 @@ class _ClassListViewState extends State<ClassListView> {
                   : null,
               child: Column(
                 children: [
+                  ListTile(
+                      title: const Text(
+                        "Book Private Lessons (on Square)",
+                        textAlign: TextAlign.center,
+                      ),
+                      trailing: const Icon(Icons.launch),
+                      onTap: () {
+                        launch(squareLessonsLink);
+                      }),
                   MultiSelectChip(
                     initialChoices: [filters.first],
                     itemList: filters,

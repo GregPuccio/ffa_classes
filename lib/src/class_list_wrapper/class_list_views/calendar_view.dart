@@ -2,11 +2,13 @@ import 'dart:collection';
 
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
+import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ClassCalendarView extends StatefulWidget {
   const ClassCalendarView({Key? key}) : super(key: key);
@@ -138,31 +140,62 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
             ),
           ];
           return portrait
-              ? Column(children: children)
+              ? Column(
+                  children: [
+                    ListTile(
+                        title: const Text(
+                          "Book Private Lessons (on Square)",
+                          textAlign: TextAlign.center,
+                        ),
+                        trailing: const Icon(Icons.launch),
+                        onTap: () {
+                          launch(squareLessonsLink);
+                        }),
+                    Flexible(child: Column(children: children)),
+                  ],
+                )
               : Center(
                   child: Container(
                     alignment: Alignment.topCenter,
-                    width: 800,
-                    child: Row(
+                    width: 1000,
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: SingleChildScrollView(child: children[0]),
-                        ),
-                        const VerticalDivider(),
-                        Expanded(
-                          child: Column(
+                        ListTile(
+                            title: const Text(
+                              "Book Private Lessons (on Square)",
+                              textAlign: TextAlign.center,
+                            ),
+                            trailing: const Icon(Icons.launch),
+                            onTap: () {
+                              launch(squareLessonsLink);
+                            }),
+                        Flexible(
+                          child: Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
-                                  style: Theme.of(context).textTheme.headline6,
-                                ),
+                              Expanded(
+                                child:
+                                    SingleChildScrollView(child: children[0]),
                               ),
-                              children[1],
+                              const VerticalDivider(),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6,
+                                      ),
+                                    ),
+                                    children[1],
+                                  ],
+                                ),
+                              )
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

@@ -2,13 +2,11 @@ import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
-import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ClassListWrapper extends StatefulWidget {
   const ClassListWrapper({Key? key}) : super(key: key);
@@ -78,24 +76,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                     ];
                   })
               : null,
-          body: Column(
-            children: [
-              ListTile(
-                  title: const Text(
-                    "Book Private Lessons (on Square)",
-                    textAlign: TextAlign.center,
-                  ),
-                  trailing: const Icon(Icons.launch),
-                  onTap: () {
-                    launch(squareLessonsLink);
-                  }),
-              Flexible(
-                child: calendar
-                    ? const ClassCalendarView()
-                    : const ClassListView(),
-              ),
-            ],
-          ),
+          body: calendar ? const ClassCalendarView() : const ClassListView(),
         );
       } else {
         return Center(
