@@ -57,16 +57,17 @@ class _ClassListViewState extends State<ClassListView> {
         path: FirestorePath.fClasses(),
         builder: (map, docID) => FClass.fromMap(map!).copyWith(id: docID),
         queryBuilder: (query) {
+          DateTime now = DateTime.now();
+          DateTime thisMonth = DateTime.utc(now.year, now.month);
           if (currentFilter != -1) {
             return query
                 .where('classType', isEqualTo: currentFilter)
                 .orderBy('date')
                 .where('date',
-                    isGreaterThanOrEqualTo:
-                        DateTime.now().millisecondsSinceEpoch);
+                    isGreaterThanOrEqualTo: thisMonth.millisecondsSinceEpoch);
           } else {
             return query.orderBy('date').where('date',
-                isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch);
+                isGreaterThanOrEqualTo: thisMonth.millisecondsSinceEpoch);
           }
         },
       ),

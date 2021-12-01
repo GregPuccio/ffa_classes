@@ -302,7 +302,13 @@ class _FClassDetailsState extends State<FClassDetails> {
                   ),
                   if (!userData.admin)
                     InkButton(
-                      active: fClass.date.isAfter(DateTime.now()),
+                      active: fClass.date.isAfter(
+                        DateTime.utc(
+                          DateTime.now().year,
+                          DateTime.now().month,
+                          DateTime.now().day - 1,
+                        ),
+                      ),
                       text: fClass.fencers.contains(userData.toFencer())
                           ? (fClass.classType == ClassType.camp
                                   ? "Edit"
