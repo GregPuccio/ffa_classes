@@ -36,8 +36,9 @@ class _EditCampState extends State<EditCamp> {
     customMaxNumberController =
         TextEditingController(text: fClass.customMaxFencers);
     regRateController = TextEditingController(text: fClass.customRegRate);
-    unlimRateController = TextEditingController(text: fClass.customRegDiscount);
-    regDiscountController = TextEditingController(text: fClass.customUnlimRate);
+    regDiscountController =
+        TextEditingController(text: fClass.customRegDiscount);
+    unlimRateController = TextEditingController(text: fClass.customUnlimRate);
     unlimDiscountController =
         TextEditingController(text: fClass.customUnlimDiscount);
     super.initState();
@@ -145,6 +146,9 @@ class _EditCampState extends State<EditCamp> {
               : null,
           child: ListView(
             children: [
+              const SizedBox(
+                height: 10,
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -165,6 +169,7 @@ class _EditCampState extends State<EditCamp> {
                     labelText: "Description",
                     border: OutlineInputBorder(),
                   ),
+                  maxLines: 5,
                 ),
               ),
               Padding(
@@ -198,13 +203,16 @@ class _EditCampState extends State<EditCamp> {
                 lastTime: const TimeOfDay(hour: 20, minute: 00),
                 initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
                 timeStep: 10,
-                timeBlock: 30,
+                timeBlock: 10,
                 onRangeCompleted: (range) => setState(() {
                   fClass = fClass.copyWith(
                     startTime: range?.start,
                     endTime: range?.end,
                   );
                 }),
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -259,6 +267,50 @@ class _EditCampState extends State<EditCamp> {
                     ),
                   ],
                 ),
+              ),
+              TextButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Delete Camp"),
+                          content: const Text(
+                              "Are you sure you would like to delete this camp and all of its data? (Fencers registered/paid for, etc.)"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                FirestoreService().deleteData(
+                                  path: FirestorePath.fClass(fClass.id),
+                                );
+                                Navigator.popUntil(
+                                    context, ModalRoute.withName('/'));
+                              },
+                              child: const Text("Delete Camp"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                FirestoreService().deleteData(
+                                  path: FirestorePath.fClass(fClass.id),
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                          ],
+                        );
+                      });
+                },
+                child: Text(
+                  "Delete Camp",
+                  style: Theme.of(context)
+                      .textTheme
+                      .button!
+                      .copyWith(color: Colors.red),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
               ),
             ],
           ),

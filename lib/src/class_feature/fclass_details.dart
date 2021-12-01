@@ -38,10 +38,13 @@ class _FClassDetailsState extends State<FClassDetails> {
               selectedDates = fClass.findFencerCampDays(fencer);
               if (fClass.endDate != null) {
                 dates = [];
+                fClass.campDays?.removeWhere((day) =>
+                    day.fencers.length >=
+                    (int.tryParse(fClass.maxFencerNumber) ?? 0));
                 dates.addAll(
                   List.generate(fClass.campDays?.length ?? 0, (index) {
-                    DateTime date = fClass.date.add(Duration(days: index));
-                    return DateFormat('E M/d').format(date);
+                    return DateFormat('E M/d')
+                        .format(fClass.campDays![index].date);
                   }),
                 );
               }
@@ -139,7 +142,7 @@ class _FClassDetailsState extends State<FClassDetails> {
             return Scaffold(
               appBar: AppBar(
                 title: Text(
-                    "${fClass.title} ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber}"),
+                    "${fClass.title} | ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber} Registered"),
                 actions: userData.admin
                     ? [
                         IconButton(
@@ -197,7 +200,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                                   .subtitle1),
                                           const Divider(),
                                           Text(
-                                            "Cost: ${fClass.classCost}",
+                                            "Cost:${fClass.classCost}",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .subtitle1,
