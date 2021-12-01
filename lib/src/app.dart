@@ -65,9 +65,15 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
+                if (routeSettings.name != null) {
+                  Uri uri = Uri.parse(routeSettings.name!);
+                  if (uri.pathSegments.length == 2 &&
+                      uri.pathSegments.first == FClassDetails.routeName) {
+                    String id = uri.pathSegments[1];
+                    return FClassDetails(id: id);
+                  }
+                }
                 switch (routeSettings.name) {
-                  case FClassDetails.routeName:
-                    return const FClassDetails();
                   case AddClass.routeName:
                     return const AddClass();
                   case EditClass.routeName:

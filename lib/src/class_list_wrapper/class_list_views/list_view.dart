@@ -3,7 +3,6 @@ import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
-import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:flutter/material.dart';
 
 class ClassListView extends StatefulWidget {
@@ -102,10 +101,9 @@ class _ClassListViewState extends State<ClassListView> {
                             ),
                             trailing: Text("${fClass.fencers.length} fencers"),
                             onTap: () {
-                              Navigator.pushNamed(
+                              Navigator.restorablePushNamed(
                                 context,
-                                FClassDetails.routeName,
-                                arguments: ScreenArgs(fClass: fClass),
+                                '${FClassDetails.routeName}/${fClass.id}',
                               );
                             },
                           ),

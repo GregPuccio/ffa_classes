@@ -59,6 +59,22 @@ class FClass {
     }
   }
 
+  String get webAddressID {
+    if (customClassTitle != null) {
+      List<String> title = customClassTitle!.split(" ");
+      String url = "";
+      for (var text in title) {
+        if (url.isNotEmpty) {
+          url = url + "-";
+        }
+        url = url + text;
+      }
+      return url;
+    } else {
+      return id;
+    }
+  }
+
   String get description {
     switch (classType) {
       case ClassType.camp:

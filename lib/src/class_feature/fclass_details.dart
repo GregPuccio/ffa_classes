@@ -16,8 +16,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FClassDetails extends StatefulWidget {
-  const FClassDetails({Key? key}) : super(key: key);
-  static const routeName = 'classDetails';
+  final String id;
+  const FClassDetails({required this.id, Key? key}) : super(key: key);
+  static const routeName = 'classes';
 
   @override
   State<FClassDetails> createState() => _FClassDetailsState();
@@ -26,10 +27,9 @@ class FClassDetails extends StatefulWidget {
 class _FClassDetailsState extends State<FClassDetails> {
   List<String> dates = [];
   List<String> selectedDates = [];
+  late FClass fClass;
   @override
   Widget build(BuildContext context) {
-    ScreenArgs args = ModalRoute.of(context)!.settings.arguments! as ScreenArgs;
-    FClass fClass = args.fClass!;
     Widget whenData(UserData? userData) {
       if (userData != null) {
         Future showCampRegistrationDialog(Fencer fencer) {
@@ -133,227 +133,233 @@ class _FClassDetailsState extends State<FClassDetails> {
 
         return StreamBuilder<FClass>(
           stream: FirestoreService().documentStream(
-              path: FirestorePath.fClass(fClass.id),
+              path: FirestorePath.fClass(widget.id),
               builder: (map, docID) =>
                   FClass.fromMap(map!).copyWith(id: docID)),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               fClass = snapshot.data!;
-            }
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                    "${fClass.title} | ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber} Registered"),
-                actions: userData.admin
-                    ? [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              FencerSearch.routeName,
-                              arguments: ScreenArgs(fClass: fClass),
-                            );
-                          },
-                          icon: const Icon(Icons.person_add),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              fClass.classType == ClassType.camp
-                                  ? EditCamp.routeName
-                                  : EditClass.routeName,
-                              arguments: ScreenArgs(fClass: fClass),
-                            );
-                          },
-                          icon: const Icon(Icons.settings),
-                        ),
-                      ]
-                    : null,
-              ),
-              body: Column(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Container(
-                        alignment: Alignment.topCenter,
-                        width: MediaQuery.of(context).orientation ==
-                                Orientation.landscape
-                            ? 600
-                            : null,
-                        child: ListView.builder(
-                          itemCount: fClass.fencers.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return Column(
-                                children: [
-                                  Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                              "When: ${fClass.dateRange} | ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                      "${fClass.title} | ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber} Registered"),
+                  actions: userData.admin
+                      ? [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                context,
+                                FencerSearch.routeName,
+                                arguments: ScreenArgs(fClass: fClass),
+                              );
+                            },
+                            icon: const Icon(Icons.person_add),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                context,
+                                fClass.classType == ClassType.camp
+                                    ? EditCamp.routeName
+                                    : EditClass.routeName,
+                                arguments: ScreenArgs(fClass: fClass),
+                              );
+                            },
+                            icon: const Icon(Icons.settings),
+                          ),
+                        ]
+                      : null,
+                ),
+                body: Column(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Container(
+                          alignment: Alignment.topCenter,
+                          width: MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                              ? 600
+                              : null,
+                          child: ListView.builder(
+                            itemCount: fClass.fencers.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return Column(
+                                  children: [
+                                    Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                "When: ${fClass.dateRange} | ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle1),
+                                            const Divider(),
+                                            Text(
+                                              "Cost:${fClass.classCost}",
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .subtitle1),
-                                          const Divider(),
-                                          Text(
-                                            "Cost:${fClass.classCost}",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .subtitle1,
-                                          ),
-                                          const Divider(),
-                                          Text(fClass.description,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .subtitle2),
-                                        ],
+                                                  .subtitle1,
+                                            ),
+                                            const Divider(),
+                                            Text(fClass.description,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle2),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              Fencer fencer = fClass.fencers[index - 1];
-                              Widget? subtitle;
-                              String text = "";
-                              if (fClass.classType == ClassType.camp &&
-                                  fClass.campDays != null) {
-                                for (var day in fClass.campDays!) {
-                                  if (day.fencers.contains(fencer)) {
-                                    text = text +
-                                        "${DateFormat("E M/d").format(day.date)} | ";
-                                  }
-                                }
-                                subtitle = Text(text);
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(fencer.name),
-                                    subtitle: subtitle,
-                                    trailing: userData.admin
-                                        ? const Icon(Icons.edit)
-                                        : null,
-                                    onTap: userData.admin
-                                        ? () {
-                                            showCampRegistrationDialog(fencer);
-                                          }
-                                        : null,
-                                  ),
+                                  ],
                                 );
                               } else {
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(fencer.name),
-                                    subtitle: Text(
-                                      fencer.checkedIn ? "Present" : "Absent",
+                                Fencer fencer = fClass.fencers[index - 1];
+                                Widget? subtitle;
+                                String text = "";
+                                if (fClass.classType == ClassType.camp &&
+                                    fClass.campDays != null) {
+                                  for (var day in fClass.campDays!) {
+                                    if (day.fencers.contains(fencer)) {
+                                      text = text +
+                                          "${DateFormat("E M/d").format(day.date)} | ";
+                                    }
+                                  }
+                                  subtitle = Text(text);
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(fencer.name),
+                                      subtitle: subtitle,
+                                      trailing: userData.admin
+                                          ? const Icon(Icons.edit)
+                                          : null,
+                                      onTap: userData.admin
+                                          ? () {
+                                              showCampRegistrationDialog(
+                                                  fencer);
+                                            }
+                                          : null,
                                     ),
-                                    trailing: userData.admin
-                                        ? const Icon(Icons.edit)
-                                        : null,
-                                    onTap: userData.admin
-                                        ? () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                      "Change Status"),
-                                                  content: Text(
-                                                      "${fencer.name} is currently ${fencer.checkedIn ? "" : "not "}checked in, if you would like to change that please use the button below."),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        fClass.fencers[
-                                                                index - 1] =
-                                                            fencer.copyWith(
-                                                                checkedIn: !fencer
-                                                                    .checkedIn);
-                                                        FirestoreService()
-                                                            .updateData(
-                                                          path: FirestorePath
-                                                              .fClass(
-                                                                  fClass.id),
-                                                          data: fClass.toMap(),
-                                                        );
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(
-                                                          "Mark as ${fencer.checkedIn ? 'absent' : 'present'}"),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }
-                                        : null,
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(fencer.name),
+                                      subtitle: Text(
+                                        fencer.checkedIn ? "Present" : "Absent",
+                                      ),
+                                      trailing: userData.admin
+                                          ? const Icon(Icons.edit)
+                                          : null,
+                                      onTap: userData.admin
+                                          ? () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        "Change Status"),
+                                                    content: Text(
+                                                        "${fencer.name} is currently ${fencer.checkedIn ? "" : "not "}checked in, if you would like to change that please use the button below."),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          fClass.fencers[
+                                                                  index - 1] =
+                                                              fencer.copyWith(
+                                                                  checkedIn: !fencer
+                                                                      .checkedIn);
+                                                          FirestoreService()
+                                                              .updateData(
+                                                            path: FirestorePath
+                                                                .fClass(
+                                                                    fClass.id),
+                                                            data:
+                                                                fClass.toMap(),
+                                                          );
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text(
+                                                            "Mark as ${fencer.checkedIn ? 'absent' : 'present'}"),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          : null,
+                                    ),
+                                  );
+                                }
                               }
-                            }
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  if (!userData.admin)
-                    InkButton(
-                      active: fClass.date.isAfter(
-                        DateTime.utc(
-                          DateTime.now().year,
-                          DateTime.now().month,
-                          DateTime.now().day - 1,
+                    if (!userData.admin)
+                      InkButton(
+                        active: fClass.date.isAfter(
+                          DateTime.utc(
+                            DateTime.now().year,
+                            DateTime.now().month,
+                            DateTime.now().day - 1,
+                          ),
                         ),
-                      ),
-                      text: fClass.fencers.contains(userData.toFencer())
-                          ? (fClass.classType == ClassType.camp
-                                  ? "Edit"
-                                  : "Remove") +
-                              " registration"
-                          : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
-                      onPressed: () async {
-                        if (fClass.classType == ClassType.camp) {
-                          dynamic result = await showCampRegistrationDialog(
-                              userData.toFencer());
-                          if (result != null && result == true) {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text("All set!"),
-                                    content: Text(
-                                        "You are now registered for ${fClass.title}, payments can be given to any coach directly and then your status will be updated to paid. Thank you!"),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text("Ok"))
-                                    ],
-                                  );
-                                });
-                          }
-                        } else {
-                          setState(() {
-                            if (fClass.fencers.contains(userData.toFencer())) {
-                              fClass.fencers.remove(userData.toFencer());
-                            } else {
-                              fClass.fencers.add(userData.toFencer());
+                        text: fClass.fencers.contains(userData.toFencer())
+                            ? (fClass.classType == ClassType.camp
+                                    ? "Edit"
+                                    : "Remove") +
+                                " registration"
+                            : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
+                        onPressed: () async {
+                          if (fClass.classType == ClassType.camp) {
+                            dynamic result = await showCampRegistrationDialog(
+                                userData.toFencer());
+                            if (result != null && result == true) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("All set!"),
+                                      content: Text(
+                                          "You are now registered for ${fClass.title}, payments can be given to any coach directly and then your status will be updated to paid. Thank you!"),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("Ok"))
+                                      ],
+                                    );
+                                  });
                             }
-                          });
-                          FirestoreService().updateData(
-                            path: FirestorePath.fClass(fClass.id),
-                            data: fClass.toMap(),
-                          );
-                        }
-                      },
-                    )
-                ],
-              ),
-            );
+                          } else {
+                            setState(() {
+                              if (fClass.fencers
+                                  .contains(userData.toFencer())) {
+                                fClass.fencers.remove(userData.toFencer());
+                              } else {
+                                fClass.fencers.add(userData.toFencer());
+                              }
+                            });
+                            FirestoreService().updateData(
+                              path: FirestorePath.fClass(fClass.id),
+                              data: fClass.toMap(),
+                            );
+                          }
+                        },
+                      )
+                  ],
+                ),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
           },
         );
       } else {

@@ -107,6 +107,7 @@ class _AddCampState extends State<AddCamp> {
                     labelText: "Description",
                     border: OutlineInputBorder(),
                   ),
+                  maxLines: 5,
                 ),
               ),
               Padding(
@@ -253,8 +254,8 @@ class _AddCampState extends State<AddCamp> {
                         ),
                         TextButton(
                           onPressed: () {
-                            FirestoreService().addData(
-                                path: FirestorePath.fClasses(),
+                            FirestoreService().setData(
+                                path: FirestorePath.fClass(fClass.webAddressID),
                                 data: fClass.toMap());
                             Navigator.pop(context);
                             Navigator.pop(context);
