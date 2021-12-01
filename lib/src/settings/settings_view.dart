@@ -64,6 +64,18 @@ class SettingsView extends StatelessWidget {
                   AuthService().signOut();
                 },
               ),
+              TextButton(
+                child: const Text("Acknowledgements"),
+                onPressed: () {
+                  showLicensePage(
+                    context: context,
+                    applicationName: "FFA Classes",
+                    applicationVersion: "0.14-beta",
+                    applicationIcon:
+                        Image.asset('assets/images/logo.png', width: 100),
+                  );
+                },
+              ),
             ],
           ),
         ),
