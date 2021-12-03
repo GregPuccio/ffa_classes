@@ -448,7 +448,6 @@ class _FClassDetailsState extends State<FClassDetails> {
                                       builder: (context, setState) {
                                     List<Fencer> fencers =
                                         userData.fencersInList(fClass.fencers);
-                                    fencers.addAll(fClass.fencers);
                                     return AlertDialog(
                                       title: const Text('Edit Registration'),
                                       content: Column(
@@ -468,6 +467,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                                   .fencersInList(fencers)) {
                                                 fencers.remove(fencer);
                                               }
+                                              fencers.addAll(fClass.fencers);
                                               fencers.addAll(userData
                                                   .fencersFromFirstName(val));
                                             },
