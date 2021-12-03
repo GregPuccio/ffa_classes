@@ -3,29 +3,37 @@ import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/user_feature/child.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class AccountSetup extends StatefulWidget {
-  final User user;
-  const AccountSetup({Key? key, required this.user}) : super(key: key);
+class EditAccount extends StatefulWidget {
+  final UserData userData;
+  const EditAccount({Key? key, required this.userData}) : super(key: key);
+  static const routeName = 'editAccount';
 
   @override
-  _AccountSetupState createState() => _AccountSetupState();
+  _EditAccountState createState() => _EditAccountState();
 }
 
-class _AccountSetupState extends State<AccountSetup> {
+class _EditAccountState extends State<EditAccount> {
   late TextEditingController parentFirstName;
   late TextEditingController parentLastName;
   late List<TextEditingController> childrenFirstNames;
   late List<TextEditingController> childrenLastNames;
   @override
   void initState() {
-    childrenFirstNames = [];
-    childrenLastNames = [];
+    childrenFirstNames = List.generate(
+        widget.userData.children.length,
+        (index) => TextEditingController(
+            text: widget.userData.children[index].firstName));
+    childrenLastNames = List.generate(
+        widget.userData.children.length,
+        (index) => TextEditingController(
+            text: widget.userData.children[index].lastName));
 
-    parentFirstName = TextEditingController();
-    parentLastName = TextEditingController();
+    parentFirstName =
+        TextEditingController(text: widget.userData.parentFirstName);
+    parentLastName =
+        TextEditingController(text: widget.userData.parentLastName);
     super.initState();
   }
 
@@ -166,7 +174,7 @@ class _AccountSetupState extends State<AccountSetup> {
             ),
           ),
           InkButton(
-            text: "Complete setup",
+            text: "Save changes",
             onPressed: () {
               if (parentFirstName.text.isEmpty ||
                   parentLastName.text.isEmpty ||
@@ -181,23 +189,29 @@ class _AccountSetupState extends State<AccountSetup> {
                 List<Child> children = [];
                 for (int i = 0; i < childrenFirstNames.length; i++) {
                   children.add(Child(
-                    id: 'id',
+                    id: widget.userData.id + i.toString(),
                     firstName: childrenFirstNames[i].text,
                     lastName: childrenLastNames[i].text,
                   ));
                 }
                 UserData user = UserData(
-                  id: 'id',
+                  id: widget.userData.id,
                   admin: false,
-                  emailAddress: widget.user.email!,
+                  emailAddress: widget.userData.emailAddress,
                   parentFirstName: parentFirstName.text,
                   parentLastName: parentLastName.text,
                   children: children,
                 );
                 FirestoreService().setData(
-                  path: FirestorePath.user(widget.user.uid),
+                  path: FirestorePath.user(widget.userData.id),
                   data: user.toMap(),
                 );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Account has been successfully updated!"),
+                  ),
+                );
+                Navigator.pop(context);
               }
             },
           ),

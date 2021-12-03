@@ -26,13 +26,13 @@ class FClassDetails extends StatefulWidget {
 
 class _FClassDetailsState extends State<FClassDetails> {
   List<String> dates = [];
-  List<String> selectedDates = [];
   late FClass fClass;
   @override
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
       if (userData != null) {
-        Future showCampRegistrationDialog(Fencer fencer) {
+        Future showCampRegistrationDialog(Fencer fencer) async {
+          List<String> selectedDates = [];
           return showDialog(
             context: context,
             builder: (context) {
@@ -142,7 +142,7 @@ class _FClassDetailsState extends State<FClassDetails> {
               return Scaffold(
                 appBar: AppBar(
                   title: Text(
-                      "${fClass.title} | ${fClass.fencers.length}/${fClass.maxFencerNumber == "0" ? "\u221E" : fClass.maxFencerNumber} Registered"),
+                      "${fClass.title} | ${fClass.fencers.length}/${fClass.maxFencerNumber} Registered"),
                   actions: userData.admin
                       ? [
                           IconButton(
@@ -311,16 +311,46 @@ class _FClassDetailsState extends State<FClassDetails> {
                             DateTime.now().day - 1,
                           ),
                         ),
-                        text: fClass.fencers.contains(userData.toFencer())
-                            ? (fClass.classType == ClassType.camp
-                                    ? "Edit"
-                                    : "Remove") +
-                                " registration"
+                        text: userData.isFencerInList(fClass.fencers)
+                            ? "Edit registration"
                             : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
                         onPressed: () async {
                           if (fClass.classType == ClassType.camp) {
-                            dynamic result = await showCampRegistrationDialog(
-                                userData.toFencer());
+                            /// if the type is a camp
+                            Fencer fencer;
+                            if (userData.children.length == 1) {
+                              fencer = userData.toFencer(0);
+                            } else {
+                              fencer = await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("Select Fencer"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                              "Please select which fencer you are registering for the camp. Registration is done one fencer at a time."),
+                                          MultiSelectChip(
+                                            itemList: userData.children
+                                                .map((child) => child.firstName)
+                                                .toList(),
+                                            onSelectionChanged: (val) {
+                                              Navigator.pop(
+                                                  context,
+                                                  userData
+                                                      .fencersFromFirstName(val)
+                                                      .first);
+                                            },
+                                            multi: false,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }
+                            dynamic result =
+                                await showCampRegistrationDialog(fencer);
                             if (result != null && result == true) {
                               showDialog(
                                   context: context,
@@ -339,14 +369,136 @@ class _FClassDetailsState extends State<FClassDetails> {
                                   });
                             }
                           } else {
-                            setState(() {
-                              if (fClass.fencers
-                                  .contains(userData.toFencer())) {
-                                fClass.fencers.remove(userData.toFencer());
+                            /// if the type is a regular class
+                            if (userData.children.length == 1) {
+                              /// if the user only has one child
+                              if (userData.isFencerInList(fClass.fencers)) {
+                                /// if the child is in the list
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title:
+                                            const Text('Delete Registration'),
+                                        content: Text(
+                                            "Would you like to delete ${userData.toFencer(0).firstName}'s registration for this class?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("No"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              fClass.fencers
+                                                  .remove(userData.toFencer(0));
+                                              FirestoreService().updateData(
+                                                path: FirestorePath.fClass(
+                                                    fClass.id),
+                                                data: fClass.toMap(),
+                                              );
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(
+                                                "Delete registration"),
+                                          ),
+                                        ],
+                                      );
+                                    });
                               } else {
-                                fClass.fencers.add(userData.toFencer());
+                                /// if the child is not in the list
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('Register'),
+                                        content: Text(
+                                            "Would you like to register ${userData.toFencer(0).firstName} for this class?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("No"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              fClass.fencers
+                                                  .add(userData.toFencer(0));
+                                              FirestoreService().updateData(
+                                                path: FirestorePath.fClass(
+                                                    fClass.id),
+                                                data: fClass.toMap(),
+                                              );
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Register"),
+                                          ),
+                                        ],
+                                      );
+                                    });
                               }
-                            });
+                            } else {
+                              /// if the user has multiple children
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return StatefulBuilder(
+                                      builder: (context, setState) {
+                                    List<Fencer> fencers =
+                                        userData.fencersInList(fClass.fencers);
+                                    return AlertDialog(
+                                      title: const Text('Edit Registration'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Text(
+                                              "Select the child(ren) you would like to sign up for this class:"),
+                                          MultiSelectChip(
+                                            initialChoices: fencers
+                                                .map((child) => child.firstName)
+                                                .toList(),
+                                            itemList: userData.children
+                                                .map((child) => child.firstName)
+                                                .toList(),
+                                            onSelectionChanged: (val) {
+                                              for (var fencer in userData
+                                                  .fencersInList(fencers)) {
+                                                fencers.remove(fencer);
+                                              }
+                                              fencers.addAll(userData
+                                                  .fencersFromFirstName(val));
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            fClass = fClass.copyWith(
+                                                fencers: fencers);
+                                            FirestoreService().updateData(
+                                              path: FirestorePath.fClass(
+                                                  fClass.id),
+                                              data: fClass.toMap(),
+                                            );
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Confirm changes"),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                                },
+                              );
+                            }
                             FirestoreService().updateData(
                               path: FirestorePath.fClass(fClass.id),
                               data: fClass.toMap(),

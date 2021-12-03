@@ -104,10 +104,16 @@ class FClass {
   String get maxFencerNumber {
     switch (classType) {
       case ClassType.camp:
-        return customMaxFencers ?? "XX";
+        {
+          if (customMaxFencers != null && customMaxFencers!.isNotEmpty) {
+            return customMaxFencers!;
+          } else {
+            return "\u221E";
+          }
+        }
       case ClassType.foundation:
-        return "12";
       case ClassType.youth:
+        return "12";
       case ClassType.mixed:
       case ClassType.advanced:
         return "20";

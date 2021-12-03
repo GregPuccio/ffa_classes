@@ -50,25 +50,27 @@ class SecondaryButton extends StatelessWidget {
   final String text;
   final Function? onPressed;
   final bool active;
+  final Color? activeColor;
   const SecondaryButton({
     Key? key,
     required this.text,
     this.onPressed,
-    required this.active,
+    this.active = true,
+    this.activeColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Color color = active
+        ? activeColor ?? Theme.of(context).colorScheme.secondaryVariant
+        : Colors.grey;
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxHeight: 55, maxWidth: 400),
         margin: const EdgeInsets.all(10.0),
         child: OutlinedButton(
           style: OutlinedButton.styleFrom(
-            side: BorderSide(
-                color: active
-                    ? Theme.of(context).colorScheme.secondaryVariant
-                    : Colors.grey),
+            side: BorderSide(color: color),
             backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 1,
           ),
@@ -78,9 +80,7 @@ class SecondaryButton extends StatelessWidget {
               text,
               style: TextStyle(
                 fontSize: 20,
-                color: active
-                    ? Theme.of(context).colorScheme.secondaryVariant
-                    : Colors.grey,
+                color: color,
               ),
               textAlign: TextAlign.center,
             ),

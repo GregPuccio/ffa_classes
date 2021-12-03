@@ -8,6 +8,7 @@ import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/create_account.dart';
+import 'package:ffaclasses/src/user_feature/edit_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,11 @@ class MyApp extends StatelessWidget {
                     return const FencerSearch();
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
+                  case EditAccount.routeName:
+                    return EditAccount(
+                      userData:
+                          (routeSettings.arguments as ScreenArgs).userData!,
+                    );
                   default:
                     return const AuthWrapper();
                 }
