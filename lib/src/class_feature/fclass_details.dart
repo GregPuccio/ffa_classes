@@ -463,13 +463,16 @@ class _FClassDetailsState extends State<FClassDetails> {
                                                 .map((child) => child.firstName)
                                                 .toList(),
                                             onSelectionChanged: (val) {
+                                              fencers = [];
+                                              fencers.addAll(fClass.fencers);
                                               for (var fencer in userData
                                                   .fencersInList(fencers)) {
                                                 fencers.remove(fencer);
                                               }
-                                              fencers.addAll(fClass.fencers);
                                               fencers.addAll(userData
                                                   .fencersFromFirstName(val));
+                                              fencers =
+                                                  fencers.toSet().toList();
                                             },
                                           ),
                                         ],
