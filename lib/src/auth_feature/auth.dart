@@ -162,6 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
             decoration: InputDecoration(
               labelText: "Password",
               prefixIcon: const Icon(Icons.lock),
+              border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 icon: Icon(
                   obscure ? Icons.visibility : Icons.visibility_off,
