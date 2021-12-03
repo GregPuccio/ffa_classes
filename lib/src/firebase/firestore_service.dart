@@ -102,6 +102,40 @@ class FirestoreService {
     });
   }
 
+  /// a stream that gives updates of all of the documents at a given [path]
+  /// based on the [queryBuilder] queries
+  Stream<List<Fencer>> userChildrentoFencerCollectionStream<Fencer>({
+    required String path,
+    required List<Fencer> Function(
+            Map<String, dynamic>? data, String documentID)
+        builder,
+    Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>> query)?
+        queryBuilder,
+    int Function(Fencer lhs, Fencer rhs)? sort,
+  }) {
+    Query<Map<String, dynamic>> query =
+        FirebaseFirestore.instance.collection(path);
+    if (queryBuilder != null) {
+      query = queryBuilder(query);
+    }
+    final Stream<QuerySnapshot<Map<String, dynamic>>> snapshots =
+        query.snapshots();
+    return snapshots.map((snapshot) {
+      List<Fencer> fencers = [];
+      for (var snapshot in snapshot.docs) {
+        fencers.addAll(builder(snapshot.data(), snapshot.id));
+      }
+      // final result = snapshot.docs
+      //     .map((snapshot) => builder(snapshot.data(), snapshot.id))
+      //     .where((value) => value != null)
+      //     .toList();
+      if (sort != null) {
+        fencers.sort(sort);
+      }
+      return fencers;
+    });
+  }
+
   /// a future that gives the documents in a given collection
   /// MAKE SURE TO USE THE BUILDER TO LIMIT THE NUMBER OF DOCUMENTS
   Future<List<T>> collectionFuture<T>({

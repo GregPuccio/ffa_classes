@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 PreferredSizeWidget searchBar(TextEditingController controller, Color cardColor,
-    {String text = 'Search by first name'}) {
+    {String text = 'Search by last name'}) {
   return PreferredSize(
     preferredSize: const Size.fromHeight(kTextTabBarHeight),
     child: Container(

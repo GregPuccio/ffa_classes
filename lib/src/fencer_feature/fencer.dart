@@ -45,6 +45,20 @@ class Fencer {
     };
   }
 
+  static List<Fencer> fromUserMap(Map<String, dynamic> map) {
+    List fencerMap = map['children'];
+    return List.generate(
+      fencerMap.length,
+      (index) => Fencer(
+        id: fencerMap[index]['id'],
+        firstName: fencerMap[index]['firstName'],
+        lastName: fencerMap[index]['lastName'],
+        emailAddress: map['emailAddress'],
+        checkedIn: fencerMap[index]['checkedIn'] ?? false,
+      ),
+    );
+  }
+
   factory Fencer.fromMap(Map<String, dynamic> map) {
     return Fencer(
       id: map['id'],

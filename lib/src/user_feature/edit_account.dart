@@ -49,7 +49,7 @@ class _EditAccountState extends State<EditAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Account Setup"),
+        title: const Text("Edit Account"),
       ),
       body: Column(
         children: [

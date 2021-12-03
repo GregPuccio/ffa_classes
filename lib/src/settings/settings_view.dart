@@ -51,7 +51,7 @@ class SettingsView extends StatelessWidget {
                   Card(
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Edit Names"),
+                      title: const Text("Edit Account"),
                       trailing: const Icon(Icons.arrow_forward),
                       onTap: () {
                         Navigator.pushNamed(
@@ -116,12 +116,11 @@ class SettingsView extends StatelessWidget {
                   //             builder: (map, docID) =>
                   //                 UserData.fromMap(map!).copyWith(id: docID));
                   //     for (var user in users) {
-                  //       Child child = Child(
-                  //           id: user.id + "0",
-                  //           firstName: user.firstName,
-                  //           lastName: user.lastName);
-                  //       UserData userData = user.copyWith(children: [child]);
-                  //       FirestoreService().updateData(
+                  //       UserData userData = user.copyWith(
+                  //         parentFirstName: user.children[0].firstName,
+                  //         parentLastName: user.children[0].lastName,
+                  //       );
+                  //       FirestoreService().setData(
                   //         path: FirestorePath.user(user.id),
                   //         data: userData.toMap(),
                   //       );

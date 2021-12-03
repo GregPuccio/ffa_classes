@@ -39,10 +39,9 @@ class _FencerSearchState extends State<FencerSearch> {
         children: [
           Expanded(
             child: StreamBuilder<List<Fencer>>(
-              stream: FirestoreService().collectionStream(
+              stream: FirestoreService().userChildrentoFencerCollectionStream(
                 path: FirestorePath.users(),
-                builder: (map, docID) =>
-                    Fencer.fromMap(map!).copyWith(id: docID),
+                builder: (map, docID) => Fencer.fromUserMap(map!),
                 queryBuilder: (query) => query
                     .orderBy('searchName')
                     .where('searchName',
