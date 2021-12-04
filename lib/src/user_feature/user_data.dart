@@ -46,6 +46,8 @@ class UserData {
       lastName: children[childIndex].lastName,
       emailAddress: emailAddress,
       checkedIn: false,
+      registeredByID: id,
+      registeredAt: DateTime.now(),
     );
   }
 
@@ -58,6 +60,8 @@ class UserData {
         lastName: children[i].lastName,
         emailAddress: emailAddress,
         checkedIn: false,
+        registeredByID: id,
+        registeredAt: DateTime.now(),
       ));
     }
     return newFencers;

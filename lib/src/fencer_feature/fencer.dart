@@ -6,12 +6,16 @@ class Fencer {
   final String lastName;
   final String emailAddress;
   final bool checkedIn;
+  final String registeredByID;
+  final DateTime registeredAt;
   Fencer({
     required this.id,
     required this.firstName,
     required this.lastName,
     required this.emailAddress,
     required this.checkedIn,
+    required this.registeredByID,
+    required this.registeredAt,
   });
 
   Fencer copyWith({
@@ -20,6 +24,8 @@ class Fencer {
     String? lastName,
     String? emailAddress,
     bool? checkedIn,
+    String? registeredByID,
+    DateTime? registeredAt,
   }) {
     return Fencer(
       id: id ?? this.id,
@@ -27,6 +33,8 @@ class Fencer {
       lastName: lastName ?? this.lastName,
       emailAddress: emailAddress ?? this.emailAddress,
       checkedIn: checkedIn ?? this.checkedIn,
+      registeredByID: registeredByID ?? this.registeredByID,
+      registeredAt: registeredAt ?? this.registeredAt,
     );
   }
 
@@ -42,6 +50,8 @@ class Fencer {
       'lastName': lastName,
       'emailAddress': emailAddress,
       'checkedIn': checkedIn,
+      'registeredByID': registeredByID,
+      'registeredAt': registeredAt.millisecondsSinceEpoch,
     };
   }
 
@@ -55,6 +65,9 @@ class Fencer {
         lastName: fencerMap[index]['lastName'],
         emailAddress: map['emailAddress'],
         checkedIn: fencerMap[index]['checkedIn'] ?? false,
+        registeredByID: fencerMap[index]['registeredByID'],
+        registeredAt: DateTime.fromMillisecondsSinceEpoch(
+            fencerMap[index]['registeredAt']),
       ),
     );
   }
@@ -66,6 +79,8 @@ class Fencer {
       lastName: map['lastName'],
       emailAddress: map['emailAddress'],
       checkedIn: map['checkedIn'] ?? false,
+      registeredByID: map['registeredByID'],
+      registeredAt: DateTime.fromMillisecondsSinceEpoch(map['registeredAt']),
     );
   }
 
@@ -75,7 +90,7 @@ class Fencer {
 
   @override
   String toString() {
-    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, checkedIn: $checkedIn)';
+    return 'Fencer(id: $id, firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, checkedIn: $checkedIn, registeredByID: $registeredByID, registeredAt: $registeredAt)';
   }
 
   @override
@@ -95,6 +110,8 @@ class Fencer {
         firstName.hashCode ^
         lastName.hashCode ^
         emailAddress.hashCode ^
-        checkedIn.hashCode;
+        checkedIn.hashCode ^
+        registeredByID.hashCode ^
+        registeredAt.hashCode;
   }
 }
