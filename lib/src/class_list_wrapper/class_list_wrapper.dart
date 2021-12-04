@@ -2,6 +2,7 @@ import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
+// import 'package:ffaclasses/src/invoice_feature/invoice_example.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
@@ -50,7 +51,11 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
             ],
           ),
           floatingActionButton: userData.admin
-              ? PopupMenuButton(
+              ?
+              // Row(
+              //     mainAxisAlignment: MainAxisAlignment.end,
+              //     children: [
+              PopupMenuButton(
                   child: const FloatingActionButton(
                       onPressed: null, child: Icon(Icons.add)),
                   itemBuilder: (_) {
@@ -75,6 +80,18 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                       ),
                     ];
                   })
+              // ,
+              // FloatingActionButton(
+              //   heroTag: 'invoice',
+              //   onPressed: () {
+              //     Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (context) => const InvoiceExample()));
+              //   },
+              // ),
+              //   ],
+              // )
               : null,
           body: calendar ? const ClassCalendarView() : const ClassListView(),
         );

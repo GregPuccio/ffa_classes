@@ -65,9 +65,10 @@ class Fencer {
         lastName: fencerMap[index]['lastName'],
         emailAddress: map['emailAddress'],
         checkedIn: fencerMap[index]['checkedIn'] ?? false,
-        registeredByID: fencerMap[index]['registeredByID'],
-        registeredAt: DateTime.fromMillisecondsSinceEpoch(
-            fencerMap[index]['registeredAt']),
+        registeredByID: fencerMap[index]['registeredByID'] ?? map['id'],
+        registeredAt: DateTime.fromMillisecondsSinceEpoch(fencerMap[index]
+                ['registeredAt'] ??
+            DateTime.now().millisecondsSinceEpoch),
       ),
     );
   }

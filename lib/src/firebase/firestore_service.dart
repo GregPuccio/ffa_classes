@@ -125,10 +125,6 @@ class FirestoreService {
       for (var snapshot in snapshot.docs) {
         fencers.addAll(builder(snapshot.data(), snapshot.id));
       }
-      // final result = snapshot.docs
-      //     .map((snapshot) => builder(snapshot.data(), snapshot.id))
-      //     .where((value) => value != null)
-      //     .toList();
       if (sort != null) {
         fencers.sort(sort);
       }

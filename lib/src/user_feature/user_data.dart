@@ -106,11 +106,25 @@ class UserData {
     return newFencers;
   }
 
+  List<String> setSearchParam(List<String> fencerNames) {
+    List<String> caseSearchList = [];
+    String temp = "";
+    for (int i = 0; i < fencerNames.length; i++) {
+      temp = "";
+      for (int j = 0; j < fencerNames[i].length; j++) {
+        temp = temp + fencerNames[i][j];
+        caseSearchList.add(temp);
+      }
+    }
+    return caseSearchList;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'admin': admin,
-      'searchName': parentLastName.toLowerCase(),
+      'searchTerms': setSearchParam(
+          children.map((e) => e.firstName.toLowerCase()).toList()),
       'emailAddress': emailAddress,
       'parentFirstName': parentFirstName,
       'parentLastName': parentLastName,

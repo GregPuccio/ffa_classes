@@ -22,7 +22,17 @@ class _FencerSearchState extends State<FencerSearch> {
   @override
   void initState() {
     controller = TextEditingController();
+    controller.addListener(() {
+      setState(() {});
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(() {});
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,24 +45,24 @@ class _FencerSearchState extends State<FencerSearch> {
         title: const Text("Fencer Search"),
         bottom: searchBar(controller, Theme.of(context).cardColor),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<Fencer>>(
-              stream: FirestoreService().userChildrentoFencerCollectionStream(
-                path: FirestorePath.users(),
-                builder: (map, docID) => Fencer.fromUserMap(map!),
-                queryBuilder: (query) => query
-                    .orderBy('searchName')
-                    .where('searchName',
-                        isGreaterThanOrEqualTo: controller.text)
-                    .where('admin', isEqualTo: false)
-                    .limit(20),
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<Fencer> fencers = snapshot.data!;
-                  return ListView.builder(
+      body: StreamBuilder<List<Fencer>>(
+        stream: FirestoreService().userChildrentoFencerCollectionStream(
+          path: FirestorePath.users(),
+          builder: (map, docID) => Fencer.fromUserMap(map!),
+          queryBuilder: (query) => query
+              .orderBy('parentLastName')
+              .where('searchTerms',
+                  arrayContains: controller.text.toLowerCase())
+              .where('admin', isEqualTo: false)
+              .limit(20),
+        ),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Fencer> fencers = snapshot.data!;
+            return Column(
+              children: [
+                Flexible(
+                  child: ListView.builder(
                     itemCount: fencers.length,
                     itemBuilder: (context, index) {
                       Fencer fencer = fencers[index];
@@ -75,27 +85,27 @@ class _FencerSearchState extends State<FencerSearch> {
                         ),
                       );
                     },
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ),
-          InkButton(
-            active: edited,
-            text: edited ? "Save changes" : "No changes made",
-            onPressed: () {
-              FirestoreService().updateData(
-                path: FirestorePath.fClass(fClass.id),
-                data: fClass.toMap(),
-              );
-              setState(() {
-                edited = false;
-              });
-            },
-          ),
-        ],
+                  ),
+                ),
+                InkButton(
+                  active: edited,
+                  text: edited ? "Save changes" : "No changes made",
+                  onPressed: () {
+                    FirestoreService().updateData(
+                      path: FirestorePath.fClass(fClass.id),
+                      data: fClass.toMap(),
+                    );
+                    setState(() {
+                      edited = false;
+                    });
+                  },
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
