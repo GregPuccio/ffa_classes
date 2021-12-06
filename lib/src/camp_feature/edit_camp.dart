@@ -110,7 +110,7 @@ class _EditCampState extends State<EditCamp> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text("Cancel"),
+                      child: const Text("CANCEL"),
                     ),
                     TextButton(
                       onPressed: () {
@@ -120,7 +120,7 @@ class _EditCampState extends State<EditCamp> {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },
-                      child: const Text("Confirm"),
+                      child: const Text("CONFIRM"),
                     ),
                   ],
                 ),
@@ -278,19 +278,19 @@ class _EditCampState extends State<EditCamp> {
                           actions: [
                             TextButton(
                               onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("CANCEL"),
+                            ),
+                            TextButton(
+                              onPressed: () {
                                 FirestoreService().deleteData(
                                   path: FirestorePath.fClass(fClass.id),
                                 );
                                 Navigator.popUntil(
                                     context, ModalRoute.withName('/'));
                               },
-                              child: const Text("Delete Camp"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Cancel"),
+                              child: const Text("DELETE CAMP"),
                             ),
                           ],
                         );

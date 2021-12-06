@@ -88,6 +88,12 @@ class _FClassDetailsState extends State<FClassDetails> {
                     actions: [
                       TextButton(
                         onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("CANCEL"),
+                      ),
+                      TextButton(
+                        onPressed: () {
                           if (selectedDates.isNotEmpty) {
                             fencer = fencer.copyWith(checkedIn: fencerPaid);
 
@@ -121,7 +127,7 @@ class _FClassDetailsState extends State<FClassDetails> {
 
                           Navigator.pop(context, selectedDates.isNotEmpty);
                         },
-                        child: const Text("Confirm"),
+                        child: const Text("CONFIRM"),
                       ),
                     ],
                   );
@@ -285,7 +291,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                                               context);
                                                         },
                                                         child: Text(
-                                                            "Mark as ${fencer.checkedIn ? 'absent' : 'present'}"),
+                                                            "MARK FENCER ${fencer.checkedIn ? 'ABSENT' : 'PRESENT'}"),
                                                       ),
                                                     ],
                                                   );
@@ -363,7 +369,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                         TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: const Text("Ok"))
+                                            child: const Text("OK"))
                                       ],
                                     );
                                   });
@@ -387,7 +393,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: const Text("No"),
+                                            child: const Text("CANCEL"),
                                           ),
                                           TextButton(
                                             onPressed: () {
@@ -401,7 +407,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                               Navigator.pop(context);
                                             },
                                             child: const Text(
-                                                "Delete registration"),
+                                                "DELETE REGISTRATION"),
                                           ),
                                         ],
                                       );
@@ -420,7 +426,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: const Text("No"),
+                                            child: const Text("CANCEL"),
                                           ),
                                           TextButton(
                                             onPressed: () {
@@ -433,7 +439,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                               );
                                               Navigator.pop(context);
                                             },
-                                            child: const Text("Register"),
+                                            child: const Text("REGISTER"),
                                           ),
                                         ],
                                       );
@@ -482,7 +488,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text("Cancel"),
+                                          child: const Text("CANCEL"),
                                         ),
                                         TextButton(
                                           onPressed: () {
@@ -495,7 +501,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             );
                                             Navigator.pop(context);
                                           },
-                                          child: const Text("Confirm changes"),
+                                          child: const Text("CONFIRM CHANGES"),
                                         ),
                                       ],
                                     );

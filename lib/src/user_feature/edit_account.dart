@@ -51,171 +51,181 @@ class _EditAccountState extends State<EditAccount> {
       appBar: AppBar(
         title: const Text("Edit Account"),
       ),
-      body: Column(
-        children: [
-          Flexible(
-            child: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Parent:",
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                ),
-                Row(
+      body: Center(
+        child: Container(
+          alignment: Alignment.topCenter,
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? 600
+              : null,
+          child: Column(
+            children: [
+              Flexible(
+                child: ListView(
                   children: [
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          textCapitalization: TextCapitalization.words,
-                          controller: parentFirstName,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "First Name",
-                          ),
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Parent:",
+                        style: Theme.of(context).textTheme.headline5,
                       ),
                     ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          textCapitalization: TextCapitalization.words,
-                          controller: parentLastName,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Last Name",
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Children:",
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                ),
-                Column(
-                  children: List.generate(
-                    childrenFirstNames.length,
-                    (index) {
-                      return Row(
-                        children: [
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextField(
-                                textCapitalization: TextCapitalization.words,
-                                controller: childrenFirstNames[index],
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "First Name",
-                                ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              textCapitalization: TextCapitalization.words,
+                              controller: parentFirstName,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "First Name",
                               ),
                             ),
                           ),
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextField(
-                                textCapitalization: TextCapitalization.words,
-                                controller: childrenLastNames[index],
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Last Name",
-                                ),
+                        ),
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              textCapitalization: TextCapitalization.words,
+                              controller: parentLastName,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Last Name",
                               ),
                             ),
-                          )
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                Row(
-                  children: [
-                    if (childrenFirstNames.length > 1)
-                      Flexible(
-                        child: SecondaryButton(
-                          onPressed: () {
-                            setState(() {
-                              // if (childrenFirstNames.length > 1) {
-                              childrenFirstNames.removeLast();
-                              childrenLastNames.removeLast();
-                              // }
-                            });
-                          },
-                          text: "- Remove child",
-                          activeColor: Colors.red,
+                          ),
                         ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Children:",
+                        style: Theme.of(context).textTheme.headline5,
                       ),
-                    Flexible(
-                      child: SecondaryButton(
-                        text: "+ Add child",
-                        active: true,
-                        onPressed: () {
-                          setState(() {
-                            childrenFirstNames.add(TextEditingController());
-                            childrenLastNames.add(TextEditingController(
-                              text: parentLastName.text,
-                            ));
-                          });
+                    ),
+                    Column(
+                      children: List.generate(
+                        childrenFirstNames.length,
+                        (index) {
+                          return Row(
+                            children: [
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    controller: childrenFirstNames[index],
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "First Name",
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextField(
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    controller: childrenLastNames[index],
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: "Last Name",
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          );
                         },
                       ),
                     ),
+                    Row(
+                      children: [
+                        if (childrenFirstNames.length > 1)
+                          Flexible(
+                            child: SecondaryButton(
+                              onPressed: () {
+                                setState(() {
+                                  // if (childrenFirstNames.length > 1) {
+                                  childrenFirstNames.removeLast();
+                                  childrenLastNames.removeLast();
+                                  // }
+                                });
+                              },
+                              text: "- Remove child",
+                              activeColor: Colors.red,
+                            ),
+                          ),
+                        Flexible(
+                          child: SecondaryButton(
+                            text: "+ Add child",
+                            active: true,
+                            onPressed: () {
+                              setState(() {
+                                childrenFirstNames.add(TextEditingController());
+                                childrenLastNames.add(TextEditingController(
+                                  text: parentLastName.text,
+                                ));
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              InkButton(
+                text: "Save changes",
+                onPressed: () {
+                  if (parentFirstName.text.isEmpty ||
+                      parentLastName.text.isEmpty ||
+                      childrenFirstNames.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            "Please make sure all fields are filled in and you have added your child/children!"),
+                      ),
+                    );
+                  } else {
+                    List<Child> children = [];
+                    for (int i = 0; i < childrenFirstNames.length; i++) {
+                      children.add(Child(
+                        id: widget.userData.id + i.toString(),
+                        firstName: childrenFirstNames[i].text,
+                        lastName: childrenLastNames[i].text,
+                      ));
+                    }
+                    UserData user = UserData(
+                      id: widget.userData.id,
+                      admin: false,
+                      emailAddress: widget.userData.emailAddress,
+                      parentFirstName: parentFirstName.text,
+                      parentLastName: parentLastName.text,
+                      children: children,
+                    );
+                    FirestoreService().setData(
+                      path: FirestorePath.user(widget.userData.id),
+                      data: user.toMap(),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Account has been successfully updated!"),
+                      ),
+                    );
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
           ),
-          InkButton(
-            text: "Save changes",
-            onPressed: () {
-              if (parentFirstName.text.isEmpty ||
-                  parentLastName.text.isEmpty ||
-                  childrenFirstNames.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        "Please make sure all fields are filled in and you have added your child/children!"),
-                  ),
-                );
-              } else {
-                List<Child> children = [];
-                for (int i = 0; i < childrenFirstNames.length; i++) {
-                  children.add(Child(
-                    id: widget.userData.id + i.toString(),
-                    firstName: childrenFirstNames[i].text,
-                    lastName: childrenLastNames[i].text,
-                  ));
-                }
-                UserData user = UserData(
-                  id: widget.userData.id,
-                  admin: false,
-                  emailAddress: widget.userData.emailAddress,
-                  parentFirstName: parentFirstName.text,
-                  parentLastName: parentLastName.text,
-                  children: children,
-                );
-                FirestoreService().setData(
-                  path: FirestorePath.user(widget.userData.id),
-                  data: user.toMap(),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Account has been successfully updated!"),
-                  ),
-                );
-                Navigator.pop(context);
-              }
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

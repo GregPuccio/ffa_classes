@@ -75,7 +75,7 @@ class _EditClassState extends State<EditClass> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text("Cancel"),
+                      child: const Text("CANCEL"),
                     ),
                     TextButton(
                       onPressed: () {
@@ -86,7 +86,7 @@ class _EditClassState extends State<EditClass> {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },
-                      child: const Text("Confirm"),
+                      child: const Text("CONFIRM"),
                     ),
                   ],
                 ),
@@ -164,19 +164,19 @@ class _EditClassState extends State<EditClass> {
                           actions: [
                             TextButton(
                               onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("CANCEL"),
+                            ),
+                            TextButton(
+                              onPressed: () {
                                 FirestoreService().deleteData(
                                   path: FirestorePath.fClass(fClass.id),
                                 );
                                 Navigator.popUntil(
                                     context, ModalRoute.withName('/'));
                               },
-                              child: const Text("Delete Class"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Cancel"),
+                              child: const Text("DELETE CLASS"),
                             ),
                           ],
                         );

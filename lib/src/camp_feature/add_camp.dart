@@ -250,7 +250,7 @@ class _AddCampState extends State<AddCamp> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("Cancel"),
+                          child: const Text("CANCEL"),
                         ),
                         TextButton(
                           onPressed: () {
@@ -260,7 +260,7 @@ class _AddCampState extends State<AddCamp> {
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },
-                          child: const Text("Confirm"),
+                          child: const Text("CONFIRM"),
                         ),
                       ],
                     ),

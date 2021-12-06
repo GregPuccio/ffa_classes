@@ -1,13 +1,20 @@
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
+import 'package:ffaclasses/src/constants/links.dart';
+import 'package:ffaclasses/src/constants/theming/app_color.dart';
+import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
+import 'package:ffaclasses/src/constants/widgets/theme_popup_menu.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
+import 'package:ffaclasses/src/user_feature/change_password.dart';
 import 'package:ffaclasses/src/user_feature/edit_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import 'settings_controller.dart';
+import 'theme_controller.dart';
 
 /// Displays the various settings that can be customized by the user.
 ///
@@ -18,10 +25,12 @@ class SettingsView extends StatelessWidget {
 
   static const routeName = '/settings';
 
-  final SettingsController controller;
+  final ThemeController controller;
 
   @override
   Widget build(BuildContext context) {
+    final double margins =
+        AppData.responsiveInsets(MediaQuery.of(context).size.width);
     Widget whenData(UserData? userData) {
       if (userData != null) {
         return Scaffold(
@@ -51,13 +60,26 @@ class SettingsView extends StatelessWidget {
                   Card(
                     margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: const Text("Edit Account"),
+                      title: const Text("Edit Parent & Children"),
                       trailing: const Icon(Icons.arrow_forward),
                       onTap: () {
                         Navigator.pushNamed(
                           context,
                           EditAccount.routeName,
                           arguments: ScreenArgs(userData: userData),
+                        );
+                      },
+                    ),
+                  ),
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: const Text("Change Password"),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          ChangePassword.routeName,
                         );
                       },
                     ),
@@ -71,33 +93,58 @@ class SettingsView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField<ThemeMode>(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: margins,
+                        horizontal: margins + 4,
                       ),
-                      isExpanded: true,
-                      // Read the selected themeMode from the controller
-                      value: controller.themeMode,
-                      // Call the updateThemeMode method any time the user selects a theme.
-                      onChanged: controller.updateThemeMode,
-                      items: const [
-                        DropdownMenuItem(
-                          value: ThemeMode.system,
-                          child: Text('System Theme'),
-                        ),
-                        DropdownMenuItem(
-                          value: ThemeMode.light,
-                          child: Text('Light Theme'),
-                        ),
-                        DropdownMenuItem(
-                          value: ThemeMode.dark,
-                          child: Text('Dark Theme'),
-                        ),
-                      ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // A 3-way theme toggle switch that shows the scheme.
+                          FlexThemeModeSwitch(
+                            themeMode: controller.themeMode,
+                            onThemeModeChanged: controller.setThemeMode,
+                            flexSchemeData:
+                                AppColor.schemes[controller.schemeIndex],
+                            optionButtonBorderRadius:
+                                controller.useSubThemes ? 12 : 4,
+                            buttonOrder:
+                                FlexThemeModeButtonOrder.lightSystemDark,
+                          ),
+                          const SizedBox(height: 8),
+                          // Theme popup menu button to select color scheme.
+                          ThemePopupMenu(
+                            contentPadding: EdgeInsets.zero,
+                            schemeIndex: controller.schemeIndex,
+                            onChanged: controller.setSchemeIndex,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: const Text(
+                      "ABOUT",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: const Text("Privacy Policy"),
+                      trailing: const Icon(Icons.launch),
+                      onTap: () {
+                        launch(privacyPolicy);
+                      },
+                    ),
+                  ),
+
                   // Container(
                   //   margin: const EdgeInsets.all(10),
                   //   child: const Text(

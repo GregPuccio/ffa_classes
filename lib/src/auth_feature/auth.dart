@@ -20,8 +20,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   AuthScreenState currentState = AuthScreenState.signIn;
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  TextEditingController? forgotPassController;
   bool obscure = true;
 
   late String verificationId;
@@ -46,6 +47,66 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message!)));
     }
+  }
+
+  Future forgotPassword() {
+    forgotPassController = TextEditingController(text: emailController.text);
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Forgot Password"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Please enter the email address that you use for your account below.",
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              autofocus: true,
+              controller: forgotPassController,
+              decoration: const InputDecoration(
+                labelText: "Email",
+                prefixIcon: Icon(Icons.mail),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("CANCEL"),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (EmailValidator.validate(forgotPassController!.text)) {
+                final dynamic result = await AuthService()
+                    .forgotPassword(forgotPassController!.text);
+                if (result.runtimeType == String) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(result),
+                  ));
+                } else {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        "If the email address entered has an account associated, an email has been sent to the address."),
+                  ));
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Please enter a valid email."),
+                ));
+              }
+            },
+            child: const Text("SEND EMAIL"),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget getSignIn(context) {
@@ -79,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
-                  obscure ? Icons.visibility : Icons.visibility_off,
+                  obscure ? Icons.visibility_off : Icons.visibility,
                 ),
                 onPressed: () {
                   setState(() {
@@ -91,7 +152,14 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: obscure,
           ),
         ),
-        const SizedBox(height: 16),
+        Container(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            child: const Text("Forgot password?"),
+            onPressed: () => forgotPassword(),
+          ),
+        ),
+        const SizedBox(height: 8),
         InkButton(
           onPressed: () async {
             if (EmailValidator.validate(emailController.text)) {
@@ -165,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 icon: Icon(
-                  obscure ? Icons.visibility : Icons.visibility_off,
+                  obscure ? Icons.visibility_off : Icons.visibility,
                 ),
                 onPressed: () {
                   setState(() {
@@ -234,11 +302,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  @override
+  void initState() {
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+
+    if (forgotPassController != null) {
+      forgotPassController!.dispose();
+    }
     super.dispose();
   }
 

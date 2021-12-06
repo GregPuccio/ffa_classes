@@ -167,7 +167,7 @@ class _AddClassState extends State<AddClass> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("Cancel"),
+                          child: const Text("CANCEL"),
                         ),
                         TextButton(
                           onPressed: () {
@@ -176,10 +176,10 @@ class _AddClassState extends State<AddClass> {
                                   path: FirestorePath.fClasses(),
                                   data: fClass.toMap());
                             }
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            Navigator.popUntil(
+                                context, ModalRoute.withName('/'));
                           },
-                          child: const Text("Confirm"),
+                          child: const Text("CONFIRM"),
                         ),
                       ],
                     ),

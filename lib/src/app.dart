@@ -4,29 +4,32 @@ import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
 import 'package:ffaclasses/src/class_feature/edit_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
+import 'package:ffaclasses/src/constants/theming/app_color.dart';
+import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
+import 'package:ffaclasses/src/user_feature/change_password.dart';
 import 'package:ffaclasses/src/user_feature/create_account.dart';
 import 'package:ffaclasses/src/user_feature/edit_account.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'camp_feature/add_camp.dart';
-import 'settings/settings_controller.dart';
+import 'settings/theme_controller.dart';
 import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
-    required this.settingsController,
+    required this.themeController,
   }) : super(key: key);
-
-  final SettingsController settingsController;
+  final ThemeController themeController;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,7 @@ class MyApp extends StatelessWidget {
     // The AnimatedBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
     return AnimatedBuilder(
-      animation: settingsController,
+      animation: themeController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
           shortcuts: shortcuts,
@@ -54,9 +57,41 @@ class MyApp extends StatelessWidget {
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
-          theme: ThemeData(),
-          darkTheme: ThemeData.dark(),
-          themeMode: settingsController.themeMode,
+          theme: FlexThemeData.light(
+            // We moved the definition of the list of color schemes to use into
+            // a separate static class and list. We use the theme controller
+            // to change the index of used color scheme from the list.
+            colors: AppColor.schemes[themeController.schemeIndex].light,
+            // Here we use another surface blend mode, where the scaffold
+            // background gets a strong blend. This type is commonly used
+            // on web/desktop when you wrap content on the scaffold in a
+            // card that has a lighter background.
+            surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
+            // Our content is not all wrapped in cards in this demo, so
+            // we keep the blend level fairly low for good contrast.
+            blendLevel: 5,
+            appBarElevation: 0.5,
+            useSubThemes: themeController.useSubThemes,
+            // In this example we use the values for visual density and font
+            // from a single static source, so we can change it easily there.
+            visualDensity: AppData.visualDensity,
+            // fontFamily: AppData.font,
+          ),
+          darkTheme: FlexThemeData.dark(
+            colors: AppColor.schemes[themeController.schemeIndex].dark,
+            surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
+            // We go with a slightly stronger blend in dark mode. It is worth
+            // noticing, that in light mode, the alpha value used for the blends
+            // is the blend level value, but in dark mode it is 2x this value.
+            // Visually they match fairly well, but it depends on how saturated
+            // your dark mode primary color is.
+            blendLevel: 7,
+            appBarElevation: 0.5,
+            useSubThemes: themeController.useSubThemes,
+            visualDensity: AppData.visualDensity,
+            // fontFamily: AppData.font,
+          ),
+          themeMode: themeController.themeMode,
           debugShowCheckedModeBanner: false,
 
           // Define a function to handle named routes in order to support
@@ -87,12 +122,14 @@ class MyApp extends StatelessWidget {
                   case FencerSearch.routeName:
                     return const FencerSearch();
                   case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
+                    return SettingsView(controller: themeController);
                   case EditAccount.routeName:
                     return EditAccount(
                       userData:
                           (routeSettings.arguments as ScreenArgs).userData!,
                     );
+                  case ChangePassword.routeName:
+                    return const ChangePassword();
                   default:
                     return const AuthWrapper();
                 }
