@@ -1,6 +1,5 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app_data_directory/app_data_dir_web.dart'
     if (dart.library.io) 'app_data_directory/app_data_dir_no_web.dart';
