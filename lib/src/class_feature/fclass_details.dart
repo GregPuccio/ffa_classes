@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
 import 'package:ffaclasses/src/class_feature/edit_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass.dart';
@@ -525,12 +526,7 @@ class _FClassDetailsState extends State<FClassDetails> {
           },
         );
       } else {
-        return Center(
-          child: Text(
-            "Error",
-            style: Theme.of(context).textTheme.headline6,
-          ),
-        );
+        return const Center(child: CircularProgressIndicator());
       }
     }
 
@@ -539,12 +535,7 @@ class _FClassDetailsState extends State<FClassDetails> {
         return watch.watch(userDataProvider).when(
               data: whenData,
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (object, stackTrace) => Center(
-                child: Text(
-                  "Error",
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
+              error: (object, stackTrace) => const AuthWrapper(),
             );
       },
     );

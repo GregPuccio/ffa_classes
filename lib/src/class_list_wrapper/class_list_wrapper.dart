@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
@@ -96,12 +97,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
           body: calendar ? const ClassCalendarView() : const ClassListView(),
         );
       } else {
-        return Center(
-          child: Text(
-            "Error",
-            style: Theme.of(context).textTheme.headline6,
-          ),
-        );
+        return const Center(child: CircularProgressIndicator());
       }
     }
 
@@ -110,12 +106,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
         return watch.watch(userDataProvider).when(
               data: whenData,
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (object, stackTrace) => Center(
-                child: Text(
-                  "Error",
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
+              error: (object, stackTrace) => const AuthWrapper(),
             );
       },
     );

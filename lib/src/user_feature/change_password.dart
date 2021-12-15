@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
@@ -156,12 +157,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         return watch.watch(userDataProvider).when(
               data: whenData,
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (object, stackTrace) => Center(
-                child: Text(
-                  "Error",
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
+              error: (object, stackTrace) => const AuthWrapper(),
             );
       },
     );
