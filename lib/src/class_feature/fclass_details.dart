@@ -229,11 +229,15 @@ class _FClassDetailsState extends State<FClassDetails> {
                                 Widget? subtitle;
                                 String text = "";
                                 if (fClass.classType == ClassType.camp &&
-                                    fClass.campDays != null) {
+                                    fClass.campDays != null &&
+                                    fClass.campDays!.isNotEmpty) {
                                   for (var day in fClass.campDays!) {
                                     if (day.fencers.contains(fencer)) {
                                       text = text +
-                                          "${DateFormat("E M/d").format(day.date)} | ";
+                                          DateFormat("E M/d").format(day.date);
+                                    }
+                                    if (day != fClass.campDays!.last) {
+                                      text = text + " | ";
                                     }
                                   }
                                   subtitle = Text(text);
