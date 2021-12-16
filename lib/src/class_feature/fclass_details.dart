@@ -231,13 +231,15 @@ class _FClassDetailsState extends State<FClassDetails> {
                                 if (fClass.classType == ClassType.camp &&
                                     fClass.campDays != null &&
                                     fClass.campDays!.isNotEmpty) {
+                                  bool first = true;
                                   for (var day in fClass.campDays!) {
                                     if (day.fencers.contains(fencer)) {
+                                      if (!first) {
+                                        text = text + " | ";
+                                      }
                                       text = text +
                                           DateFormat("E M/d").format(day.date);
-                                    }
-                                    if (day != fClass.campDays!.last) {
-                                      text = text + " | ";
+                                      first = false;
                                     }
                                   }
                                   subtitle = Text(text);
