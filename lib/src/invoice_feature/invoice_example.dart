@@ -1,4 +1,5 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
+import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
@@ -94,8 +95,10 @@ class _InvoiceExampleState extends State<InvoiceExample> {
             future: FirestoreService().collectionFuture(
               path: FirestorePath.fClasses(),
               builder: (map, docID) => FClass.fromMap(map!).copyWith(id: docID),
-              queryBuilder: (query) => query.where("userIDs",
-                  arrayContains: userData.fencers()[0].id),
+              queryBuilder: (query) => query.where(
+                "userIDs",
+                arrayContainsAny: userData.fencers().map((e) => e.id).toList(),
+              ),
             ),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -104,7 +107,7 @@ class _InvoiceExampleState extends State<InvoiceExample> {
                   _invoiceProducts = FClass.convertClassesToProducts(
                       classes, _products, userData);
                 }
-                return ListView(
+                return Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8),
@@ -149,6 +152,28 @@ class _InvoiceExampleState extends State<InvoiceExample> {
                           ),
                         ),
                       ),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                          itemCount: classes.length,
+                          itemBuilder: (context, index) {
+                            FClass fClass = classes[index];
+                            return Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Card(
+                                child: ListTile(
+                                  title: Text(fClass.title),
+                                  subtitle: Text(fClass.dateRange),
+                                  onTap: () {
+                                    Navigator.restorablePushNamed(
+                                      context,
+                                      '${FClassDetails.routeName}/${fClass.id}',
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }),
                     ),
                   ],
                 );

@@ -19,6 +19,7 @@ class _EditAccountState extends State<EditAccount> {
   late TextEditingController parentLastName;
   late List<TextEditingController> childrenFirstNames;
   late List<TextEditingController> childrenLastNames;
+  bool edited = false;
   @override
   void initState() {
     childrenFirstNames = List.generate(
@@ -81,6 +82,13 @@ class _EditAccountState extends State<EditAccount> {
                                 border: OutlineInputBorder(),
                                 labelText: "First Name",
                               ),
+                              onChanged: (val) {
+                                if (!edited) {
+                                  setState(() {
+                                    edited = true;
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ),
@@ -94,6 +102,13 @@ class _EditAccountState extends State<EditAccount> {
                                 border: OutlineInputBorder(),
                                 labelText: "Last Name",
                               ),
+                              onChanged: (val) {
+                                if (!edited) {
+                                  setState(() {
+                                    edited = true;
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ),
@@ -123,6 +138,13 @@ class _EditAccountState extends State<EditAccount> {
                                       border: OutlineInputBorder(),
                                       labelText: "First Name",
                                     ),
+                                    onChanged: (val) {
+                                      if (!edited) {
+                                        setState(() {
+                                          edited = true;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                               ),
@@ -137,6 +159,13 @@ class _EditAccountState extends State<EditAccount> {
                                       border: OutlineInputBorder(),
                                       labelText: "Last Name",
                                     ),
+                                    onChanged: (val) {
+                                      if (!edited) {
+                                        setState(() {
+                                          edited = true;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                               )
@@ -156,6 +185,9 @@ class _EditAccountState extends State<EditAccount> {
                                   childrenFirstNames.removeLast();
                                   childrenLastNames.removeLast();
                                   // }
+                                  if (!edited) {
+                                    edited = true;
+                                  }
                                 });
                               },
                               text: "- Remove child",
@@ -181,50 +213,52 @@ class _EditAccountState extends State<EditAccount> {
                   ],
                 ),
               ),
-              InkButton(
-                text: "Save changes",
-                onPressed: () {
-                  if (parentFirstName.text.isEmpty ||
-                      parentLastName.text.isEmpty ||
-                      childrenFirstNames.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "Please make sure all fields are filled in and you have added your child/children!"),
-                      ),
-                    );
-                  } else {
-                    List<Child> children = [];
-                    for (int i = 0; i < childrenFirstNames.length; i++) {
-                      children.add(Child(
-                        id: widget.userData.id + i.toString(),
-                        firstName: childrenFirstNames[i].text,
-                        lastName: childrenLastNames[i].text,
-                      ));
+              if (edited)
+                InkButton(
+                  text: "Save changes",
+                  onPressed: () {
+                    if (parentFirstName.text.isEmpty ||
+                        parentLastName.text.isEmpty ||
+                        childrenFirstNames.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              "Please make sure all fields are filled in and you have added your child/children!"),
+                        ),
+                      );
+                    } else {
+                      List<Child> children = [];
+                      for (int i = 0; i < childrenFirstNames.length; i++) {
+                        children.add(Child(
+                          id: widget.userData.id + i.toString(),
+                          firstName: childrenFirstNames[i].text,
+                          lastName: childrenLastNames[i].text,
+                        ));
+                      }
+                      UserData user = UserData(
+                        id: widget.userData.id,
+                        admin: false,
+                        emailAddress: widget.userData.emailAddress,
+                        parentFirstName: parentFirstName.text,
+                        parentLastName: parentLastName.text,
+                        children: children,
+                        member: widget.userData.member,
+                        unlimitedMember: widget.userData.member,
+                      );
+                      FirestoreService().setData(
+                        path: FirestorePath.user(widget.userData.id),
+                        data: user.toMap(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("Account has been successfully updated!"),
+                        ),
+                      );
+                      Navigator.pop(context);
                     }
-                    UserData user = UserData(
-                      id: widget.userData.id,
-                      admin: false,
-                      emailAddress: widget.userData.emailAddress,
-                      parentFirstName: parentFirstName.text,
-                      parentLastName: parentLastName.text,
-                      children: children,
-                      member: widget.userData.member,
-                      unlimitedMember: widget.userData.member,
-                    );
-                    FirestoreService().setData(
-                      path: FirestorePath.user(widget.userData.id),
-                      data: user.toMap(),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Account has been successfully updated!"),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-              ),
+                  },
+                ),
             ],
           ),
         ),
