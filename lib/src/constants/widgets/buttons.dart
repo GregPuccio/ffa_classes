@@ -69,6 +69,7 @@ class SecondaryButton extends StatelessWidget {
         constraints: const BoxConstraints(maxHeight: 55, maxWidth: 400),
         margin: const EdgeInsets.all(10.0),
         child: OutlinedButton(
+          clipBehavior: Clip.antiAlias,
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: color),
             backgroundColor: Theme.of(context).colorScheme.surface,

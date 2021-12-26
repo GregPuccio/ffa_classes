@@ -45,32 +45,37 @@ class _ClientsViewState extends ConsumerState<ClientsView> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<UserData> users = snapshot.data!;
-            return Column(
-              children: [
-                searchBar(controller, Theme.of(context).cardColor),
-                Flexible(
-                  child: ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      UserData user = users[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(
-                              "${user.parentFirstName} ${user.parentLastName}"),
-                          trailing: const Icon(Icons.edit),
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              EditAccount.routeName,
-                              arguments: ScreenArgs(userData: user),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+            return Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Column(
+                  children: [
+                    searchBar(controller, Theme.of(context).cardColor),
+                    Flexible(
+                      child: ListView.builder(
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          UserData user = users[index];
+                          return Card(
+                            child: ListTile(
+                              title: Text(
+                                  "${user.parentFirstName} ${user.parentLastName}"),
+                              trailing: const Icon(Icons.edit),
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  EditAccount.routeName,
+                                  arguments: ScreenArgs(userData: user),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           } else {
             return const Center(child: CircularProgressIndicator());

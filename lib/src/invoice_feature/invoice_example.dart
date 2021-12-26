@@ -1,5 +1,6 @@
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
+import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
@@ -107,75 +108,88 @@ class _InvoiceExampleState extends State<InvoiceExample> {
                   _invoiceProducts = FClass.convertClassesToProducts(
                       classes, _products, userData);
                 }
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                return Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: ListView(
                             children: [
-                              TextFormField(
-                                initialValue: userData.emailAddress,
-                                enabled: false,
-                                decoration: const InputDecoration(
-                                  labelText: 'Email',
-                                  prefixIcon: Icon(Icons.email),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        TextFormField(
+                                          initialValue: userData.emailAddress,
+                                          enabled: false,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Email',
+                                            prefixIcon: Icon(Icons.email),
+                                          ),
+                                          onChanged: (value) =>
+                                              setState(() => _email = value),
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        SecondaryButton(
+                                          text: 'Create Invoice',
+                                          onPressed: (_email.isNotEmpty)
+                                              ? () => _createInvoice()
+                                              : null,
+                                        ),
+                                        SecondaryButton(
+                                          text: 'View PDF',
+                                          onPressed: (_invoice != null)
+                                              ? () => _viewPdf()
+                                              : null,
+                                        ),
+                                        SecondaryButton(
+                                          text: 'View Portal',
+                                          onPressed: (_invoice != null)
+                                              ? () => _viewPortal()
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                onChanged: (value) =>
-                                    setState(() => _email = value),
-                                keyboardType: TextInputType.emailAddress,
                               ),
-                              const SizedBox(height: 16),
-                              OutlinedButton(
-                                child: const Text('Create Invoice'),
-                                onPressed: (_email.isNotEmpty)
-                                    ? () => _createInvoice()
-                                    : null,
-                              ),
-                              OutlinedButton(
-                                child: const Text('View PDF'),
-                                onPressed: (_invoice != null)
-                                    ? () => _viewPdf()
-                                    : null,
-                              ),
-                              OutlinedButton(
-                                child: const Text('View Portal'),
-                                onPressed: (_invoice != null)
-                                    ? () => _viewPortal()
-                                    : null,
-                              ),
+                              ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: classes.length,
+                                  itemBuilder: (context, index) {
+                                    FClass fClass = classes[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(fClass.title),
+                                          subtitle: Text(fClass.dateRange),
+                                          onTap: () {
+                                            Navigator.restorablePushNamed(
+                                              context,
+                                              '${FClassDetails.routeName}/${fClass.id}',
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  }),
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    Flexible(
-                      child: ListView.builder(
-                          itemCount: classes.length,
-                          itemBuilder: (context, index) {
-                            FClass fClass = classes[index];
-                            return Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Card(
-                                child: ListTile(
-                                  title: Text(fClass.title),
-                                  subtitle: Text(fClass.dateRange),
-                                  onTap: () {
-                                    Navigator.restorablePushNamed(
-                                      context,
-                                      '${FClassDetails.routeName}/${fClass.id}',
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                  ),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());

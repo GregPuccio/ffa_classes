@@ -138,10 +138,7 @@ class _EditCampState extends State<EditCamp> {
       ),
       body: Center(
         child: Container(
-          alignment: Alignment.topCenter,
-          width: MediaQuery.of(context).orientation == Orientation.landscape
-              ? 600
-              : null,
+          constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
             children: [
               const SizedBox(

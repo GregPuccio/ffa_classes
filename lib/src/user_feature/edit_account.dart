@@ -54,10 +54,7 @@ class _EditAccountState extends State<EditAccount> {
       ),
       body: Center(
         child: Container(
-          alignment: Alignment.topCenter,
-          width: MediaQuery.of(context).orientation == Orientation.landscape
-              ? 600
-              : null,
+          constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
             children: [
               Flexible(
