@@ -3,6 +3,7 @@ import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
+import 'package:ffaclasses/src/invoice_feature/invoice_example.dart';
 // import 'package:ffaclasses/src/invoice_feature/invoice_example.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
@@ -20,11 +21,28 @@ class ClassListWrapper extends StatefulWidget {
 
 class _ClassListWrapperState extends State<ClassListWrapper> {
   bool calendar = false;
+  int index = 0;
+
+  void changeTab(int newIndex) {
+    if (index != newIndex) {
+      setState(() {
+        index = newIndex;
+      });
+    }
+  }
 
   void changeView() {
     setState(() {
       calendar = !calendar;
     });
+  }
+
+  Widget getBody() {
+    if (index == 0) {
+      return calendar ? const ClassCalendarView() : const ClassListView();
+    } else {
+      return const InvoiceExample();
+    }
   }
 
   @override
@@ -94,7 +112,15 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
               //   ],
               // )
               : null,
-          body: calendar ? const ClassCalendarView() : const ClassListView(),
+          body: getBody(),
+          bottomNavigationBar: BottomNavigationBar(
+            onTap: changeTab,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Classes'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.payment), label: 'Payments'),
+            ],
+          ),
         );
       } else {
         return const Center(child: CircularProgressIndicator());

@@ -1,4 +1,7 @@
+import 'package:ffaclasses/src/riverpod/providers.dart';
+import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoiceninja/invoiceninja.dart';
 import 'package:invoiceninja/models/client.dart';
 import 'package:invoiceninja/models/invoice.dart';
@@ -76,61 +79,84 @@ class _InvoiceExampleState extends State<InvoiceExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoice Ninja Example'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Card(
-            child: Padding(
+    Widget whenData(UserData? userData) {
+      if (userData != null) {
+        return ListView(
+          children: [
+            Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      suffixIcon: Icon(Icons.email),
-                    ),
-                    onChanged: (value) => setState(() => _email = value),
-                    keyboardType: TextInputType.emailAddress,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        initialValue: userData.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          suffixIcon: Icon(Icons.email),
+                        ),
+                        onChanged: (value) => setState(() => _email = value),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      DropdownButtonFormField<Product>(
+                        decoration: const InputDecoration(
+                          labelText: 'Product',
+                        ),
+                        onChanged: (value) => setState(() => _product = value),
+                        items: _products
+                            .map((product) => DropdownMenuItem(
+                                  child: Text(product.productKey),
+                                  value: product,
+                                ))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton(
+                        child: const Text('Create Invoice'),
+                        onPressed: (_email.isNotEmpty && _product != null)
+                            ? () => _createInvoice()
+                            : null,
+                      ),
+                      OutlinedButton(
+                        child: const Text('View PDF'),
+                        onPressed: (_invoice != null) ? () => _viewPdf() : null,
+                      ),
+                      OutlinedButton(
+                        child: const Text('View Portal'),
+                        onPressed:
+                            (_invoice != null) ? () => _viewPortal() : null,
+                      ),
+                    ],
                   ),
-                  DropdownButtonFormField<Product>(
-                    decoration: const InputDecoration(
-                      labelText: 'Product',
-                    ),
-                    onChanged: (value) => setState(() => _product = value),
-                    items: _products
-                        .map((product) => DropdownMenuItem(
-                              child: Text(product.productKey),
-                              value: product,
-                            ))
-                        .toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    child: const Text('Create Invoice'),
-                    onPressed: (_email.isNotEmpty && _product != null)
-                        ? () => _createInvoice()
-                        : null,
-                  ),
-                  OutlinedButton(
-                    child: const Text('View PDF'),
-                    onPressed: (_invoice != null) ? () => _viewPdf() : null,
-                  ),
-                  OutlinedButton(
-                    child: const Text('View Portal'),
-                    onPressed: (_invoice != null) ? () => _viewPortal() : null,
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
+          ],
+        );
+      } else {
+        return const Center(child: CircularProgressIndicator());
+      }
+    }
+
+    return Consumer(
+      builder: (context, watch, child) {
+        return watch.watch(userDataProvider).when(
+              data: whenData,
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (object, stackTrace) => Center(
+                child: Text(
+                  "Error",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+            );
+      },
     );
   }
 }
