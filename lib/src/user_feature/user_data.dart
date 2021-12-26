@@ -5,6 +5,8 @@ import 'package:ffaclasses/src/user_feature/child.dart';
 
 class UserData {
   final String id;
+  final String invoicingKey;
+  final List<String> invoices;
   final bool admin;
   final String emailAddress;
   final String parentFirstName;
@@ -15,6 +17,8 @@ class UserData {
 
   UserData({
     required this.id,
+    required this.invoicingKey,
+    required this.invoices,
     required this.admin,
     required this.emailAddress,
     required this.parentFirstName,
@@ -26,6 +30,8 @@ class UserData {
 
   UserData copyWith({
     String? id,
+    String? invoicingKey,
+    List<String>? invoices,
     String? emailAddress,
     String? parentFirstName,
     String? parentLastName,
@@ -35,6 +41,8 @@ class UserData {
   }) {
     return UserData(
       id: id ?? this.id,
+      invoicingKey: invoicingKey ?? this.invoicingKey,
+      invoices: invoices ?? this.invoices,
       admin: admin,
       emailAddress: emailAddress ?? this.emailAddress,
       parentFirstName: parentFirstName ?? this.parentFirstName,
@@ -128,6 +136,8 @@ class UserData {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'invoicingKey': invoicingKey,
+      'invoices': invoices,
       'admin': admin,
       'searchTerms': setSearchParam(
           children.map((e) => e.firstName.toLowerCase()).toList()),
@@ -143,6 +153,8 @@ class UserData {
   factory UserData.fromMap(Map<String, dynamic> map) {
     return UserData(
       id: map['id'],
+      invoicingKey: map['invoicingKey'] ?? '',
+      invoices: List<String>.from(map['invoices'] ?? []),
       admin: map['admin'] ?? false,
       emailAddress: map['emailAddress'],
       parentFirstName: map['parentFirstName'],

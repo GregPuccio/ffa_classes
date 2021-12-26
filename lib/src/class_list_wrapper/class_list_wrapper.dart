@@ -4,8 +4,7 @@ import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
-import 'package:ffaclasses/src/invoice_feature/invoice_example.dart';
-// import 'package:ffaclasses/src/invoice_feature/invoice_example.dart';
+import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
@@ -38,11 +37,15 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
     });
   }
 
-  Widget getBody() {
+  Widget getBody(bool admin) {
     if (index == 0) {
       return calendar ? const ClassCalendarView() : const ClassListView();
     } else if (index == 1) {
-      return const InvoiceExample();
+      // if (admin) {
+      //   return const AdminInvoicing();
+      // } else {
+      return const ClientInvoicing();
+      // }
     } else {
       return const ClientsView();
     }
@@ -100,7 +103,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                     ];
                   })
               : null,
-          body: getBody(),
+          body: getBody(userData.admin),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: index,
             onTap: changeTab,

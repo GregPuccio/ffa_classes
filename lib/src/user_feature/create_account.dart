@@ -188,6 +188,8 @@ class _AccountSetupState extends State<AccountSetup> {
                 }
                 UserData user = UserData(
                   id: 'id',
+                  invoicingKey: '',
+                  invoices: [],
                   admin: false,
                   emailAddress: widget.user.email!,
                   parentFirstName: parentFirstName.text,
