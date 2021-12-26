@@ -26,8 +26,8 @@ class _InvoiceExampleState extends State<InvoiceExample> {
     InvoiceNinja.configure(
       // Set your company key or use 'KEY' to test
       // The key can be generated on Settings > Client Portal
-      'KEY',
-      url: 'https://demo.invoiceninja.com', // Set your selfhost app URL
+      'HwkyOH5itK8vANSXTjdkrAPkTOxkhBMs',
+      url: 'https://ffa.invoicing.co', // Set your selfhost app URL
       debugEnabled: true,
     );
 
