@@ -108,6 +108,16 @@ class _FClassDetailsState extends State<FClassDetails> {
                             fClass.fencers.remove(fencer);
                           }
 
+                          List<String> userIDs = [];
+
+                          fClass.campDays?.forEach((day) {
+                            for (var fencer in day.fencers) {
+                              userIDs.add(fencer.id);
+                            }
+                          });
+
+                          userIDs.removeWhere((id) => id == fencer.id);
+
                           fClass.campDays?.forEach((day) {
                             DateTime date = day.date;
                             String dateString =
@@ -117,10 +127,14 @@ class _FClassDetailsState extends State<FClassDetails> {
                               if (!day.fencers.contains(fencer)) {
                                 day.fencers.add(fencer);
                               }
+                              userIDs.add(fencer.id);
                             } else {
                               day.fencers.remove(fencer);
                             }
                           });
+
+                          fClass = fClass.copyWith(userIDs: userIDs);
+
                           FirestoreService().updateData(
                             path: FirestorePath.fClass(fClass.id),
                             data: fClass.toMap(),
@@ -404,6 +418,8 @@ class _FClassDetailsState extends State<FClassDetails> {
                                           ),
                                           TextButton(
                                             onPressed: () {
+                                              fClass.userIDs.remove(
+                                                  userData.fencers()[0].id);
                                               fClass.fencers
                                                   .remove(userData.toFencer(0));
                                               FirestoreService().updateData(
@@ -437,6 +453,8 @@ class _FClassDetailsState extends State<FClassDetails> {
                                           ),
                                           TextButton(
                                             onPressed: () {
+                                              fClass.userIDs.add(
+                                                  userData.fencers()[0].id);
                                               fClass.fencers
                                                   .add(userData.toFencer(0));
                                               FirestoreService().updateData(
@@ -461,6 +479,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                                       builder: (context, setState) {
                                     List<Fencer> fencers =
                                         userData.fencersInList(fClass.fencers);
+                                    List<String> userIDs = [];
                                     return AlertDialog(
                                       title: const Text('Edit Registration'),
                                       content: Column(
@@ -478,14 +497,21 @@ class _FClassDetailsState extends State<FClassDetails> {
                                             onSelectionChanged: (val) {
                                               fencers = [];
                                               fencers.addAll(fClass.fencers);
+                                              userIDs.addAll(fClass.userIDs);
                                               for (var fencer in userData
                                                   .fencersInList(fencers)) {
                                                 fencers.remove(fencer);
+                                                userIDs.remove(fencer.id);
                                               }
                                               fencers.addAll(userData
                                                   .fencersFromFirstName(val));
+                                              userIDs.addAll(userData
+                                                  .fencersFromFirstName(val)
+                                                  .map((e) => e.id));
                                               fencers =
                                                   fencers.toSet().toList();
+                                              userIDs =
+                                                  userIDs.toSet().toList();
                                             },
                                           ),
                                         ],
@@ -500,7 +526,8 @@ class _FClassDetailsState extends State<FClassDetails> {
                                         TextButton(
                                           onPressed: () {
                                             fClass = fClass.copyWith(
-                                                fencers: fencers);
+                                                fencers: fencers,
+                                                userIDs: userIDs);
                                             FirestoreService().updateData(
                                               path: FirestorePath.fClass(
                                                   fClass.id),

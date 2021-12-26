@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
+import 'package:invoiceninja/models/product.dart';
 
 class FClass {
   final String id;
@@ -22,6 +24,7 @@ class FClass {
   final String? customUnlimRate;
   final String? customUnlimDiscount;
   final List<Fencer> fencers;
+  final List<String> userIDs;
   final List<FClass>? campDays;
   FClass({
     required this.id,
@@ -38,6 +41,7 @@ class FClass {
     this.customUnlimRate,
     this.customUnlimDiscount,
     required this.fencers,
+    required this.userIDs,
     this.campDays,
   });
 
@@ -150,6 +154,7 @@ class FClass {
     String? customUnlimRate,
     String? customUnlimDiscount,
     List<Fencer>? fencers,
+    List<String>? userIDs,
     List<FClass>? campDays,
   }) {
     return FClass(
@@ -168,6 +173,7 @@ class FClass {
       customUnlimRate: customUnlimRate ?? this.customUnlimRate,
       customUnlimDiscount: customUnlimDiscount ?? this.customUnlimDiscount,
       fencers: fencers ?? this.fencers,
+      userIDs: userIDs ?? this.userIDs,
       campDays: campDays ?? this.campDays,
     );
   }
@@ -223,6 +229,59 @@ class FClass {
     }
   }
 
+  String getProductKey(bool member, bool unlimitedMember) {
+    switch (classType) {
+      case ClassType.foundation:
+        return "Foundation Class";
+      case ClassType.youth:
+        if (member) {
+          return "Youth Class";
+        } else {
+          return "Youth Class (Non-Member)";
+        }
+      case ClassType.mixed:
+        if (member) {
+          return "Mixed Class";
+        } else {
+          return "Mixed Class (Non-Member)";
+        }
+      case ClassType.advanced:
+        if (member) {
+          return "Advanced Class";
+        } else {
+          return "Advanced Class (Non-Member)";
+        }
+      case ClassType.camp:
+        if (unlimitedMember) {
+          return "Winter Camp (1 Day)";
+        } else {
+          return "Winter Camp (1 Day) (Non-Member)";
+        }
+    }
+  }
+
+  static List<Product> convertClassesToProducts(
+      List<FClass> classes, List<Product> products, UserData userData) {
+    List<Product> invoiceProducts = [];
+    for (var fClass in classes) {
+      if (fClass.classType != ClassType.camp) {
+        invoiceProducts.add(products.firstWhere((product) =>
+            product.productKey ==
+            fClass.getProductKey(userData.member, userData.unlimitedMember)));
+      } else {
+        for (var id in fClass.userIDs) {
+          if (id.substring(0, id.length - 1) == userData.id) {
+            invoiceProducts.add(products.firstWhere((product) =>
+                product.productKey ==
+                fClass.getProductKey(
+                    userData.member, userData.unlimitedMember)));
+          }
+        }
+      }
+    }
+    return invoiceProducts;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'date': date.millisecondsSinceEpoch,
@@ -242,6 +301,7 @@ class FClass {
       'customUnlimRate': customUnlimRate,
       'customUnlimDiscount': customUnlimDiscount,
       'fencers': fencers.map((x) => x.toMap()).toList(),
+      'userIDs': userIDs,
       'campDays': campDays?.map((e) => e.toMap()).toList(),
     };
   }
@@ -272,6 +332,7 @@ class FClass {
       customUnlimRate: map['customUnlimRate'],
       customUnlimDiscount: map['customUnlimDiscount'],
       fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
+      userIDs: List<String>.from(map['userIDs'] ?? []),
       campDays: map['campDays'] != null
           ? List<FClass>.from(map['campDays'].map((x) => FClass.fromMap(x)))
           : null,

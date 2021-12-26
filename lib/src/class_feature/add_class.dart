@@ -30,6 +30,7 @@ class _AddClassState extends State<AddClass> {
       endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: ClassType.foundation,
       fencers: [],
+      userIDs: [],
     );
     repeat = true;
 

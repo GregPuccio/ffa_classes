@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/admin_clients_feature/clients_view.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
@@ -40,8 +41,10 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
   Widget getBody() {
     if (index == 0) {
       return calendar ? const ClassCalendarView() : const ClassListView();
-    } else {
+    } else if (index == 1) {
       return const InvoiceExample();
+    } else {
+      return const ClientsView();
     }
   }
 
@@ -53,10 +56,11 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
           appBar: AppBar(
             title: const Text('Forward Fencing Classes'),
             actions: [
-              IconButton(
-                onPressed: changeView,
-                icon: Icon(calendar ? Icons.home : Icons.calendar_today),
-              ),
+              if (index == 0)
+                IconButton(
+                  onPressed: changeView,
+                  icon: Icon(calendar ? Icons.home : Icons.calendar_today),
+                ),
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
@@ -69,12 +73,8 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
               ),
             ],
           ),
-          floatingActionButton: userData.admin
-              ?
-              // Row(
-              //     mainAxisAlignment: MainAxisAlignment.end,
-              //     children: [
-              PopupMenuButton(
+          floatingActionButton: userData.admin && index == 0
+              ? PopupMenuButton(
                   child: const FloatingActionButton(
                       onPressed: null, child: Icon(Icons.add)),
                   itemBuilder: (_) {
@@ -99,26 +99,19 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                       ),
                     ];
                   })
-              // ,
-              // FloatingActionButton(
-              //   heroTag: 'invoice',
-              //   onPressed: () {
-              //     Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //             builder: (context) => const InvoiceExample()));
-              //   },
-              // ),
-              //   ],
-              // )
               : null,
           body: getBody(),
           bottomNavigationBar: BottomNavigationBar(
+            currentIndex: index,
             onTap: changeTab,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Classes'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.payment), label: 'Payments'),
+            items: [
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.list), label: 'Classes'),
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.payment), label: 'Invoicing'),
+              if (userData.admin)
+                const BottomNavigationBarItem(
+                    icon: Icon(Icons.people), label: 'Clients'),
             ],
           ),
         );

@@ -193,6 +193,8 @@ class _AccountSetupState extends State<AccountSetup> {
                   parentFirstName: parentFirstName.text,
                   parentLastName: parentLastName.text,
                   children: children,
+                  member: false,
+                  unlimitedMember: false,
                 );
                 FirestoreService().setData(
                   path: FirestorePath.user(widget.user.uid),

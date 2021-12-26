@@ -1,3 +1,6 @@
+import 'package:ffaclasses/src/class_feature/fclass.dart';
+import 'package:ffaclasses/src/firebase/firestore_path.dart';
+import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +22,7 @@ class _InvoiceExampleState extends State<InvoiceExample> {
   List<Product> _products = [];
 
   String _email = '';
-  Product? _product;
+  List<Product>? _invoiceProducts;
   Invoice? _invoice;
 
   @override
@@ -42,14 +45,14 @@ class _InvoiceExampleState extends State<InvoiceExample> {
   }
 
   void _createInvoice() async {
-    if (_product == null) {
+    if (_invoiceProducts == null) {
       return;
     }
 
     var client = Client.forContact(email: _email);
     client = await InvoiceNinja.clients.save(client);
 
-    var invoice = Invoice.forClient(client, products: [_product!]);
+    var invoice = Invoice.forClient(client, products: _invoiceProducts!);
     invoice = await InvoiceNinja.invoices.save(invoice);
 
     setState(() {
@@ -81,64 +84,80 @@ class _InvoiceExampleState extends State<InvoiceExample> {
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
       if (userData != null) {
-        return ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextFormField(
-                        initialValue: userData.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          suffixIcon: Icon(Icons.email),
-                        ),
-                        onChanged: (value) => setState(() => _email = value),
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      DropdownButtonFormField<Product>(
-                        decoration: const InputDecoration(
-                          labelText: 'Product',
-                        ),
-                        onChanged: (value) => setState(() => _product = value),
-                        items: _products
-                            .map((product) => DropdownMenuItem(
-                                  child: Text(product.productKey),
-                                  value: product,
-                                ))
-                            .toList(),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        child: const Text('Create Invoice'),
-                        onPressed: (_email.isNotEmpty && _product != null)
-                            ? () => _createInvoice()
-                            : null,
-                      ),
-                      OutlinedButton(
-                        child: const Text('View PDF'),
-                        onPressed: (_invoice != null) ? () => _viewPdf() : null,
-                      ),
-                      OutlinedButton(
-                        child: const Text('View Portal'),
-                        onPressed:
-                            (_invoice != null) ? () => _viewPortal() : null,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+        if (!userData.admin) {
+          return const Center(
+            child: Text("Coming Soon!"),
+          );
+        } else {
+          _email = userData.emailAddress;
+          return FutureBuilder<List<FClass>>(
+            future: FirestoreService().collectionFuture(
+              path: FirestorePath.fClasses(),
+              builder: (map, docID) => FClass.fromMap(map!).copyWith(id: docID),
+              queryBuilder: (query) => query.where("userIDs",
+                  arrayContains: userData.fencers()[0].id),
             ),
-          ],
-        );
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<FClass> classes = snapshot.data!;
+                if (_products.isNotEmpty) {
+                  _invoiceProducts = FClass.convertClassesToProducts(
+                      classes, _products, userData);
+                }
+                return ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TextFormField(
+                                initialValue: userData.emailAddress,
+                                enabled: false,
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  prefixIcon: Icon(Icons.email),
+                                ),
+                                onChanged: (value) =>
+                                    setState(() => _email = value),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              const SizedBox(height: 16),
+                              OutlinedButton(
+                                child: const Text('Create Invoice'),
+                                onPressed: (_email.isNotEmpty)
+                                    ? () => _createInvoice()
+                                    : null,
+                              ),
+                              OutlinedButton(
+                                child: const Text('View PDF'),
+                                onPressed: (_invoice != null)
+                                    ? () => _viewPdf()
+                                    : null,
+                              ),
+                              OutlinedButton(
+                                child: const Text('View Portal'),
+                                onPressed: (_invoice != null)
+                                    ? () => _viewPortal()
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          );
+        }
       } else {
         return const Center(child: CircularProgressIndicator());
       }

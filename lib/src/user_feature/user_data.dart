@@ -10,6 +10,9 @@ class UserData {
   final String parentFirstName;
   final String parentLastName;
   final List<Child> children;
+  final bool member;
+  final bool unlimitedMember;
+
   UserData({
     required this.id,
     required this.admin,
@@ -17,17 +20,18 @@ class UserData {
     required this.parentFirstName,
     required this.parentLastName,
     required this.children,
+    required this.member,
+    required this.unlimitedMember,
   });
 
   UserData copyWith({
     String? id,
-    String? firstName,
-    String? lastName,
     String? emailAddress,
-    bool? parentSignUp,
     String? parentFirstName,
     String? parentLastName,
     List<Child>? children,
+    bool? member,
+    bool? unlimitedMember,
   }) {
     return UserData(
       id: id ?? this.id,
@@ -36,6 +40,8 @@ class UserData {
       parentFirstName: parentFirstName ?? this.parentFirstName,
       parentLastName: parentLastName ?? this.parentLastName,
       children: children ?? this.children,
+      member: member ?? this.member,
+      unlimitedMember: unlimitedMember ?? this.unlimitedMember,
     );
   }
 
@@ -129,6 +135,8 @@ class UserData {
       'parentFirstName': parentFirstName,
       'parentLastName': parentLastName,
       'children': children.map((x) => x.toMap()).toList(),
+      'member': member,
+      'unlimitedMember': unlimitedMember,
     };
   }
 
@@ -142,6 +150,8 @@ class UserData {
       children: (map['children'] != null)
           ? List<Child>.from(map['children'].map((x) => Child.fromMap(x)))
           : [],
+      member: map['member'] ?? false,
+      unlimitedMember: map['unlimitedMember'] ?? false,
     );
   }
 
@@ -152,7 +162,7 @@ class UserData {
 
   @override
   String toString() {
-    return 'UserData(id: $id, emailAddress: $emailAddress, parentFirstName: $parentFirstName, parentLastName: $parentLastName)';
+    return 'UserData(id: $id, admin: $admin, emailAddress: $emailAddress, parentFirstName: $parentFirstName, parentLastName: $parentLastName, children: $children, member: $member, unlimitedMember: $unlimitedMember)';
   }
 
   @override
@@ -169,8 +179,12 @@ class UserData {
   @override
   int get hashCode {
     return id.hashCode ^
+        admin.hashCode ^
         emailAddress.hashCode ^
         parentFirstName.hashCode ^
-        parentLastName.hashCode;
+        parentLastName.hashCode ^
+        children.hashCode ^
+        member.hashCode ^
+        unlimitedMember.hashCode;
   }
 }

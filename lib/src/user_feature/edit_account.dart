@@ -209,6 +209,8 @@ class _EditAccountState extends State<EditAccount> {
                       parentFirstName: parentFirstName.text,
                       parentLastName: parentLastName.text,
                       children: children,
+                      member: widget.userData.member,
+                      unlimitedMember: widget.userData.member,
                     );
                     FirestoreService().setData(
                       path: FirestorePath.user(widget.userData.id),

@@ -34,6 +34,7 @@ class _AddCampState extends State<AddCamp> {
       endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: ClassType.camp,
       fencers: [],
+      userIDs: [],
     );
     customCampTitleController = TextEditingController();
     customClassDescriptionController = TextEditingController();
