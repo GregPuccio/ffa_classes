@@ -1,3 +1,4 @@
+import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/auth_feature/auth.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
@@ -6,6 +7,8 @@ import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
+import 'package:ffaclasses/src/feedback_feature/custom_feedback.dart';
+import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
@@ -43,100 +46,105 @@ class MyApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: themeController,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
-          shortcuts: shortcuts,
-          // Providing a restorationScopeId allows the Navigator built by the
-          // MaterialApp to restore the navigation stack when a user leaves and
-          // returns to the app after it has been killed while running in the
-          // background.
-          restorationScopeId: 'app',
-          supportedLocales: const [
-            Locale('en', ''), // English, no country code
-          ],
+        return BetterFeedback(
+            child: MaterialApp(
+              shortcuts: shortcuts,
+              // Providing a restorationScopeId allows the Navigator built by the
+              // MaterialApp to restore the navigation stack when a user leaves and
+              // returns to the app after it has been killed while running in the
+              // background.
+              restorationScopeId: 'app',
+              supportedLocales: const [
+                Locale('en', ''), // English, no country code
+              ],
 
-          // Define a light and dark color theme. Then, read the user's
-          // preferred ThemeMode (light, dark, or system default) from the
-          // SettingsController to display the correct theme.
-          theme: FlexThemeData.light(
-            // We moved the definition of the list of color schemes to use into
-            // a separate static class and list. We use the theme controller
-            // to change the index of used color scheme from the list.
-            colors: AppColor.schemes[themeController.schemeIndex].light,
-            // Here we use another surface blend mode, where the scaffold
-            // background gets a strong blend. This type is commonly used
-            // on web/desktop when you wrap content on the scaffold in a
-            // card that has a lighter background.
-            surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
-            // Our content is not all wrapped in cards in this demo, so
-            // we keep the blend level fairly low for good contrast.
-            blendLevel: 5,
-            appBarElevation: 0.5,
-            useSubThemes: themeController.useSubThemes,
-            // In this example we use the values for visual density and font
-            // from a single static source, so we can change it easily there.
-            visualDensity: AppData.visualDensity,
-            fontFamily: AppData.font,
-          ),
-          darkTheme: FlexThemeData.dark(
-            colors: AppColor.schemes[themeController.schemeIndex].dark,
-            surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
-            // We go with a slightly stronger blend in dark mode. It is worth
-            // noticing, that in light mode, the alpha value used for the blends
-            // is the blend level value, but in dark mode it is 2x this value.
-            // Visually they match fairly well, but it depends on how saturated
-            // your dark mode primary color is.
-            blendLevel: 7,
-            appBarElevation: 0.5,
-            useSubThemes: themeController.useSubThemes,
-            visualDensity: AppData.visualDensity,
-            fontFamily: AppData.font,
-          ),
-          themeMode: themeController.themeMode,
-          debugShowCheckedModeBanner: false,
+              // Define a light and dark color theme. Then, read the user's
+              // preferred ThemeMode (light, dark, or system default) from the
+              // SettingsController to display the correct theme.
+              theme: FlexThemeData.light(
+                // We moved the definition of the list of color schemes to use into
+                // a separate static class and list. We use the theme controller
+                // to change the index of used color scheme from the list.
+                colors: AppColor.schemes[themeController.schemeIndex].light,
+                // Here we use another surface blend mode, where the scaffold
+                // background gets a strong blend. This type is commonly used
+                // on web/desktop when you wrap content on the scaffold in a
+                // card that has a lighter background.
+                surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
+                // Our content is not all wrapped in cards in this demo, so
+                // we keep the blend level fairly low for good contrast.
+                blendLevel: 5,
+                appBarElevation: 0.5,
+                useSubThemes: themeController.useSubThemes,
+                // In this example we use the values for visual density and font
+                // from a single static source, so we can change it easily there.
+                visualDensity: AppData.visualDensity,
+                fontFamily: AppData.font,
+              ),
+              darkTheme: FlexThemeData.dark(
+                colors: AppColor.schemes[themeController.schemeIndex].dark,
+                surfaceMode: FlexSurfaceMode.highScaffoldLowSurfaces,
+                // We go with a slightly stronger blend in dark mode. It is worth
+                // noticing, that in light mode, the alpha value used for the blends
+                // is the blend level value, but in dark mode it is 2x this value.
+                // Visually they match fairly well, but it depends on how saturated
+                // your dark mode primary color is.
+                blendLevel: 7,
+                appBarElevation: 0.5,
+                useSubThemes: themeController.useSubThemes,
+                visualDensity: AppData.visualDensity,
+                fontFamily: AppData.font,
+              ),
+              themeMode: themeController.themeMode,
+              debugShowCheckedModeBanner: false,
 
-          // Define a function to handle named routes in order to support
-          // Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                if (routeSettings.name != null) {
-                  Uri uri = Uri.parse(routeSettings.name!);
-                  if (uri.pathSegments.length == 2 &&
-                      uri.pathSegments.first == FClassDetails.routeName) {
-                    String id = uri.pathSegments[1];
-                    return FClassDetails(id: id);
-                  }
-                }
-                switch (routeSettings.name) {
-                  case AddClass.routeName:
-                    return const AddClass();
-                  case EditClass.routeName:
-                    return EditClass(
-                        args: routeSettings.arguments as ScreenArgs);
-                  case AddCamp.routeName:
-                    return const AddCamp();
-                  case EditCamp.routeName:
-                    return EditCamp(
-                        args: routeSettings.arguments as ScreenArgs);
-                  case FencerSearch.routeName:
-                    return const FencerSearch();
-                  case SettingsView.routeName:
-                    return SettingsView(controller: themeController);
-                  case EditAccount.routeName:
-                    return EditAccount(
-                      userData:
-                          (routeSettings.arguments as ScreenArgs).userData!,
-                    );
-                  case ChangePassword.routeName:
-                    return const ChangePassword();
-                  default:
-                    return const AuthWrapper();
-                }
+              // Define a function to handle named routes in order to support
+              // Flutter web url navigation and deep linking.
+              onGenerateRoute: (RouteSettings routeSettings) {
+                return MaterialPageRoute<void>(
+                  settings: routeSettings,
+                  builder: (BuildContext context) {
+                    if (routeSettings.name != null) {
+                      Uri uri = Uri.parse(routeSettings.name!);
+                      if (uri.pathSegments.length == 2 &&
+                          uri.pathSegments.first == FClassDetails.routeName) {
+                        String id = uri.pathSegments[1];
+                        return FClassDetails(id: id);
+                      }
+                    }
+                    switch (routeSettings.name) {
+                      case AddClass.routeName:
+                        return const AddClass();
+                      case EditClass.routeName:
+                        return EditClass(
+                            args: routeSettings.arguments as ScreenArgs);
+                      case AddCamp.routeName:
+                        return const AddCamp();
+                      case EditCamp.routeName:
+                        return EditCamp(
+                            args: routeSettings.arguments as ScreenArgs);
+                      case FencerSearch.routeName:
+                        return const FencerSearch();
+                      case SettingsView.routeName:
+                        return SettingsView(controller: themeController);
+                      case EditAccount.routeName:
+                        return EditAccount(
+                          userData:
+                              (routeSettings.arguments as ScreenArgs).userData!,
+                        );
+                      case ChangePassword.routeName:
+                        return const ChangePassword();
+                      case FeedbackList.routeName:
+                        return const FeedbackList();
+                      default:
+                        return const AuthWrapper();
+                    }
+                  },
+                );
               },
-            );
-          },
-        );
+            ),
+            feedbackBuilder: (context, onSubmit) =>
+                CustomFeedbackForm(onSubmit: onSubmit));
       },
     );
   }

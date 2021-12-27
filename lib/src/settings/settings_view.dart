@@ -1,3 +1,4 @@
+import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
 import 'package:ffaclasses/src/constants/links.dart';
@@ -5,6 +6,10 @@ import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/constants/widgets/theme_popup_menu.dart';
+import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
+import 'package:ffaclasses/src/feedback_feature/feedback_model.dart';
+import 'package:ffaclasses/src/firebase/firestore_path.dart';
+import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/change_password.dart';
@@ -125,7 +130,6 @@ class SettingsView extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: const Text(
@@ -145,36 +149,43 @@ class SettingsView extends StatelessWidget {
                       },
                     ),
                   ),
-
-                  // Container(
-                  //   margin: const EdgeInsets.all(10),
-                  //   child: const Text(
-                  //     "ADMIN",
-                  //     style: TextStyle(
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
-                  // InkButton(
-                  //   text: "Reformat",
-                  //   onPressed: () async {
-                  //     List<UserData> users = await FirestoreService()
-                  //         .collectionFuture(
-                  //             path: FirestorePath.users(),
-                  //             builder: (map, docID) =>
-                  //                 UserData.fromMap(map!).copyWith(id: docID));
-                  //     for (var user in users) {
-                  //       UserData userData = user.copyWith(
-                  //         parentFirstName: user.children[0].firstName,
-                  //         parentLastName: user.children[0].lastName,
-                  //       );
-                  //       FirestoreService().setData(
-                  //         path: FirestorePath.user(user.id),
-                  //         data: userData.toMap(),
-                  //       );
-                  //     }
-                  //   },
-                  // ),
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: const Text("Provide Feedback"),
+                      trailing: const Icon(Icons.edit),
+                      onTap: () {
+                        BetterFeedback.of(context).show(
+                          (feedback) async {
+                            FeedbackModel feedbackModel = FeedbackModel(
+                              id: 'id',
+                              text: feedback.text,
+                              feedbackType: feedback.extra!['type'],
+                              submittedBy:
+                                  "${userData.parentFirstName} ${userData.parentLastName}",
+                              submittedWhen: DateTime.now(),
+                              incorporated: false,
+                            );
+                            FirestoreService().addData(
+                              path: FirestorePath.feedbacks(),
+                              data: feedbackModel.toMap(),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  if (userData.admin)
+                    Card(
+                      margin: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: const Text("View Feedback"),
+                        trailing: const Icon(Icons.visibility),
+                        onTap: () {
+                          Navigator.pushNamed(context, FeedbackList.routeName);
+                        },
+                      ),
+                    ),
                   SecondaryButton(
                     text: "Logout",
                     onPressed: () {
@@ -187,10 +198,10 @@ class SettingsView extends StatelessWidget {
                     onPressed: () {
                       showLicensePage(
                         context: context,
-                        applicationName: "FFA Classes",
-                        applicationVersion: "0.14-beta",
-                        applicationIcon:
-                            Image.asset('assets/images/logo.png', width: 100),
+                        applicationName: AppData.name,
+                        applicationVersion: AppData.version,
+                        applicationIcon: Image.asset(AppData.icon, width: 100),
+                        applicationLegalese: AppData.author,
                       );
                     },
                   ),

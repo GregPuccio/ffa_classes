@@ -5,3 +5,8 @@ enum ClassType {
   advanced,
   camp,
 }
+
+enum FeedbackType {
+  bugReport,
+  featureRequest,
+}

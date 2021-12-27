@@ -17,14 +17,14 @@ class AppData {
   // When I build new public web versions of the demos, I just make sure to
   // update this info before I trigger GitHub actions CI/CD that builds them.
   // static const String appName = 'FlexColor\u{00AD}Scheme';
-  // static const String version = '4.1.1';
-  // static const String packageVersion = 'FlexColorScheme package $version';
+  static const String version = '0.8.4';
+  static const String name = 'FFA Classes';
   // static const String packageUrl = 'https://pub.dev/packages/flex_color_scheme';
   // static const String flutterVersion = 'stable v2.5.3';
   // static const String copyright = '© 2020, 2021';
-  // static const String author = 'Mike Rydstrom';
+  static const String author = 'Created by Greg Puccio';
   // static const String license = 'BSD 3-Clause License';
-  // static const String icon = 'assets/images/app_icon.png';
+  static const String icon = 'assets/images/logo.png';
 
   // The max dp width used for layout content on the screen in the available
   // body area. Wider content gets growing side padding, kind of like on most
