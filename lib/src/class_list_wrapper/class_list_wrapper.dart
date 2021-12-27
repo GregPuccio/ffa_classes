@@ -1,9 +1,11 @@
+import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/admin_clients_feature/clients_view.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
+import 'package:ffaclasses/src/feedback_feature/n_feedback_functions.dart';
 import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
@@ -74,6 +76,22 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                       context, SettingsView.routeName);
                 },
               ),
+              if (userData.admin)
+                ElevatedButton(
+                  child: const Text('Provide feedback'),
+                  onPressed: () {
+                    BetterFeedback.of(context).show(
+                      (feedback) async {
+                        // upload to server, share whatever
+                        // for example purposes just show it to the user
+                        alertFeedbackFunction(
+                          context,
+                          feedback,
+                        );
+                      },
+                    );
+                  },
+                ),
             ],
           ),
           floatingActionButton: userData.admin && index == 0
