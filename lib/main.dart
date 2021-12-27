@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'src/app.dart';
 
+late ThemeController themeController;
+
 void main() async {
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
@@ -14,7 +16,7 @@ void main() async {
   // Initialize the theme service.
   await themeService.init();
   // Create a ThemeController that uses the ThemeService.
-  final ThemeController themeController = ThemeController(themeService);
+  themeController = ThemeController(themeService);
   // Load all the preferred theme settings, while the app is loading, before
   // MaterialApp is created. This prevents a sudden theme change when the app
   // is first displayed.

@@ -32,7 +32,12 @@ class FeedbackList extends StatelessWidget {
                     return Card(
                       margin: const EdgeInsets.all(8.0),
                       child: ListTile(
-                        title: Text(feedback.text),
+                        title: Column(
+                          children: [
+                            Text(feedbackTypeString(feedback.feedbackType)),
+                            Text(feedback.text)
+                          ],
+                        ),
                         subtitle: Text(
                           "${feedback.submittedBy} | ${DateFormat('M/d/yy hh:m aa').format(feedback.submittedWhen)}",
                         ),

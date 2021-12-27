@@ -1,9 +1,12 @@
+import 'package:feedback/feedback.dart';
+import 'package:ffaclasses/main.dart';
 import 'package:ffaclasses/src/admin_clients_feature/clients_view.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
+import 'package:ffaclasses/src/feedback_feature/feedback_functions.dart';
 import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
@@ -38,16 +41,21 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
   }
 
   Widget getBody(bool admin) {
-    if (index == 0) {
-      return calendar ? const ClassCalendarView() : const ClassListView();
-    } else if (index == 1) {
-      // if (admin) {
-      //   return const AdminInvoicing();
-      // } else {
-      return const ClientInvoicing();
+    switch (index) {
+      case 0:
+        return calendar ? const ClassCalendarView() : const ClassListView();
+      case 1:
+        // if (admin) {
+        //   return const AdminInvoicing();
+        // } else {
+        return const ClientInvoicing();
       // }
-    } else {
-      return const ClientsView();
+      case 2:
+        return const ClientsView();
+      case 3:
+        return SettingsView(controller: themeController);
+      default:
+        return Container();
     }
   }
 
@@ -65,13 +73,17 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                   icon: Icon(calendar ? Icons.home : Icons.calendar_today),
                 ),
               IconButton(
-                icon: const Icon(Icons.settings),
+                icon: const Icon(Icons.bug_report),
                 onPressed: () {
-                  // Navigate to the settings page. If the user leaves and returns
-                  // to the app after it has been killed while running in the
-                  // background, the navigation stack is restored.
-                  Navigator.restorablePushNamed(
-                      context, SettingsView.routeName);
+                  BetterFeedback.of(context).show(
+                    (feedback) async {
+                      alertFeedbackFunction(
+                        context,
+                        feedback,
+                        userData,
+                      );
+                    },
+                  );
                 },
               ),
             ],
@@ -115,6 +127,8 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
               if (userData.admin)
                 const BottomNavigationBarItem(
                     icon: Icon(Icons.people), label: 'Clients'),
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.settings), label: 'Settings'),
             ],
           ),
         );

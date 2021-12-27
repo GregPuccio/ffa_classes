@@ -28,6 +28,8 @@ class FClassDetails extends StatefulWidget {
 class _FClassDetailsState extends State<FClassDetails> {
   List<String> dates = [];
   late FClass fClass;
+  int dateIndex = -1;
+
   @override
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
@@ -160,6 +162,8 @@ class _FClassDetailsState extends State<FClassDetails> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               fClass = snapshot.data!;
+              List<Fencer> fencersToShow = [];
+              fencersToShow.addAll(fClass.fencersOnDay(dateIndex));
               return Scaffold(
                 appBar: AppBar(
                   title: Text(
@@ -202,7 +206,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                               ? 600
                               : null,
                           child: ListView.builder(
-                            itemCount: fClass.fencers.length + 1,
+                            itemCount: fencersToShow.length + 1,
                             itemBuilder: (context, index) {
                               if (index == 0) {
                                 return Column(
@@ -236,10 +240,34 @@ class _FClassDetailsState extends State<FClassDetails> {
                                         ),
                                       ),
                                     ),
+                                    if (fClass.campDays != null)
+                                      MultiSelectChip(
+                                        initialChoices: const ['All'],
+                                        itemList: List.generate(
+                                            fClass.campDays!.length + 1,
+                                            (index) {
+                                          if (index == 0) {
+                                            return 'All';
+                                          } else {
+                                            return fClass.campDays![index - 1]
+                                                .writtenDay;
+                                          }
+                                        }),
+                                        onSelectionChanged: (val) {
+                                          String date = val.first;
+                                          int i = fClass.campDays!.indexWhere(
+                                              (day) => day.writtenDay == date);
+                                          setState(() {
+                                            dateIndex = i;
+                                          });
+                                        },
+                                        horizScroll: true,
+                                        multi: false,
+                                      ),
                                   ],
                                 );
                               } else {
-                                Fencer fencer = fClass.fencers[index - 1];
+                                Fencer fencer = fencersToShow[index - 1];
                                 Widget? subtitle;
                                 String text = "";
                                 if (fClass.classType == ClassType.camp &&

@@ -24,7 +24,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'camp_feature/add_camp.dart';
 import 'settings/theme_controller.dart';
-import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -125,8 +124,6 @@ class MyApp extends StatelessWidget {
                           args: routeSettings.arguments as ScreenArgs);
                     case FencerSearch.routeName:
                       return const FencerSearch();
-                    case SettingsView.routeName:
-                      return SettingsView(controller: themeController);
                     case EditAccount.routeName:
                       return EditAccount(
                         userData:

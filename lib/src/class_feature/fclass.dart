@@ -105,6 +105,10 @@ class FClass implements Comparable {
     return "${DateFormat('E').format(date)} ${date.month}/${date.day}${endDate != null && endDate != date ? " - ${DateFormat('E').format(endDate!)} ${endDate!.month}/${endDate!.day}" : ''}";
   }
 
+  String get writtenDay {
+    return DateFormat('M/d').format(date);
+  }
+
   String get maxFencerNumber {
     switch (classType) {
       case ClassType.camp:
@@ -280,6 +284,16 @@ class FClass implements Comparable {
       }
     }
     return invoiceProducts;
+  }
+
+  List<Fencer> fencersOnDay(int index) {
+    if (index == -1) {
+      return fencers;
+    } else if (campDays != null && campDays!.length >= index) {
+      return campDays![index].fencers;
+    } else {
+      return fencers;
+    }
   }
 
   Map<String, dynamic> toMap() {
