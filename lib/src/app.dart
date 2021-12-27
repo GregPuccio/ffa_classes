@@ -7,7 +7,7 @@ import 'package:ffaclasses/src/class_feature/fclass_details.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
 import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
-import 'package:ffaclasses/src/feedback_feature/n_custom_feedback.dart';
+import 'package:ffaclasses/src/feedback_feature/custom_feedback.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
