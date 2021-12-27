@@ -1,6 +1,7 @@
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
@@ -160,7 +161,8 @@ class SettingsView extends StatelessWidget {
                             FeedbackModel feedbackModel = FeedbackModel(
                               id: 'id',
                               text: feedback.text,
-                              feedbackType: feedback.extra!['type'],
+                              feedbackType: feedback.extra?['type'] ??
+                                  FeedbackType.featureRequest,
                               submittedBy:
                                   "${userData.parentFirstName} ${userData.parentLastName}",
                               submittedWhen: DateTime.now(),
