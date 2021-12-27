@@ -75,6 +75,7 @@ class _ClassListViewState extends State<ClassListView> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<FClass> classes = snapshot.data!;
+          classes.sort();
           return Center(
             child: Container(
               alignment: Alignment.topCenter,

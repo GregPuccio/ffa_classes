@@ -9,7 +9,7 @@ import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:invoiceninja/models/product.dart';
 
-class FClass {
+class FClass implements Comparable {
   final String id;
   final DateTime date;
   final DateTime? endDate;
@@ -375,5 +375,20 @@ class FClass {
         customClassDescription.hashCode ^
         customMaxFencers.hashCode ^
         fencers.hashCode;
+  }
+
+  @override
+  int compareTo(other) {
+    if (date == other.date) {
+      if (startTime.hour < other.startTime.hour) {
+        return -1;
+      } else {
+        return 1;
+      }
+    } else if (date.isBefore(other.date)) {
+      return -1;
+    } else {
+      return 1;
+    }
   }
 }
