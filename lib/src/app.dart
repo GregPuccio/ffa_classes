@@ -143,8 +143,8 @@ class MyApp extends StatelessWidget {
               );
             },
           ),
-          // feedbackBuilder: (context, onSubmit) =>
-          //     CustomFeedbackForm(onSubmit: onSubmit),
+          feedbackBuilder: (context, onSubmit) =>
+              CustomFeedbackForm(onSubmit: onSubmit),
         );
       },
     );
