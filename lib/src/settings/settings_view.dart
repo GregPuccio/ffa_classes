@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
@@ -152,7 +150,7 @@ class SettingsView extends StatelessWidget {
                       },
                     ),
                   ),
-                  if (Platform.isAndroid)
+                  if (userData.admin)
                     Card(
                       margin: const EdgeInsets.all(8.0),
                       child: ListTile(
