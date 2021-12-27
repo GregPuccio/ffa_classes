@@ -23,6 +23,8 @@ class FeedbackList extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<FeedbackModel> feedbacks = snapshot.data!;
+              feedbacks.sort(
+                  (a, b) => a.feedbackType.name.compareTo(b.feedbackType.name));
               return ListView.builder(
                   itemCount: feedbacks.length,
                   itemBuilder: (context, index) {

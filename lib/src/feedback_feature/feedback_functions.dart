@@ -17,12 +17,14 @@ void alertFeedbackFunction(
     context: outerContext,
     builder: (context) {
       return AlertDialog(
-        title: Text(feedback.text),
+        title: Text(
+          feedbackTypeString(feedback.extra?['type'] as FeedbackType),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (feedback.extra != null) Text(feedback.extra!.toString()),
+              Text(feedback.text),
               Image.memory(
                 feedback.screenshot,
                 height: 600,

@@ -167,6 +167,23 @@ class SettingsView extends StatelessWidget {
                       ),
                     ),
                   if (userData.admin)
+                    ElevatedButton(
+                      child: const Text('Provide feedback'),
+                      onPressed: () {
+                        BetterFeedback.of(context).show(
+                          (feedback) async {
+                            // upload to server, share whatever
+                            // for example purposes just show it to the user
+                            alertFeedbackFunction(
+                              context,
+                              feedback,
+                              userData,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  if (userData.admin)
                     Card(
                       margin: const EdgeInsets.all(8.0),
                       child: ListTile(
