@@ -1,16 +1,13 @@
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
-import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/constants/widgets/theme_popup_menu.dart';
+import 'package:ffaclasses/src/feedback_feature/feedback_functions.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
-import 'package:ffaclasses/src/feedback_feature/feedback_model.dart';
-import 'package:ffaclasses/src/firebase/firestore_path.dart';
-import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/change_password.dart';
@@ -159,19 +156,10 @@ class SettingsView extends StatelessWidget {
                         onTap: () {
                           BetterFeedback.of(context).show(
                             (feedback) async {
-                              FeedbackModel feedbackModel = FeedbackModel(
-                                id: 'id',
-                                text: feedback.text,
-                                feedbackType: feedback.extra?['type'] ??
-                                    FeedbackType.featureRequest,
-                                submittedBy:
-                                    "${userData.parentFirstName} ${userData.parentLastName}",
-                                submittedWhen: DateTime.now(),
-                                incorporated: false,
-                              );
-                              FirestoreService().addData(
-                                path: FirestorePath.feedbacks(),
-                                data: feedbackModel.toMap(),
+                              alertFeedbackFunction(
+                                context,
+                                feedback,
+                                userData,
                               );
                             },
                           );
