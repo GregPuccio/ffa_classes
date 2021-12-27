@@ -51,7 +51,9 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
         return const ClientInvoicing();
       // }
       case 2:
-        return const ClientsView();
+        return admin
+            ? const ClientsView()
+            : SettingsView(controller: themeController);
       case 3:
         return SettingsView(controller: themeController);
       default:
