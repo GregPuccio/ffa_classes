@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/auth_feature/auth_service.dart';
@@ -150,33 +152,34 @@ class SettingsView extends StatelessWidget {
                       },
                     ),
                   ),
-                  Card(
-                    margin: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: const Text("Provide Feedback"),
-                      trailing: const Icon(Icons.edit),
-                      onTap: () {
-                        BetterFeedback.of(context).show(
-                          (feedback) async {
-                            FeedbackModel feedbackModel = FeedbackModel(
-                              id: 'id',
-                              text: feedback.text,
-                              feedbackType: feedback.extra?['type'] ??
-                                  FeedbackType.featureRequest,
-                              submittedBy:
-                                  "${userData.parentFirstName} ${userData.parentLastName}",
-                              submittedWhen: DateTime.now(),
-                              incorporated: false,
-                            );
-                            FirestoreService().addData(
-                              path: FirestorePath.feedbacks(),
-                              data: feedbackModel.toMap(),
-                            );
-                          },
-                        );
-                      },
+                  if (Platform.isAndroid)
+                    Card(
+                      margin: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: const Text("Provide Feedback"),
+                        trailing: const Icon(Icons.edit),
+                        onTap: () {
+                          BetterFeedback.of(context).show(
+                            (feedback) async {
+                              FeedbackModel feedbackModel = FeedbackModel(
+                                id: 'id',
+                                text: feedback.text,
+                                feedbackType: feedback.extra?['type'] ??
+                                    FeedbackType.featureRequest,
+                                submittedBy:
+                                    "${userData.parentFirstName} ${userData.parentLastName}",
+                                submittedWhen: DateTime.now(),
+                                incorporated: false,
+                              );
+                              FirestoreService().addData(
+                                path: FirestorePath.feedbacks(),
+                                data: feedbackModel.toMap(),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
                   if (userData.admin)
                     Card(
                       margin: const EdgeInsets.all(8.0),
