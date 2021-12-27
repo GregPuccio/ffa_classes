@@ -27,7 +27,7 @@ class _CustomFeedbackFormState extends State<CustomFeedbackForm> {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             children: [
               const Text('Please choose your feedback type:'),
               Row(
@@ -64,10 +64,14 @@ class _CustomFeedbackFormState extends State<CustomFeedbackForm> {
         TextButton(
           // disable this button until the user has specified a feedback type
           onPressed: _feedbackType != null
-              ? () => widget.onSubmit(
+              ? () {
+                  widget.onSubmit(
                     _feedbackText ?? '',
                     extras: {'type': _feedbackType},
-                  )
+                  );
+                  // await Future.delayed(const Duration(seconds: 1));
+                  // Navigator.pop(context);
+                }
               : null,
           child: const Text('Submit'),
         ),
