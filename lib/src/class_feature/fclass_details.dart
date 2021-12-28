@@ -359,13 +359,13 @@ class _FClassDetailsState extends State<FClassDetails> {
                     ),
                     if (!userData.admin)
                       InkButton(
-                        active: fClass.date.isAfter(
-                          DateTime.utc(
-                            DateTime.now().year,
-                            DateTime.now().month,
-                            DateTime.now().day - 1,
-                          ),
-                        ),
+                        // active: fClass.date.isAfter(
+                        //   DateTime.utc(
+                        //     DateTime.now().year,
+                        //     DateTime.now().month,
+                        //     DateTime.now().day - 1,
+                        //   ),
+                        // ),
                         text: userData.isFencerInList(fClass.fencers)
                             ? "Edit registration"
                             : 'Sign up for ${fClass.classType == ClassType.camp ? "camp" : "class"}',
