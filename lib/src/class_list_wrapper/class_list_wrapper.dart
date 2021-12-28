@@ -45,16 +45,12 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
       case 0:
         return calendar ? const ClassCalendarView() : const ClassListView();
       case 1:
-        // if (admin) {
-        //   return const AdminInvoicing();
-        // } else {
-        return const ClientInvoicing();
-      // }
+        if (admin) {
+          return const ClientsView();
+        } else {
+          return const ClientInvoicing();
+        }
       case 2:
-        return admin
-            ? const ClientsView()
-            : SettingsView(controller: themeController);
-      case 3:
         return SettingsView(controller: themeController);
       default:
         return Container();
@@ -124,11 +120,9 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
             items: [
               const BottomNavigationBarItem(
                   icon: Icon(Icons.list), label: 'Classes'),
-              const BottomNavigationBarItem(
-                  icon: Icon(Icons.payment), label: 'Invoicing'),
-              if (userData.admin)
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.people), label: 'Clients'),
+              BottomNavigationBarItem(
+                  icon: Icon(userData.admin ? Icons.people : Icons.payment),
+                  label: userData.admin ? 'Clients' : 'Invoicing'),
               const BottomNavigationBarItem(
                   icon: Icon(Icons.settings), label: 'Settings'),
             ],
