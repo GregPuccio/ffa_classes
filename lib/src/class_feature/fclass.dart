@@ -317,7 +317,7 @@ class FClass implements Comparable {
         if (fClass.campDays != null) {
           for (var day in fClass.campDays!) {
             if (day.date == date) {
-              newList.add(day);
+              newList.add(day.copyWith(id: fClass.id));
             }
           }
         } else if (fClass.date == date) {
