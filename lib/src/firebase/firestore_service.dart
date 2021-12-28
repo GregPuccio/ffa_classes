@@ -3,7 +3,7 @@ import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:flutter/material.dart';
 
 class FirestoreService {
-  /// sets the [data] only of a specific document at its ID given as [path]
+  /// sets the [data] of a specific document at its "ID" given as [path]
   Future<void> setData({
     required String path,
     required Map<String, dynamic> data,

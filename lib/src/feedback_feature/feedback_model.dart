@@ -18,6 +18,7 @@ class FeedbackModel {
   final String submittedBy;
   final DateTime submittedWhen;
   final bool incorporated;
+  final String snapshotUrl;
   FeedbackModel({
     required this.id,
     required this.text,
@@ -25,6 +26,7 @@ class FeedbackModel {
     required this.submittedBy,
     required this.submittedWhen,
     required this.incorporated,
+    required this.snapshotUrl,
   });
 
   FeedbackModel copyWith({
@@ -34,6 +36,7 @@ class FeedbackModel {
     String? submittedBy,
     DateTime? submittedWhen,
     bool? incorporated,
+    String? snapshotUrl,
   }) {
     return FeedbackModel(
       id: id ?? this.id,
@@ -42,6 +45,7 @@ class FeedbackModel {
       submittedBy: submittedBy ?? this.submittedBy,
       submittedWhen: submittedWhen ?? this.submittedWhen,
       incorporated: incorporated ?? this.incorporated,
+      snapshotUrl: snapshotUrl ?? this.snapshotUrl,
     );
   }
 
@@ -53,6 +57,7 @@ class FeedbackModel {
       'submittedBy': submittedBy,
       'submittedWhen': submittedWhen.millisecondsSinceEpoch,
       'incorporated': incorporated,
+      'snapshotUrl': snapshotUrl,
     };
   }
 
@@ -64,6 +69,7 @@ class FeedbackModel {
       submittedBy: map['submittedBy'] ?? '',
       submittedWhen: DateTime.fromMillisecondsSinceEpoch(map['submittedWhen']),
       incorporated: map['incorporated'] ?? false,
+      snapshotUrl: map['snapshotUrl'] ?? '',
     );
   }
 
@@ -74,7 +80,7 @@ class FeedbackModel {
 
   @override
   String toString() {
-    return 'FeedbackModel(id: $id, text: $text, feedbackType: $feedbackType, submittedBy: $submittedBy, submittedWhen: $submittedWhen, incorporated: $incorporated)';
+    return 'FeedbackModel(id: $id, text: $text, feedbackType: $feedbackType, submittedBy: $submittedBy, submittedWhen: $submittedWhen, incorporated: $incorporated, snapshotUrl: $snapshotUrl)';
   }
 
   @override
@@ -87,7 +93,8 @@ class FeedbackModel {
         other.feedbackType == feedbackType &&
         other.submittedBy == submittedBy &&
         other.submittedWhen == submittedWhen &&
-        other.incorporated == incorporated;
+        other.incorporated == incorporated &&
+        other.snapshotUrl == snapshotUrl;
   }
 
   @override
@@ -97,6 +104,7 @@ class FeedbackModel {
         feedbackType.hashCode ^
         submittedBy.hashCode ^
         submittedWhen.hashCode ^
-        incorporated.hashCode;
+        incorporated.hashCode ^
+        snapshotUrl.hashCode;
   }
 }

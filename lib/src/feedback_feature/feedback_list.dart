@@ -32,6 +32,12 @@ class FeedbackList extends StatelessWidget {
                     return Card(
                       margin: const EdgeInsets.all(8.0),
                       child: ListTile(
+                        onTap: () => openImage(context, feedback),
+                        leading: InkWell(
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(feedback.snapshotUrl),
+                          ),
+                        ),
                         title: Column(
                           children: [
                             Text(feedbackTypeString(feedback.feedbackType)),
@@ -39,7 +45,7 @@ class FeedbackList extends StatelessWidget {
                           ],
                         ),
                         subtitle: Text(
-                          "${feedback.submittedBy} | ${DateFormat('M/d/yy hh:m aa').format(feedback.submittedWhen)}",
+                          "${feedback.submittedBy} | ${DateFormat('M/d hh:m aa').format(feedback.submittedWhen)}",
                         ),
                         trailing: !feedback.incorporated
                             ? TextButton(
@@ -70,4 +76,39 @@ class FeedbackList extends StatelessWidget {
           }),
     );
   }
+}
+
+void openImage(BuildContext context, FeedbackModel feedback) async {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          feedbackTypeString(feedback.feedbackType),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(feedback.text),
+              Image.network(
+                feedback.snapshotUrl,
+                height: 600,
+                width: 500,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

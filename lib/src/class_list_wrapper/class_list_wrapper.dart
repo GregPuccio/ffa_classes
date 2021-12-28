@@ -75,7 +75,7 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                   icon: Icon(calendar ? Icons.home : Icons.calendar_today),
                 ),
               IconButton(
-                icon: const Icon(Icons.bug_report),
+                icon: const Icon(Icons.feedback),
                 onPressed: () {
                   BetterFeedback.of(context).show(
                     (feedback) async {

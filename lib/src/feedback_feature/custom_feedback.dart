@@ -62,15 +62,12 @@ class _CustomFeedbackFormState extends State<CustomFeedbackForm> {
           ),
         ),
         TextButton(
-          // disable this button until the user has specified a feedback type
           onPressed: _feedbackType != null
               ? () {
                   widget.onSubmit(
                     _feedbackText ?? '',
                     extras: {'type': _feedbackType},
                   );
-                  // await Future.delayed(const Duration(seconds: 1));
-                  // Navigator.pop(context);
                 }
               : null,
           child: const Text('Submit'),
