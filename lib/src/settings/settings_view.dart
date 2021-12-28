@@ -22,11 +22,16 @@ import 'theme_controller.dart';
 ///
 /// When a user changes a setting, the SettingsController is updated and
 /// Widgets that listen to the SettingsController are rebuilt.
-class SettingsView extends StatelessWidget {
+class SettingsView extends StatefulWidget {
   const SettingsView({Key? key, required this.controller}) : super(key: key);
 
   final ThemeController controller;
 
+  @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
@@ -98,20 +103,22 @@ class SettingsView extends StatelessWidget {
                       children: [
                         // A 3-way theme toggle switch that shows the scheme.
                         FlexThemeModeSwitch(
-                          themeMode: controller.themeMode,
-                          onThemeModeChanged: controller.setThemeMode,
+                          themeMode: widget.controller.themeMode,
+                          onThemeModeChanged: widget.controller.setThemeMode,
                           flexSchemeData:
-                              AppColor.schemes[controller.schemeIndex],
+                              AppColor.schemes[widget.controller.schemeIndex],
                           optionButtonBorderRadius:
-                              controller.useSubThemes ? 12 : 4,
+                              widget.controller.useSubThemes ? 12 : 4,
                           buttonOrder: FlexThemeModeButtonOrder.lightSystemDark,
                         ),
                         const SizedBox(height: 8),
                         // Theme popup menu button to select color scheme.
                         ThemePopupMenu(
                           contentPadding: EdgeInsets.zero,
-                          schemeIndex: controller.schemeIndex,
-                          onChanged: controller.setSchemeIndex,
+                          schemeIndex: widget.controller.schemeIndex,
+                          onChanged: (index) => setState(() {
+                            widget.controller.setSchemeIndex(index);
+                          }),
                         ),
                       ],
                     ),
