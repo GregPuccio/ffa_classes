@@ -123,8 +123,16 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                         child: ListTile(
                           title: Text(fClass.title),
                           subtitle: Text(
-                              "${fClass.startTime.format(context)}-${fClass.endTime.format(context)}"),
-                          trailing: Text("${fClass.fencers.length} fencers"),
+                            "${fClass.fencers.length} fencers",
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(fClass.startTime.format(context)),
+                              Text(fClass.endTime.format(context)),
+                            ],
+                          ),
                           onTap: () {
                             Navigator.pushNamed(
                               context,

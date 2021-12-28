@@ -296,6 +296,39 @@ class FClass implements Comparable {
     }
   }
 
+  static List<List<FClass>> sortClassesByDate(List<FClass> classes) {
+    List<DateTime> dates = [];
+    for (var fClass in classes) {
+      if (!dates.contains(fClass.date)) {
+        dates.add(fClass.date);
+      }
+      if (fClass.campDays != null) {
+        for (var day in fClass.campDays!) {
+          if (!dates.contains(day.date)) {
+            dates.add(day.date);
+          }
+        }
+      }
+    }
+    List<List<FClass>> listOfListOfClasses = [];
+    for (var date in dates) {
+      List<FClass> newList = [];
+      for (var fClass in classes) {
+        if (fClass.campDays != null) {
+          for (var day in fClass.campDays!) {
+            if (day.date == date) {
+              newList.add(day);
+            }
+          }
+        } else if (fClass.date == date) {
+          newList.add(fClass);
+        }
+      }
+      listOfListOfClasses.add(newList);
+    }
+    return listOfListOfClasses;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'date': date.millisecondsSinceEpoch,
