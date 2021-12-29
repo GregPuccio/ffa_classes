@@ -29,28 +29,30 @@ class _ClassListViewState extends State<ClassListView> {
   int currentFilter = -1;
 
   void setFilter(String val) {
-    setState(() {
-      switch (val) {
-        case "All":
-          currentFilter = -1;
-          break;
-        case "Foundation":
-          currentFilter = 0;
-          break;
-        case "Youth":
-          currentFilter = 1;
-          break;
-        case "Mixed":
-          currentFilter = 2;
-          break;
-        case "Advanced":
-          currentFilter = 3;
-          break;
-        case "Camps":
-          currentFilter = 4;
-          break;
-      }
-    });
+    if (val != filters[currentFilter + 1]) {
+      setState(() {
+        switch (val) {
+          case "All":
+            currentFilter = -1;
+            break;
+          case "Foundation":
+            currentFilter = 0;
+            break;
+          case "Youth":
+            currentFilter = 1;
+            break;
+          case "Mixed":
+            currentFilter = 2;
+            break;
+          case "Advanced":
+            currentFilter = 3;
+            break;
+          case "Camps":
+            currentFilter = 4;
+            break;
+        }
+      });
+    }
   }
 
   bool _needScroll = true;
