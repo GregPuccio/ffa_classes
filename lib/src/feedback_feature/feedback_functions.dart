@@ -1,8 +1,6 @@
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_model.dart';
-import 'package:ffaclasses/src/firebase/firestore_path.dart';
-import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/firebase/storage_service.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
@@ -57,10 +55,6 @@ void alertFeedbackFunction(
                 snapshotUrl: 'url',
               );
               StorageService().addImage(feedbackModel, feedback.screenshot);
-              FirestoreService().addData(
-                path: FirestorePath.feedbacks(),
-                data: feedbackModel.toMap(),
-              );
               Navigator.pop(context);
             },
           )
