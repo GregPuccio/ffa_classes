@@ -6,6 +6,7 @@ import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:sticky_headers/sticky_headers.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClassListView extends StatefulWidget {
@@ -52,6 +53,25 @@ class _ClassListViewState extends State<ClassListView> {
     });
   }
 
+  bool _needScroll = true;
+  final AutoScrollController _scrollController =
+      AutoScrollController(suggestedRowHeight: 125);
+
+  void _scrollToDate() {
+    int todayNumber = DateTime.now().day;
+    int sundaysToSubtract = todayNumber ~/ 7;
+    _scrollController.scrollToIndex(
+      todayNumber - sundaysToSubtract,
+      preferPosition: AutoScrollPosition.begin,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<FClass>>(
@@ -75,6 +95,12 @@ class _ClassListViewState extends State<ClassListView> {
       ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          if (_needScroll) {
+            WidgetsBinding.instance!
+                .addPostFrameCallback((_) => _scrollToDate());
+            _needScroll = false;
+          }
+
           List<FClass> classes = snapshot.data!;
           classes.sort();
           List<List<FClass>> classesByDate = FClass.sortClassesByDate(classes);
@@ -101,60 +127,69 @@ class _ClassListViewState extends State<ClassListView> {
                   ),
                   Flexible(
                     child: CustomScrollView(
+                      controller: _scrollController,
+                      restorationId: 'class_list',
                       slivers: [
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               List<FClass> fClasses = classesByDate[index];
-                              return StickyHeader(
-                                header: Container(
-                                  height: 50.0,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    fClasses.first.writtenDate,
-                                    style: const TextStyle(color: Colors.white),
+                              return AutoScrollTag(
+                                key: ValueKey(index),
+                                controller: _scrollController,
+                                index: index,
+                                child: StickyHeader(
+                                  header: Container(
+                                    height: 50.0,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      fClasses.first.writtenDate,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
                                   ),
-                                ),
-                                content: Column(
-                                  children: fClasses.map((fClass) {
-                                    return Column(
-                                      children: [
-                                        if (fClass != fClasses.first)
-                                          const Divider(
-                                            indent: 20,
-                                            endIndent: 20,
-                                            height: 1,
+                                  content: Column(
+                                    children: fClasses.map((fClass) {
+                                      return Column(
+                                        children: [
+                                          if (fClass != fClasses.first)
+                                            const Divider(
+                                              indent: 20,
+                                              endIndent: 20,
+                                              height: 1,
+                                            ),
+                                          ListTile(
+                                            title: Text(fClass.title),
+                                            subtitle: Text(
+                                              "${fClass.fencers.length} fencers",
+                                            ),
+                                            trailing: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(fClass.startTime
+                                                    .format(context)),
+                                                Text(fClass.endTime
+                                                    .format(context)),
+                                              ],
+                                            ),
+                                            onTap: () {
+                                              Navigator.restorablePushNamed(
+                                                context,
+                                                '${FClassDetails.routeName}/${fClass.id}',
+                                              );
+                                            },
                                           ),
-                                        ListTile(
-                                          title: Text(fClass.title),
-                                          subtitle: Text(
-                                            "${fClass.fencers.length} fencers",
-                                          ),
-                                          trailing: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(fClass.startTime
-                                                  .format(context)),
-                                              Text(fClass.endTime
-                                                  .format(context)),
-                                            ],
-                                          ),
-                                          onTap: () {
-                                            Navigator.restorablePushNamed(
-                                              context,
-                                              '${FClassDetails.routeName}/${fClass.id}',
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  }).toList(),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               );
                             },

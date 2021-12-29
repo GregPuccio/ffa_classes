@@ -25,6 +25,7 @@ dependencies:
   hive_flutter: ^1.1.0
   invoiceninja: ^0.0.9
   path_provider: ^2.0.8
+  scroll_to_index: ^2.1.1
   sticky_headers: ^0.2.0
   table_calendar: ^3.0.3
   time_range: ^1.0.2
