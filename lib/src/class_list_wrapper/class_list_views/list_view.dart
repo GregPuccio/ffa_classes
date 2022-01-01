@@ -61,9 +61,8 @@ class _ClassListViewState extends State<ClassListView> {
 
   void _scrollToDate() {
     int todayNumber = DateTime.now().day;
-    int sundaysToSubtract = todayNumber ~/ 7;
     _scrollController.scrollToIndex(
-      todayNumber - sundaysToSubtract,
+      todayNumber,
       preferPosition: AutoScrollPosition.begin,
     );
   }
@@ -140,59 +139,64 @@ class _ClassListViewState extends State<ClassListView> {
                                 key: ValueKey(index),
                                 controller: _scrollController,
                                 index: index,
-                                child: StickyHeader(
-                                  header: Container(
-                                    height: 50.0,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      fClasses.first.writtenDate,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  content: Column(
-                                    children: fClasses.map((fClass) {
-                                      return Column(
-                                        children: [
-                                          if (fClass != fClasses.first)
-                                            const Divider(
-                                              indent: 20,
-                                              endIndent: 20,
-                                              height: 1,
-                                            ),
-                                          ListTile(
-                                            title: Text(fClass.title),
-                                            subtitle: Text(
-                                              "${fClass.fencers.length} fencers",
-                                            ),
-                                            trailing: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: [
-                                                Text(fClass.startTime
-                                                    .format(context)),
-                                                Text(fClass.endTime
-                                                    .format(context)),
-                                              ],
-                                            ),
-                                            onTap: () {
-                                              Navigator.restorablePushNamed(
-                                                context,
-                                                '${FClassDetails.routeName}/${fClass.id}',
-                                              );
-                                            },
+                                child: fClasses.isNotEmpty
+                                    ? StickyHeader(
+                                        header: Container(
+                                          height: 50.0,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            fClasses.first.writtenDate,
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
+                                        ),
+                                        content: Column(
+                                          children: fClasses.map((fClass) {
+                                            return Column(
+                                              children: [
+                                                if (fClass != fClasses.first)
+                                                  const Divider(
+                                                    indent: 20,
+                                                    endIndent: 20,
+                                                    height: 1,
+                                                  ),
+                                                ListTile(
+                                                  title: Text(fClass.title),
+                                                  subtitle: Text(
+                                                    "${fClass.fencers.length} fencers",
+                                                  ),
+                                                  trailing: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Text(fClass.startTime
+                                                          .format(context)),
+                                                      Text(fClass.endTime
+                                                          .format(context)),
+                                                    ],
+                                                  ),
+                                                  onTap: () {
+                                                    Navigator
+                                                        .restorablePushNamed(
+                                                      context,
+                                                      '${FClassDetails.routeName}/${fClass.id}',
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          }).toList(),
+                                        ),
+                                      )
+                                    : Container(),
                               );
                             },
                             childCount: classesByDate.length,

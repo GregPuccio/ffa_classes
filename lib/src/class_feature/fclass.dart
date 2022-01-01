@@ -298,17 +298,11 @@ class FClass implements Comparable {
 
   static List<List<FClass>> sortClassesByDate(List<FClass> classes) {
     List<DateTime> dates = [];
-    for (var fClass in classes) {
-      if (!dates.contains(fClass.date)) {
-        dates.add(fClass.date);
-      }
-      if (fClass.campDays != null) {
-        for (var day in fClass.campDays!) {
-          if (!dates.contains(day.date)) {
-            dates.add(day.date);
-          }
-        }
-      }
+    DateTime now = DateTime.now();
+    DateTime lastDay = DateTime.utc(now.year, now.month + 1)
+        .subtract(const Duration(hours: 24));
+    for (int i = 1; i <= lastDay.day; i++) {
+      dates.add(DateTime.utc(now.year, now.month, i));
     }
     List<List<FClass>> listOfListOfClasses = [];
     for (var date in dates) {

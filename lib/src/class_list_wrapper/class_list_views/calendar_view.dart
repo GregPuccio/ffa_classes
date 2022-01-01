@@ -115,6 +115,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
               child: ValueListenableBuilder<List<FClass>>(
                 valueListenable: _selectedFClasses,
                 builder: (context, fClasses, _) {
+                  fClasses.sort();
                   return ListView.builder(
                     itemCount: fClasses.length,
                     itemBuilder: (context, index) {
