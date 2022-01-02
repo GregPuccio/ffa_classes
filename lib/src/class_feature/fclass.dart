@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invoiceninja/models/product.dart';
 
+import 'package:ffaclasses/src/coach_feature/coach.dart';
 import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
-import 'package:invoiceninja/models/product.dart';
+import 'package:ffaclasses/src/user_feature/user_data.dart';
 
 class FClass implements Comparable {
   final String id;
@@ -16,6 +17,7 @@ class FClass implements Comparable {
   final TimeOfDay startTime;
   final TimeOfDay endTime;
   final ClassType classType;
+  final List<Coach> coaches;
   final String? customClassTitle;
   final String? customClassDescription;
   final String? customMaxFencers;
@@ -33,6 +35,7 @@ class FClass implements Comparable {
     required this.startTime,
     required this.endTime,
     required this.classType,
+    required this.coaches,
     this.customClassTitle,
     this.customClassDescription,
     this.customMaxFencers,
@@ -44,6 +47,20 @@ class FClass implements Comparable {
     required this.userIDs,
     this.campDays,
   });
+
+  static FClass create({required ClassType classType}) {
+    return FClass(
+      id: 'id',
+      date: DateTime.utc(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day),
+      startTime: const TimeOfDay(hour: 16, minute: 30),
+      endTime: const TimeOfDay(hour: 18, minute: 00),
+      classType: classType,
+      fencers: [],
+      userIDs: [],
+      coaches: [],
+    );
+  }
 
   String get title {
     switch (classType) {
@@ -61,6 +78,12 @@ class FClass implements Comparable {
       default:
         return "Sorry we couldn't find that class!";
     }
+  }
+
+  String get coachNames {
+    List<String> coachFirstAndLast =
+        coaches.map((e) => "${e.firstName} ${e.lastName}").toList();
+    return coachFirstAndLast.join(", ");
   }
 
   String get webAddressID {
@@ -150,6 +173,7 @@ class FClass implements Comparable {
     TimeOfDay? startTime,
     TimeOfDay? endTime,
     String? classType,
+    List<Coach>? coaches,
     String? customClassTitle,
     String? customClassDescription,
     String? customMaxFencers,
@@ -168,6 +192,7 @@ class FClass implements Comparable {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       classType: trueClassType(classType) ?? this.classType,
+      coaches: coaches ?? this.coaches,
       customClassTitle: customClassTitle ?? this.customClassTitle,
       customClassDescription:
           customClassDescription ?? this.customClassDescription,
@@ -226,7 +251,7 @@ class FClass implements Comparable {
       case ClassType.advanced:
         return 'Member: \$40 - Non Member: \$50';
       case ClassType.camp:
-        return "\nRegular: $customRegRate/day $customRegDiscount\nUnlimited: $customUnlimRate/day $customUnlimDiscount";
+        return "Regular: $customRegRate/day $customRegDiscount\nUnlimited: $customUnlimRate/day $customUnlimDiscount";
 
       default:
         return null;
@@ -333,6 +358,7 @@ class FClass implements Comparable {
       'endTime': DateTime.utc(1)
           .add(Duration(hours: endTime.hour, minutes: endTime.minute))
           .millisecondsSinceEpoch,
+      'coaches': coaches.map((x) => x.toMap()).toList(),
       'classType': classType.index,
       'customClassTitle': customClassTitle,
       'customClassDescription': customClassDescription,
@@ -364,6 +390,9 @@ class FClass implements Comparable {
           DateTime.fromMillisecondsSinceEpoch(map['startTime'], isUtc: true)),
       endTime: TimeOfDay.fromDateTime(
           DateTime.fromMillisecondsSinceEpoch(map['endTime'], isUtc: true)),
+      coaches: List<Coach>.from(
+        map['coaches']?.map((x) => Coach.fromMap(x)) ?? [],
+      ),
       classType: ClassType.values[map['classType']],
       customClassTitle: map['customClassTitle'],
       customClassDescription: map['customClassDescription'],
@@ -372,7 +401,8 @@ class FClass implements Comparable {
       customRegDiscount: map['customRegDiscount'],
       customUnlimRate: map['customUnlimRate'],
       customUnlimDiscount: map['customUnlimDiscount'],
-      fencers: List<Fencer>.from(map['fencers'].map((x) => Fencer.fromMap(x))),
+      fencers: List<Fencer>.from(
+          map['fencers']?.map((x) => Fencer.fromMap(x)) ?? []),
       userIDs: List<String>.from(map['userIDs'] ?? []),
       campDays: map['campDays'] != null
           ? List<FClass>.from(map['campDays'].map((x) => FClass.fromMap(x)))
@@ -386,7 +416,7 @@ class FClass implements Comparable {
 
   @override
   String toString() {
-    return 'FClass(id: $id, date: $date, startTime: $startTime, endTime: $endTime, classType: $classType, customClassTitle: $customClassTitle, customClassDescription: $customClassDescription, customMaxFencers: $customMaxFencers, fencers: $fencers)';
+    return 'FClass(id: $id, date: $date, endDate: $endDate, startTime: $startTime, endTime: $endTime, classType: $classType, coaches: $coaches, customClassTitle: $customClassTitle, customClassDescription: $customClassDescription, customMaxFencers: $customMaxFencers, customRegRate: $customRegRate, customRegDiscount: $customRegDiscount, customUnlimRate: $customUnlimRate, customUnlimDiscount: $customUnlimDiscount, fencers: $fencers, userIDs: $userIDs, campDays: $campDays)';
   }
 
   @override
@@ -396,26 +426,42 @@ class FClass implements Comparable {
     return other is FClass &&
         other.id == id &&
         other.date == date &&
+        other.endDate == endDate &&
         other.startTime == startTime &&
         other.endTime == endTime &&
         other.classType == classType &&
+        listEquals(other.coaches, coaches) &&
         other.customClassTitle == customClassTitle &&
         other.customClassDescription == customClassDescription &&
         other.customMaxFencers == customMaxFencers &&
-        listEquals(other.fencers, fencers);
+        other.customRegRate == customRegRate &&
+        other.customRegDiscount == customRegDiscount &&
+        other.customUnlimRate == customUnlimRate &&
+        other.customUnlimDiscount == customUnlimDiscount &&
+        listEquals(other.fencers, fencers) &&
+        listEquals(other.userIDs, userIDs) &&
+        listEquals(other.campDays, campDays);
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
         date.hashCode ^
+        endDate.hashCode ^
         startTime.hashCode ^
         endTime.hashCode ^
         classType.hashCode ^
+        coaches.hashCode ^
         customClassTitle.hashCode ^
         customClassDescription.hashCode ^
         customMaxFencers.hashCode ^
-        fencers.hashCode;
+        customRegRate.hashCode ^
+        customRegDiscount.hashCode ^
+        customUnlimRate.hashCode ^
+        customUnlimDiscount.hashCode ^
+        fencers.hashCode ^
+        userIDs.hashCode ^
+        campDays.hashCode;
   }
 
   @override

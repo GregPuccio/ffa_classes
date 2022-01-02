@@ -30,130 +30,160 @@ class _FClassDetailsState extends State<FClassDetails> {
   late FClass fClass;
   int dateIndex = -1;
 
+  Future showCampRegistrationDialog(Fencer fencer, UserData userData) async {
+    List<String> selectedDates = [];
+    return showDialog(
+      context: context,
+      builder: (context) {
+        selectedDates = fClass.findFencerCampDays(fencer);
+        if (fClass.endDate != null) {
+          dates = [];
+          fClass.campDays?.removeWhere((day) =>
+              day.fencers.length >=
+              (int.tryParse(fClass.maxFencerNumber) ?? 0));
+          dates.addAll(
+            List.generate(fClass.campDays?.length ?? 0, (index) {
+              return DateFormat('E M/d').format(fClass.campDays![index].date);
+            }),
+          );
+        }
+        bool fencerPaid = fencer.checkedIn;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Camp Days"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                      "Choose the camp days you would like to sign${userData.admin ? " ${fencer.name}" : ""} up for."),
+                  MultiSelectChip(
+                    itemList: dates,
+                    initialChoices: selectedDates,
+                    onSelectionChanged: (val) {
+                      setState(() {
+                        selectedDates = val;
+                      });
+                    },
+                  ),
+                  Text(
+                      "Regular Membership Cost: \$${totalRegularCost(dates, selectedDates)}"),
+                  Text(
+                      "Unlimited Membership Cost: \$${totalUnlimitedCost(dates, selectedDates)}"),
+                  if (userData.admin)
+                    CheckboxListTile(
+                      title: Text("Fencer has ${fencerPaid ? "" : "not "}paid"),
+                      value: fencerPaid,
+                      onChanged: (val) {
+                        setState(() {
+                          fencerPaid = !fencerPaid;
+                        });
+                      },
+                    )
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("CANCEL"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedDates.isNotEmpty) {
+                      fencer = fencer.copyWith(checkedIn: fencerPaid);
+
+                      if (!fClass.fencers.contains(fencer)) {
+                        fClass.fencers.add(fencer);
+                      } else {
+                        fClass.fencers.remove(fencer);
+                        fClass.fencers.add(fencer);
+                      }
+                    } else {
+                      fClass.fencers.remove(fencer);
+                    }
+
+                    List<String> userIDs = [];
+
+                    fClass.campDays?.forEach((day) {
+                      for (var fencer in day.fencers) {
+                        userIDs.add(fencer.id);
+                      }
+                    });
+
+                    userIDs.removeWhere((id) => id == fencer.id);
+
+                    fClass.campDays?.forEach((day) {
+                      DateTime date = day.date;
+                      String dateString = DateFormat('E M/d').format(date);
+                      if (selectedDates.any((date) => date == dateString)) {
+                        if (!day.fencers.contains(fencer)) {
+                          day.fencers.add(fencer);
+                        }
+                        userIDs.add(fencer.id);
+                      } else {
+                        day.fencers.remove(fencer);
+                      }
+                    });
+
+                    fClass = fClass.copyWith(userIDs: userIDs);
+
+                    FirestoreService().updateData(
+                      path: FirestorePath.fClass(fClass.id),
+                      data: fClass.toMap(),
+                    );
+
+                    Navigator.pop(context, selectedDates.isNotEmpty);
+                  },
+                  child: const Text("CONFIRM"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future showChangeCoachStatus(UserData userData, {bool add = true}) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("${add ? "Add" : "Remove"} myself"),
+          content: Text(
+              "Are you sure you want to ${add ? "add" : "remove"} yourself ${add ? "to" : "from"} this camp/class as a coach?"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancel")),
+            TextButton(
+                onPressed: () {
+                  if (add) {
+                    fClass.coaches.add(userData.toCoach());
+                  } else {
+                    fClass.coaches.remove(userData.toCoach());
+                  }
+                  FirestoreService()
+                      .updateData(path: FirestorePath.fClass(fClass.id), data: {
+                    'coaches': fClass.coaches.map((x) => x.toMap()).toList(),
+                  });
+                  Navigator.pop(context);
+                },
+                child: Text("${add ? "Add" : "Remove"} me")),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
       if (userData != null) {
-        Future showCampRegistrationDialog(Fencer fencer) async {
-          List<String> selectedDates = [];
-          return showDialog(
-            context: context,
-            builder: (context) {
-              selectedDates = fClass.findFencerCampDays(fencer);
-              if (fClass.endDate != null) {
-                dates = [];
-                fClass.campDays?.removeWhere((day) =>
-                    day.fencers.length >=
-                    (int.tryParse(fClass.maxFencerNumber) ?? 0));
-                dates.addAll(
-                  List.generate(fClass.campDays?.length ?? 0, (index) {
-                    return DateFormat('E M/d')
-                        .format(fClass.campDays![index].date);
-                  }),
-                );
-              }
-              bool fencerPaid = fencer.checkedIn;
-              return StatefulBuilder(
-                builder: (context, setState) {
-                  return AlertDialog(
-                    title: const Text("Camp Days"),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                            "Choose the camp days you would like to sign${userData.admin ? " ${fencer.name}" : ""} up for."),
-                        MultiSelectChip(
-                          itemList: dates,
-                          initialChoices: selectedDates,
-                          onSelectionChanged: (val) {
-                            setState(() {
-                              selectedDates = val;
-                            });
-                          },
-                        ),
-                        Text(
-                            "Regular Membership Cost: \$${totalRegularCost(dates, selectedDates)}"),
-                        Text(
-                            "Unlimited Membership Cost: \$${totalUnlimitedCost(dates, selectedDates)}"),
-                        if (userData.admin)
-                          CheckboxListTile(
-                            title: Text(
-                                "Fencer has ${fencerPaid ? "" : "not "}paid"),
-                            value: fencerPaid,
-                            onChanged: (val) {
-                              setState(() {
-                                fencerPaid = !fencerPaid;
-                              });
-                            },
-                          )
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("CANCEL"),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (selectedDates.isNotEmpty) {
-                            fencer = fencer.copyWith(checkedIn: fencerPaid);
-
-                            if (!fClass.fencers.contains(fencer)) {
-                              fClass.fencers.add(fencer);
-                            } else {
-                              fClass.fencers.remove(fencer);
-                              fClass.fencers.add(fencer);
-                            }
-                          } else {
-                            fClass.fencers.remove(fencer);
-                          }
-
-                          List<String> userIDs = [];
-
-                          fClass.campDays?.forEach((day) {
-                            for (var fencer in day.fencers) {
-                              userIDs.add(fencer.id);
-                            }
-                          });
-
-                          userIDs.removeWhere((id) => id == fencer.id);
-
-                          fClass.campDays?.forEach((day) {
-                            DateTime date = day.date;
-                            String dateString =
-                                DateFormat('E M/d').format(date);
-                            if (selectedDates
-                                .any((date) => date == dateString)) {
-                              if (!day.fencers.contains(fencer)) {
-                                day.fencers.add(fencer);
-                              }
-                              userIDs.add(fencer.id);
-                            } else {
-                              day.fencers.remove(fencer);
-                            }
-                          });
-
-                          fClass = fClass.copyWith(userIDs: userIDs);
-
-                          FirestoreService().updateData(
-                            path: FirestorePath.fClass(fClass.id),
-                            data: fClass.toMap(),
-                          );
-
-                          Navigator.pop(context, selectedDates.isNotEmpty);
-                        },
-                        child: const Text("CONFIRM"),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          );
-        }
-
         return StreamBuilder<FClass>(
           stream: FirestoreService().documentStream(
               path: FirestorePath.fClass(widget.id),
@@ -219,14 +249,53 @@ class _FClassDetailsState extends State<FClassDetails> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            if (fClass.coachNames.isNotEmpty ||
+                                                userData.admin) ...[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                      "Coaches:\n${fClass.coachNames}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .subtitle1),
+                                                  if (userData.admin &&
+                                                      fClass.coaches.contains(
+                                                          userData.toCoach()))
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showChangeCoachStatus(
+                                                          userData,
+                                                          add: false,
+                                                        );
+                                                      },
+                                                      child: const Text(
+                                                          "Remove myself"),
+                                                    )
+                                                  else if (userData.admin)
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showChangeCoachStatus(
+                                                          userData,
+                                                        );
+                                                      },
+                                                      child: const Text(
+                                                          "Add myself"),
+                                                    ),
+                                                ],
+                                              ),
+                                              const Divider(),
+                                            ],
                                             Text(
-                                                "When: ${fClass.dateRange} | ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
+                                                "When:\n${fClass.dateRange} | ${fClass.startTime.format(context)}-${fClass.endTime.format(context)}",
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .subtitle1),
                                             const Divider(),
                                             Text(
-                                              "Cost:${fClass.classCost}",
+                                              "Cost:\n${fClass.classCost}",
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .subtitle1,
@@ -295,7 +364,9 @@ class _FClassDetailsState extends State<FClassDetails> {
                                       onTap: userData.admin
                                           ? () {
                                               showCampRegistrationDialog(
-                                                  fencer);
+                                                fencer,
+                                                userData,
+                                              );
                                             }
                                           : null,
                                     ),
@@ -404,8 +475,10 @@ class _FClassDetailsState extends State<FClassDetails> {
                                     );
                                   });
                             }
-                            dynamic result =
-                                await showCampRegistrationDialog(fencer);
+                            dynamic result = await showCampRegistrationDialog(
+                              fencer,
+                              userData,
+                            );
                             if (result != null && result == true) {
                               showDialog(
                                   context: context,

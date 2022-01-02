@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ffaclasses/src/coach_feature/coach.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:ffaclasses/src/user_feature/child.dart';
 
@@ -62,6 +63,15 @@ class UserData {
       checkedIn: false,
       registeredByID: id,
       registeredAt: DateTime.now(),
+    );
+  }
+
+  Coach toCoach() {
+    return Coach(
+      id: id,
+      emailAddress: emailAddress,
+      firstName: parentFirstName,
+      lastName: parentLastName,
     );
   }
 

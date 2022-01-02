@@ -22,18 +22,8 @@ class _AddClassState extends State<AddClass> {
   late bool repeat;
   @override
   void initState() {
-    fClass = FClass(
-      id: 'id',
-      date: DateTime.utc(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day),
-      startTime: const TimeOfDay(hour: 16, minute: 30),
-      endTime: const TimeOfDay(hour: 18, minute: 00),
-      classType: ClassType.foundation,
-      fencers: [],
-      userIDs: [],
-    );
+    fClass = FClass.create(classType: ClassType.foundation);
     repeat = true;
-
     super.initState();
   }
 
