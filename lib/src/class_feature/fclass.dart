@@ -18,6 +18,7 @@ class FClass implements Comparable {
   final TimeOfDay endTime;
   final ClassType classType;
   final List<Coach> coaches;
+  String notes;
   final String? customClassTitle;
   final String? customClassDescription;
   final String? customMaxFencers;
@@ -36,6 +37,7 @@ class FClass implements Comparable {
     required this.endTime,
     required this.classType,
     required this.coaches,
+    required this.notes,
     this.customClassTitle,
     this.customClassDescription,
     this.customMaxFencers,
@@ -56,6 +58,7 @@ class FClass implements Comparable {
       startTime: const TimeOfDay(hour: 16, minute: 30),
       endTime: const TimeOfDay(hour: 18, minute: 00),
       classType: classType,
+      notes: '',
       fencers: [],
       userIDs: [],
       coaches: [],
@@ -174,6 +177,7 @@ class FClass implements Comparable {
     TimeOfDay? endTime,
     String? classType,
     List<Coach>? coaches,
+    String? notes,
     String? customClassTitle,
     String? customClassDescription,
     String? customMaxFencers,
@@ -193,6 +197,7 @@ class FClass implements Comparable {
       endTime: endTime ?? this.endTime,
       classType: trueClassType(classType) ?? this.classType,
       coaches: coaches ?? this.coaches,
+      notes: notes ?? this.notes,
       customClassTitle: customClassTitle ?? this.customClassTitle,
       customClassDescription:
           customClassDescription ?? this.customClassDescription,
@@ -359,6 +364,7 @@ class FClass implements Comparable {
           .add(Duration(hours: endTime.hour, minutes: endTime.minute))
           .millisecondsSinceEpoch,
       'coaches': coaches.map((x) => x.toMap()).toList(),
+      'notes': notes,
       'classType': classType.index,
       'customClassTitle': customClassTitle,
       'customClassDescription': customClassDescription,
@@ -393,6 +399,7 @@ class FClass implements Comparable {
       coaches: List<Coach>.from(
         map['coaches']?.map((x) => Coach.fromMap(x)) ?? [],
       ),
+      notes: map['notes'] ?? '',
       classType: ClassType.values[map['classType']],
       customClassTitle: map['customClassTitle'],
       customClassDescription: map['customClassDescription'],

@@ -19,9 +19,14 @@ class EditClass extends StatefulWidget {
 
 class _EditClassState extends State<EditClass> {
   late FClass fClass;
+  late TextEditingController notesController;
   @override
   void initState() {
     fClass = widget.args.fClass!;
+    notesController = TextEditingController(text: fClass.notes);
+    notesController.addListener(() {
+      fClass.notes = notesController.text;
+    });
     super.initState();
   }
 
@@ -41,6 +46,7 @@ class _EditClassState extends State<EditClass> {
 
   @override
   void dispose() {
+    notesController.dispose();
     super.dispose();
   }
 
@@ -92,7 +98,12 @@ class _EditClassState extends State<EditClass> {
                 ),
               );
             },
-            child: const Text("Save"),
+            child: Text(
+              "Save",
+              style: Theme.of(context).textTheme.button?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+            ),
           ),
         ],
       ),
@@ -147,6 +158,19 @@ class _EditClassState extends State<EditClass> {
                     prefixIcon: const Icon(Icons.attach_money),
                   ),
                   readOnly: true,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: notesController,
+                  decoration: const InputDecoration(
+                    labelText: "Notes",
+                    hintText:
+                        "Add names of fencers that haven't made accounts yet or anything else you need to remember, here",
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 5,
                 ),
               ),
               TextButton(
