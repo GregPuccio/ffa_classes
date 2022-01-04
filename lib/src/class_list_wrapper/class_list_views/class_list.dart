@@ -1,17 +1,18 @@
 import 'package:ffaclasses/src/app.dart';
+import 'package:ffaclasses/src/camp_feature/camp_details.dart';
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
-import 'package:ffaclasses/src/constants/links.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/strip_coaching_details.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ClassListView extends StatefulWidget {
   const ClassListView({Key? key}) : super(key: key);
@@ -28,7 +29,8 @@ class _ClassListViewState extends State<ClassListView> {
     "Youth",
     "Mixed",
     "Advanced",
-    "Camps"
+    "Camps",
+    "Strip Coaching",
   ];
 
   int currentFilter = -2;
@@ -58,6 +60,9 @@ class _ClassListViewState extends State<ClassListView> {
           case "Camps":
             currentFilter = 4;
             break;
+          case "Strip Coaching":
+            currentFilter = 5;
+            break;
         }
       });
     } else {
@@ -72,7 +77,7 @@ class _ClassListViewState extends State<ClassListView> {
       AutoScrollController(suggestedRowHeight: 125);
 
   void _scrollToDate() {
-    int todayNumber = DateTime.now().day;
+    int todayNumber = DateTime.now().day - 1;
     _scrollController.scrollToIndex(
       todayNumber,
       preferPosition: AutoScrollPosition.begin,
@@ -135,15 +140,15 @@ class _ClassListViewState extends State<ClassListView> {
                   constraints: const BoxConstraints(maxWidth: 600),
                   child: Column(
                     children: [
-                      ListTile(
-                          title: const Text(
-                            "Book Private Lessons (on Square)",
-                            textAlign: TextAlign.center,
-                          ),
-                          trailing: const Icon(Icons.launch),
-                          onTap: () {
-                            launch(squareLessonsLink);
-                          }),
+                      // ListTile(
+                      //     title: const Text(
+                      //       "Book Private Lessons (on Square)",
+                      //       textAlign: TextAlign.center,
+                      //     ),
+                      //     trailing: const Icon(Icons.launch),
+                      //     onTap: () {
+                      //       launch(squareLessonsLink);
+                      //     }),
                       MultiSelectChip(
                         initialChoices: [filters.first],
                         itemList: filters,
@@ -200,25 +205,50 @@ class _ClassListViewState extends State<ClassListView> {
                                                             ? "1 fencer"
                                                             : "${fClass.fencers.length} fencers",
                                                       ),
-                                                      trailing: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Text(fClass.startTime
-                                                              .format(context)),
-                                                          Text(fClass.endTime
-                                                              .format(context)),
-                                                        ],
-                                                      ),
+                                                      trailing: fClass
+                                                                  .classType !=
+                                                              ClassType
+                                                                  .stripCoaching
+                                                          ? Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                Text(fClass
+                                                                    .startTime
+                                                                    .format(
+                                                                        context)),
+                                                                Text(fClass
+                                                                    .endTime
+                                                                    .format(
+                                                                        context)),
+                                                              ],
+                                                            )
+                                                          : null,
                                                       onTap: () {
+                                                        String route;
+                                                        if (fClass.classType ==
+                                                            ClassType.camp) {
+                                                          route = CampDetails
+                                                              .routeName;
+                                                        } else if (fClass
+                                                                .classType ==
+                                                            ClassType
+                                                                .stripCoaching) {
+                                                          route =
+                                                              StripCoachingDetails
+                                                                  .routeName;
+                                                        } else {
+                                                          route = FClassDetails
+                                                              .routeName;
+                                                        }
                                                         Navigator
                                                             .restorablePushNamed(
                                                           context,
-                                                          '${FClassDetails.routeName}/${fClass.id}',
+                                                          '$route/${fClass.id}',
                                                         );
                                                       },
                                                     ),

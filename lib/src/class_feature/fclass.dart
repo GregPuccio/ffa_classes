@@ -68,6 +68,7 @@ class FClass implements Comparable {
   String get title {
     switch (classType) {
       case ClassType.camp:
+      case ClassType.stripCoaching:
         return customClassTitle ?? 'Custom Event';
       case ClassType.foundation:
         return "Foundation Class";
@@ -108,6 +109,7 @@ class FClass implements Comparable {
   String get description {
     switch (classType) {
       case ClassType.camp:
+      case ClassType.stripCoaching:
         return customClassDescription ?? 'Custom Class Description';
       case ClassType.foundation:
         return "The class most suitable for younger and newer fencers (age 7-11) or by Coach invitation. This class focuses on coordination, fundamentals, and physical strategy games to build a correct technical base and to have fun and exercise! 12 max per class";
@@ -242,6 +244,8 @@ class FClass implements Comparable {
         return 'Advanced';
       case ClassType.camp:
         return "Camp";
+      case ClassType.stripCoaching:
+        return "Strip Coaching";
     }
   }
 
@@ -257,7 +261,8 @@ class FClass implements Comparable {
         return 'Member: \$40 - Non Member: \$50';
       case ClassType.camp:
         return "Regular: $customRegRate/day $customRegDiscount\nUnlimited: $customUnlimRate/day $customUnlimDiscount";
-
+      case ClassType.stripCoaching:
+        return "First Event: \$$customRegRate\nAdditional Events: \$$customRegDiscount";
       default:
         return null;
     }
@@ -290,6 +295,12 @@ class FClass implements Comparable {
           return "Winter Camp (1 Day)";
         } else {
           return "Winter Camp (1 Day) (Non-Member)";
+        }
+      case ClassType.stripCoaching:
+        if (member) {
+          return "Strip Coaching";
+        } else {
+          return "Strip Coaching (Non-Member)";
         }
     }
   }

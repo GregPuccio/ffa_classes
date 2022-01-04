@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ffaclasses/src/coach_feature/coach.dart';
+import 'package:ffaclasses/src/constants/lists.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:ffaclasses/src/user_feature/child.dart';
 
@@ -15,6 +17,7 @@ class UserData {
   final List<Child> children;
   final bool member;
   final bool unlimitedMember;
+  final List<Map<String, Map<String, List<DateTime>>>> availability;
 
   UserData({
     required this.id,
@@ -27,6 +30,7 @@ class UserData {
     required this.children,
     required this.member,
     required this.unlimitedMember,
+    required this.availability,
   });
 
   UserData copyWith({
@@ -39,6 +43,7 @@ class UserData {
     List<Child>? children,
     bool? member,
     bool? unlimitedMember,
+    List<Map<String, Map<String, List<DateTime>>>>? availability,
   }) {
     return UserData(
       id: id ?? this.id,
@@ -51,7 +56,12 @@ class UserData {
       children: children ?? this.children,
       member: member ?? this.member,
       unlimitedMember: unlimitedMember ?? this.unlimitedMember,
+      availability: availability ?? this.availability,
     );
+  }
+
+  String get fullName {
+    return "$parentFirstName $parentLastName";
   }
 
   Fencer toFencer(int childIndex) {
@@ -72,6 +82,7 @@ class UserData {
       emailAddress: emailAddress,
       firstName: parentFirstName,
       lastName: parentLastName,
+      availability: availability,
     );
   }
 
@@ -157,10 +168,34 @@ class UserData {
       'children': children.map((x) => x.toMap()).toList(),
       'member': member,
       'unlimitedMember': unlimitedMember,
+      'availability': availability,
     };
   }
 
   factory UserData.fromMap(Map<String, dynamic> map) {
+    List<Map<String, dynamic>> firstList =
+        List<Map<String, dynamic>>.from(map['availability'] ?? []);
+    List<Map<String, Map<String, List<DateTime>>>> secondList = firstList
+        .map(
+          (val) => val.map(
+            (key, value) => MapEntry(
+              key,
+              Map<String, List<DateTime>>.from(
+                value.map(
+                  (key, value) => MapEntry(
+                    key,
+                    List<DateTime>.from(
+                      value.map(
+                        (e) => (e as Timestamp).toDate(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+        .toList();
     return UserData(
       id: map['id'],
       invoicingKey: map['invoicingKey'] ?? '',
@@ -174,6 +209,7 @@ class UserData {
           : [],
       member: map['member'] ?? false,
       unlimitedMember: map['unlimitedMember'] ?? false,
+      availability: secondList,
     );
   }
 
@@ -208,5 +244,13 @@ class UserData {
         children.hashCode ^
         member.hashCode ^
         unlimitedMember.hashCode;
+  }
+
+  static List<Map<String, Map<String, List<DateTime>>>> createAvailability() {
+    List<Map<String, Map<String, List<DateTime>>>> availability = [];
+    for (int i = 0; i < daysOfWeek.length; i++) {
+      availability.add({daysOfWeek[i]: {}});
+    }
+    return availability;
   }
 }

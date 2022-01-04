@@ -4,3 +4,13 @@ const List<String> classTypes = [
   'Mixed',
   'Advanced',
 ];
+
+List<String> daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];

@@ -4,25 +4,27 @@ import 'package:ffaclasses/src/admin_clients_feature/clients_view.dart';
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
-import 'package:ffaclasses/src/class_list_wrapper/class_list_views/calendar_view.dart';
-import 'package:ffaclasses/src/class_list_wrapper/class_list_views/list_view.dart';
+import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_calendar.dart';
+import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_list.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_functions.dart';
 import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
+import 'package:ffaclasses/src/lessons_feature/lesson_calendar.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/add_strip_coaching.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ClassListWrapper extends StatefulWidget {
-  const ClassListWrapper({Key? key}) : super(key: key);
+class HomeStructure extends StatefulWidget {
+  const HomeStructure({Key? key}) : super(key: key);
   static const routeName = 'classList';
 
   @override
-  _ClassListWrapperState createState() => _ClassListWrapperState();
+  _HomeStructureState createState() => _HomeStructureState();
 }
 
-class _ClassListWrapperState extends State<ClassListWrapper> {
+class _HomeStructureState extends State<HomeStructure> {
   bool calendar = false;
   int index = 0;
 
@@ -43,14 +45,33 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
   Widget getBody(bool admin) {
     switch (index) {
       case 0:
-        return calendar ? const ClassCalendarView() : const ClassListView();
+        return Column(
+          children: [
+            ListTile(
+              title: Text(
+                "Group Attendance",
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              trailing: IconButton(
+                onPressed: changeView,
+                icon: Icon(calendar ? Icons.list : Icons.event),
+              ),
+            ),
+            Flexible(
+              child:
+                  calendar ? const ClassCalendarView() : const ClassListView(),
+            ),
+          ],
+        );
       case 1:
+        return const LessonCalendarView();
+      case 2:
         if (admin) {
           return const ClientsView();
         } else {
           return const ClientInvoicing();
         }
-      case 2:
+      case 3:
         return SettingsView(controller: themeController);
       default:
         return Container();
@@ -63,13 +84,8 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
       if (userData != null) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Forward Fencing Classes'),
+            title: const Text('Forward Fencing Academy'),
             actions: [
-              if (index == 0)
-                IconButton(
-                  onPressed: changeView,
-                  icon: Icon(calendar ? Icons.home : Icons.calendar_today),
-                ),
               IconButton(
                 icon: const Icon(Icons.feedback),
                 onPressed: () {
@@ -110,6 +126,15 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
                           },
                         ),
                       ),
+                      PopupMenuItem(
+                        child: ListTile(
+                          title: const Text('Add Strip Coaching'),
+                          onTap: () {
+                            Navigator.restorablePushNamed(
+                                context, AddStripCoaching.routeName);
+                          },
+                        ),
+                      ),
                     ];
                   })
               : null,
@@ -119,10 +144,13 @@ class _ClassListWrapperState extends State<ClassListWrapper> {
             onTap: changeTab,
             items: [
               const BottomNavigationBarItem(
-                  icon: Icon(Icons.list), label: 'Classes'),
+                  icon: Icon(Icons.people), label: 'Group'),
+              const BottomNavigationBarItem(
+                  icon: Icon(Icons.person), label: 'Private'),
               BottomNavigationBarItem(
-                  icon: Icon(userData.admin ? Icons.people : Icons.payment),
-                  label: userData.admin ? 'Clients' : 'Invoicing'),
+                  icon:
+                      Icon(userData.admin ? Icons.attach_money : Icons.payment),
+                  label: userData.admin ? 'Clients' : 'Payments'),
               const BottomNavigationBarItem(
                   icon: Icon(Icons.settings), label: 'Settings'),
             ],

@@ -16,6 +16,7 @@ final databaseProvider = Provider<FirestoreService>((ref) {
   if (auth.asData?.value?.uid != null) {
     return FirestoreService();
   }
+  ref.watch(firebaseAuthProvider).currentUser?.reload();
   throw UnimplementedError();
 });
 

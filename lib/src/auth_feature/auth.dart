@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: passwordController,
             minLength: 6,
             width: 400,
-            height: 30,
+            height: 35,
             onSuccess: () {},
           ),
         ),

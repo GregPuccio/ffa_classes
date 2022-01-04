@@ -1,17 +1,22 @@
 import 'package:feedback/feedback.dart';
 import 'package:ffaclasses/src/auth_feature/auth.dart';
+import 'package:ffaclasses/src/camp_feature/camp_details.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
 import 'package:ffaclasses/src/class_feature/edit_class.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
-import 'package:ffaclasses/src/class_list_wrapper/class_list_wrapper.dart';
+import 'package:ffaclasses/src/home_structure/home_structure.dart';
 import 'package:ffaclasses/src/constants/theming/app_color.dart';
 import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/feedback_feature/custom_feedback.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
+import 'package:ffaclasses/src/lessons_feature/edit_lesson_schedule.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/add_strip_coaching.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/edit_strip_coaching.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/strip_coaching_details.dart';
 import 'package:ffaclasses/src/user_feature/change_password.dart';
 import 'package:ffaclasses/src/user_feature/create_account.dart';
 import 'package:ffaclasses/src/user_feature/edit_account.dart';
@@ -105,10 +110,17 @@ class MyApp extends StatelessWidget {
                 builder: (BuildContext context) {
                   if (routeSettings.name != null) {
                     Uri uri = Uri.parse(routeSettings.name!);
-                    if (uri.pathSegments.length == 2 &&
-                        uri.pathSegments.first == FClassDetails.routeName) {
+                    if (uri.pathSegments.length == 2) {
                       String id = uri.pathSegments[1];
-                      return FClassDetails(id: id);
+                      if (uri.pathSegments.first == FClassDetails.routeName) {
+                        return FClassDetails(id: id);
+                      } else if (uri.pathSegments.first ==
+                          CampDetails.routeName) {
+                        return CampDetails(id: id);
+                      } else if (uri.pathSegments.first ==
+                          StripCoachingDetails.routeName) {
+                        return StripCoachingDetails(id: id);
+                      }
                     }
                   }
                   switch (routeSettings.name) {
@@ -121,6 +133,14 @@ class MyApp extends StatelessWidget {
                       return const AddCamp();
                     case EditCamp.routeName:
                       return EditCamp(
+                          args: routeSettings.arguments as ScreenArgs);
+                    case AddStripCoaching.routeName:
+                      return const AddStripCoaching();
+                    case EditStripCoaching.routeName:
+                      return EditStripCoaching(
+                          args: routeSettings.arguments as ScreenArgs);
+                    case EditLessonSchedule.routeName:
+                      return EditLessonSchedule(
                           args: routeSettings.arguments as ScreenArgs);
                     case FencerSearch.routeName:
                       return const FencerSearch();
@@ -166,7 +186,7 @@ class AuthWrapper extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (object, stackTrace) => Center(
             child: Text(
-              "Error",
+              "This Error",
               style: Theme.of(context).textTheme.headline6,
             ),
           ),
@@ -181,7 +201,7 @@ class LoggedInWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Widget whenData(UserData? userData) {
       if (userData != null) {
-        return const ClassListWrapper();
+        return const HomeStructure();
       } else {
         return AccountSetup(user: user);
       }
@@ -192,7 +212,7 @@ class LoggedInWrapper extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (object, stackTrace) => Center(
             child: Text(
-              "Error",
+              "That Error",
               style: Theme.of(context).textTheme.headline6,
             ),
           ),

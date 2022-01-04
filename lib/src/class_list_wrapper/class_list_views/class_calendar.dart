@@ -1,14 +1,15 @@
 import 'dart:collection';
 
+import 'package:ffaclasses/src/camp_feature/camp_details.dart';
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/class_feature/fclass_details.dart';
-import 'package:ffaclasses/src/constants/links.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
+import 'package:ffaclasses/src/strip_coaching_feature/strip_coaching_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ClassCalendarView extends StatefulWidget {
   const ClassCalendarView({Key? key}) : super(key: key);
@@ -54,7 +55,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Map<DateTime, List<FClass>>>(
-      stream: FirestoreService().collectionCalendarStream(
+      stream: FirestoreService().collectionCalendarStream<FClass>(
         path: FirestorePath.fClasses(),
         queryBuilder: (query) => query
             .where('date',
@@ -111,7 +112,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                 ),
               ),
             ),
-            Expanded(
+            Flexible(
               child: ValueListenableBuilder<List<FClass>>(
                 valueListenable: _selectedFClasses,
                 builder: (context, fClasses, _) {
@@ -126,18 +127,29 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                           subtitle: Text(
                             "${fClass.fencers.length} fencers",
                           ),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(fClass.startTime.format(context)),
-                              Text(fClass.endTime.format(context)),
-                            ],
-                          ),
+                          trailing: fClass.classType != ClassType.stripCoaching
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(fClass.startTime.format(context)),
+                                    Text(fClass.endTime.format(context)),
+                                  ],
+                                )
+                              : null,
                           onTap: () {
-                            Navigator.pushNamed(
+                            String route;
+                            if (fClass.classType == ClassType.camp) {
+                              route = CampDetails.routeName;
+                            } else if (fClass.classType ==
+                                ClassType.stripCoaching) {
+                              route = StripCoachingDetails.routeName;
+                            } else {
+                              route = FClassDetails.routeName;
+                            }
+                            Navigator.restorablePushNamed(
                               context,
-                              '${FClassDetails.routeName}/${fClass.id}',
+                              '$route/${fClass.id}',
                             );
                           },
                         ),
@@ -148,67 +160,38 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
               ),
             ),
           ];
-          return portrait
-              ? Column(
-                  children: [
-                    ListTile(
-                        title: const Text(
-                          "Book Private Lessons (on Square)",
-                          textAlign: TextAlign.center,
-                        ),
-                        trailing: const Icon(Icons.launch),
-                        onTap: () {
-                          launch(squareLessonsLink);
-                        }),
-                    Flexible(child: Column(children: children)),
-                  ],
-                )
-              : Center(
-                  child: Container(
-                    alignment: Alignment.topCenter,
-                    width: 1000,
-                    child: Column(
+          return Center(
+            child: Container(
+              alignment: Alignment.topCenter,
+              width: 1000,
+              child: portrait
+                  ? Column(
+                      children: children,
+                    )
+                  : Row(
                       children: [
-                        ListTile(
-                            title: const Text(
-                              "Book Private Lessons (on Square)",
-                              textAlign: TextAlign.center,
-                            ),
-                            trailing: const Icon(Icons.launch),
-                            onTap: () {
-                              launch(squareLessonsLink);
-                            }),
-                        Flexible(
-                          child: Row(
+                        Expanded(
+                          child: SingleChildScrollView(child: children[0]),
+                        ),
+                        const VerticalDivider(),
+                        Expanded(
+                          child: Column(
                             children: [
-                              Expanded(
-                                child:
-                                    SingleChildScrollView(child: children[0]),
-                              ),
-                              const VerticalDivider(),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6,
-                                      ),
-                                    ),
-                                    children[1],
-                                  ],
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
+                                  style: Theme.of(context).textTheme.headline6,
                                 ),
-                              )
+                              ),
+                              children[1],
                             ],
                           ),
-                        ),
+                        )
                       ],
                     ),
-                  ),
-                );
+            ),
+          );
         } else {
           return const Center(child: CircularProgressIndicator());
         }

@@ -157,7 +157,6 @@ class _SettingsViewState extends State<SettingsView> {
                 SecondaryButton(
                   text: "Logout",
                   onPressed: () {
-                    Navigator.pop(context);
                     AuthService().signOut();
                   },
                 ),

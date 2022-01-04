@@ -4,6 +4,12 @@ enum ClassType {
   mixed,
   advanced,
   camp,
+  stripCoaching,
+}
+
+enum LessonType {
+  privateLesson,
+  boutingLesson,
 }
 
 enum FeedbackType {

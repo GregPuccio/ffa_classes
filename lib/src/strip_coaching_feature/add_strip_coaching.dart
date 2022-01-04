@@ -4,36 +4,29 @@ import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:flutter/material.dart';
-import 'package:time_range/time_range.dart';
 
-class AddCamp extends StatefulWidget {
-  const AddCamp({Key? key}) : super(key: key);
-  static const routeName = 'addCamp';
+class AddStripCoaching extends StatefulWidget {
+  const AddStripCoaching({Key? key}) : super(key: key);
+  static const routeName = 'addStripCoaching';
 
   @override
-  _AddCampState createState() => _AddCampState();
+  _AddStripCoachingState createState() => _AddStripCoachingState();
 }
 
-class _AddCampState extends State<AddCamp> {
+class _AddStripCoachingState extends State<AddStripCoaching> {
   late FClass fClass;
-  late TextEditingController customCampTitleController;
-  late TextEditingController customClassDescriptionController;
-  late TextEditingController customMaxNumberController;
+  late TextEditingController tournamentNameController;
+  late TextEditingController tournamentDescriptionController;
   late TextEditingController regRateController;
-  late TextEditingController unlimRateController;
   late TextEditingController regDiscountController;
-  late TextEditingController unlimDiscountController;
 
   @override
   void initState() {
-    fClass = FClass.create(classType: ClassType.camp);
-    customCampTitleController = TextEditingController();
-    customClassDescriptionController = TextEditingController();
-    customMaxNumberController = TextEditingController();
+    fClass = FClass.create(classType: ClassType.stripCoaching);
+    tournamentNameController = TextEditingController();
+    tournamentDescriptionController = TextEditingController();
     regRateController = TextEditingController();
-    unlimRateController = TextEditingController();
     regDiscountController = TextEditingController();
-    unlimDiscountController = TextEditingController();
     super.initState();
   }
 
@@ -55,13 +48,10 @@ class _AddCampState extends State<AddCamp> {
 
   @override
   void dispose() {
-    customCampTitleController.dispose();
-    customClassDescriptionController.dispose();
-    customMaxNumberController.dispose();
+    tournamentNameController.dispose();
+    tournamentDescriptionController.dispose();
     regRateController.dispose();
-    unlimRateController.dispose();
     regDiscountController.dispose();
-    unlimDiscountController.dispose();
     super.dispose();
   }
 
@@ -69,7 +59,7 @@ class _AddCampState extends State<AddCamp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add A Camp'),
+        title: const Text('Add a Tournament'),
       ),
       body: Center(
         child: Container(
@@ -80,9 +70,9 @@ class _AddCampState extends State<AddCamp> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   textCapitalization: TextCapitalization.words,
-                  controller: customCampTitleController,
+                  controller: tournamentNameController,
                   decoration: const InputDecoration(
-                    labelText: "Title",
+                    labelText: "Tournament Name",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -91,52 +81,18 @@ class _AddCampState extends State<AddCamp> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   textCapitalization: TextCapitalization.sentences,
-                  controller: customClassDescriptionController,
+                  controller: tournamentDescriptionController,
                   decoration: const InputDecoration(
-                    labelText: "Description",
+                    labelText: "Description/Location",
                     border: OutlineInputBorder(),
                   ),
                   maxLines: 5,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  keyboardType:
-                      const TextInputType.numberWithOptions(signed: true),
-                  controller: customMaxNumberController,
-                  decoration: const InputDecoration(
-                    labelText: "Maximum number of fencers",
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ),
               SecondaryButton(
                 active: true,
                 onPressed: showDateChooser,
                 text: fClass.dateRange,
-              ),
-              TimeRange(
-                fromTitle: const Text('From'),
-                toTitle: const Text('To'),
-                titlePadding: 20,
-                textStyle: Theme.of(context).textTheme.bodyText1,
-                activeTextStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.transparent,
-                firstTime: const TimeOfDay(hour: 8, minute: 00),
-                lastTime: const TimeOfDay(hour: 20, minute: 00),
-                initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
-                timeStep: 10,
-                timeBlock: 30,
-                onRangeCompleted: (range) => setState(() {
-                  fClass = fClass.copyWith(
-                    startTime: range?.start,
-                    endTime: range?.end,
-                  );
-                }),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -146,7 +102,7 @@ class _AddCampState extends State<AddCamp> {
                       child: TextField(
                         controller: regRateController,
                         decoration: const InputDecoration(
-                          labelText: "Reg Rate/Day",
+                          labelText: "First Event",
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.attach_money),
                         ),
@@ -157,37 +113,9 @@ class _AddCampState extends State<AddCamp> {
                       child: TextField(
                         controller: regDiscountController,
                         decoration: const InputDecoration(
-                          labelText: "Discount",
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.remove),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: TextField(
-                        controller: unlimRateController,
-                        decoration: const InputDecoration(
-                          labelText: "Unlim Rate/Day",
+                          labelText: "Add'l Event",
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.attach_money),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Flexible(
-                      child: TextField(
-                        controller: unlimDiscountController,
-                        decoration: const InputDecoration(
-                          labelText: "Discount",
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.remove),
                         ),
                       ),
                     ),
@@ -195,17 +123,14 @@ class _AddCampState extends State<AddCamp> {
                 ),
               ),
               InkButton(
-                text: 'Create camp',
+                text: 'Create tournament',
                 onPressed: () {
                   fClass = fClass.copyWith(
-                    customClassTitle: customCampTitleController.text,
+                    customClassTitle: tournamentNameController.text,
                     customClassDescription:
-                        customClassDescriptionController.text,
-                    customMaxFencers: customMaxNumberController.text,
+                        tournamentDescriptionController.text,
                     customRegRate: regRateController.text,
                     customRegDiscount: regDiscountController.text,
-                    customUnlimRate: unlimRateController.text,
-                    customUnlimDiscount: unlimDiscountController.text,
                   );
                   List<FClass> classes = [fClass];
                   if (fClass.endDate != null && fClass.date != fClass.endDate) {
@@ -232,8 +157,6 @@ class _AddCampState extends State<AddCamp> {
                               ? 'Custom Event'
                               : fClass.title),
                           Text(fClass.dateRange),
-                          Text(
-                              "From ${fClass.startTime.format(context)} to ${fClass.endTime.format(context)}"),
                         ],
                       ),
                       actions: [

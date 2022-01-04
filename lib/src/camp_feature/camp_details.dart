@@ -1,5 +1,5 @@
 import 'package:ffaclasses/src/app.dart';
-import 'package:ffaclasses/src/class_feature/edit_class.dart';
+import 'package:ffaclasses/src/camp_feature/edit_camp.dart';
 import 'package:ffaclasses/src/class_feature/fclass.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/constants/widgets/multi_select_chip.dart';
@@ -11,20 +11,138 @@ import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class FClassDetails extends StatefulWidget {
+class CampDetails extends StatefulWidget {
   final String id;
-  const FClassDetails({required this.id, Key? key}) : super(key: key);
-  static const routeName = 'classes';
+  const CampDetails({required this.id, Key? key}) : super(key: key);
+  static const routeName = 'camps';
 
   @override
-  State<FClassDetails> createState() => _FClassDetailsState();
+  State<CampDetails> createState() => _CampDetailsState();
 }
 
-class _FClassDetailsState extends State<FClassDetails> {
+class _CampDetailsState extends State<CampDetails> {
   List<String> dates = [];
   late FClass fClass;
+  int dateIndex = -1;
+
+  Future showCampRegistrationDialog(Fencer fencer, UserData userData) async {
+    List<String> selectedDates = [];
+    return showDialog(
+      context: context,
+      builder: (context) {
+        selectedDates = fClass.findFencerCampDays(fencer);
+        if (fClass.endDate != null) {
+          dates = [];
+          fClass.campDays?.removeWhere((day) =>
+              day.fencers.length >=
+              (int.tryParse(fClass.maxFencerNumber) ?? 0));
+          dates.addAll(
+            List.generate(fClass.campDays?.length ?? 0, (index) {
+              return DateFormat('E M/d').format(fClass.campDays![index].date);
+            }),
+          );
+        }
+        bool fencerPaid = fencer.checkedIn;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Camp Days"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                      "Choose the camp days you would like to sign${userData.admin ? " ${fencer.name}" : ""} up for."),
+                  MultiSelectChip(
+                    itemList: dates,
+                    initialChoices: selectedDates,
+                    onSelectionChanged: (val) {
+                      setState(() {
+                        selectedDates = val;
+                      });
+                    },
+                  ),
+                  Text(
+                      "Regular Membership Cost: \$${totalRegularCost(dates, selectedDates)}"),
+                  Text(
+                      "Unlimited Membership Cost: \$${totalUnlimitedCost(dates, selectedDates)}"),
+                  if (userData.admin)
+                    CheckboxListTile(
+                      title: Text("Fencer has ${fencerPaid ? "" : "not "}paid"),
+                      value: fencerPaid,
+                      onChanged: (val) {
+                        setState(() {
+                          fencerPaid = !fencerPaid;
+                        });
+                      },
+                    )
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("CANCEL"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedDates.isNotEmpty) {
+                      fencer = fencer.copyWith(checkedIn: fencerPaid);
+
+                      if (!fClass.fencers.contains(fencer)) {
+                        fClass.fencers.add(fencer);
+                      } else {
+                        fClass.fencers.remove(fencer);
+                        fClass.fencers.add(fencer);
+                      }
+                    } else {
+                      fClass.fencers.remove(fencer);
+                    }
+
+                    List<String> userIDs = [];
+
+                    fClass.campDays?.forEach((day) {
+                      for (var fencer in day.fencers) {
+                        userIDs.add(fencer.id);
+                      }
+                    });
+
+                    userIDs.removeWhere((id) => id == fencer.id);
+
+                    fClass.campDays?.forEach((day) {
+                      DateTime date = day.date;
+                      String dateString = DateFormat('E M/d').format(date);
+                      if (selectedDates.any((date) => date == dateString)) {
+                        if (!day.fencers.contains(fencer)) {
+                          day.fencers.add(fencer);
+                        }
+                        userIDs.add(fencer.id);
+                      } else {
+                        day.fencers.remove(fencer);
+                      }
+                    });
+
+                    fClass = fClass.copyWith(userIDs: userIDs);
+
+                    FirestoreService().updateData(
+                      path: FirestorePath.fClass(fClass.id),
+                      data: fClass.toMap(),
+                    );
+
+                    Navigator.pop(context, selectedDates.isNotEmpty);
+                  },
+                  child: const Text("CONFIRM"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   Future showChangeCoachStatus(UserData userData, {bool add = true}) {
     return showDialog(
@@ -72,7 +190,8 @@ class _FClassDetailsState extends State<FClassDetails> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               fClass = snapshot.data!;
-              List<Fencer> fencersToShow = fClass.fencers;
+              List<Fencer> fencersToShow = [];
+              fencersToShow.addAll(fClass.fencersOnDay(dateIndex));
               return Scaffold(
                 appBar: AppBar(
                   title: Text(
@@ -93,7 +212,7 @@ class _FClassDetailsState extends State<FClassDetails> {
                             onPressed: () {
                               Navigator.pushNamed(
                                 context,
-                                EditClass.routeName,
+                                EditCamp.routeName,
                                 arguments: ScreenArgs(fClass: fClass),
                               );
                             },
@@ -186,57 +305,71 @@ class _FClassDetailsState extends State<FClassDetails> {
                                         ),
                                       ),
                                     ),
+                                    if (fClass.campDays != null)
+                                      MultiSelectChip(
+                                        initialChoices: const ['All'],
+                                        itemList: List.generate(
+                                            fClass.campDays!.length + 1,
+                                            (index) {
+                                          if (index == 0) {
+                                            return 'All';
+                                          } else {
+                                            return fClass.campDays![index - 1]
+                                                .writtenDay;
+                                          }
+                                        }),
+                                        onSelectionChanged: (val) {
+                                          String date = val.first;
+                                          int i = fClass.campDays!.indexWhere(
+                                              (day) => day.writtenDay == date);
+                                          setState(() {
+                                            dateIndex = i;
+                                          });
+                                        },
+                                        horizScroll: true,
+                                        multi: false,
+                                      ),
                                   ],
                                 );
                               } else {
                                 Fencer fencer = fencersToShow[index - 1];
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(fencer.name),
-                                    subtitle: Text(
-                                      fencer.checkedIn ? "Present" : "Absent",
+                                Widget? subtitle;
+                                String text = "";
+                                if (fClass.campDays != null &&
+                                    fClass.campDays!.isNotEmpty) {
+                                  bool first = true;
+                                  for (var day in fClass.campDays!) {
+                                    if (day.fencers.contains(fencer)) {
+                                      if (!first) {
+                                        text = text + " | ";
+                                      }
+                                      text = text +
+                                          DateFormat("E M/d").format(day.date);
+                                      first = false;
+                                    }
+                                  }
+                                  subtitle = Text(text);
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(fencer.name),
+                                      subtitle: subtitle,
+                                      trailing: userData.admin
+                                          ? const Icon(Icons.edit)
+                                          : null,
+                                      onTap: userData.admin
+                                          ? () {
+                                              showCampRegistrationDialog(
+                                                fencer,
+                                                userData,
+                                              );
+                                            }
+                                          : null,
                                     ),
-                                    trailing: userData.admin
-                                        ? const Icon(Icons.edit)
-                                        : null,
-                                    onTap: userData.admin
-                                        ? () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                      "Change Status"),
-                                                  content: Text(
-                                                      "${fencer.name} is currently ${fencer.checkedIn ? "" : "not "}checked in, if you would like to change that please use the button below."),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        fClass.fencers[
-                                                                index - 1] =
-                                                            fencer.copyWith(
-                                                                checkedIn: !fencer
-                                                                    .checkedIn);
-                                                        FirestoreService()
-                                                            .updateData(
-                                                          path: FirestorePath
-                                                              .fClass(
-                                                                  fClass.id),
-                                                          data: fClass.toMap(),
-                                                        );
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(
-                                                          "MARK FENCER ${fencer.checkedIn ? 'ABSENT' : 'PRESENT'}"),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }
-                                        : null,
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
                               }
                             },
                           ),
@@ -254,157 +387,63 @@ class _FClassDetailsState extends State<FClassDetails> {
                         // ),
                         text: userData.isFencerInList(fClass.fencers)
                             ? "Edit registration"
-                            : 'Sign up for class',
+                            : 'Sign up for camp',
                         onPressed: () async {
+                          Fencer fencer;
                           if (userData.children.length == 1) {
-                            /// if the user only has one child
-                            if (userData.isFencerInList(fClass.fencers)) {
-                              /// if the child is in the list
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Delete Registration'),
-                                      content: Text(
-                                          "Would you like to delete ${userData.toFencer(0).firstName}'s registration for this class?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("CANCEL"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            fClass.userIDs.remove(
-                                                userData.fencers()[0].id);
-                                            fClass.fencers
-                                                .remove(userData.toFencer(0));
-                                            FirestoreService().updateData(
-                                              path: FirestorePath.fClass(
-                                                  fClass.id),
-                                              data: fClass.toMap(),
-                                            );
-                                            Navigator.pop(context);
-                                          },
-                                          child:
-                                              const Text("DELETE REGISTRATION"),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            } else {
-                              /// if the child is not in the list
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Register'),
-                                      content: Text(
-                                          "Would you like to register ${userData.toFencer(0).firstName} for this class?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("CANCEL"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            fClass.userIDs
-                                                .add(userData.fencers()[0].id);
-                                            fClass.fencers
-                                                .add(userData.toFencer(0));
-                                            FirestoreService().updateData(
-                                              path: FirestorePath.fClass(
-                                                  fClass.id),
-                                              data: fClass.toMap(),
-                                            );
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("REGISTER"),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            }
+                            fencer = userData.toFencer(0);
                           } else {
-                            /// if the user has multiple children
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return StatefulBuilder(
-                                    builder: (context, setState) {
-                                  List<Fencer> fencers =
-                                      userData.fencersInList(fClass.fencers);
-                                  List<String> userIDs = [];
+                            fencer = await showDialog(
+                                context: context,
+                                builder: (context) {
                                   return AlertDialog(
-                                    title: const Text('Edit Registration'),
+                                    title: const Text("Select Fencer"),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         const Text(
-                                            "Select the child(ren) you would like to sign up for this class:"),
+                                            "Please select which fencer you are registering for the camp. Registration is done one fencer at a time."),
                                         MultiSelectChip(
-                                          initialChoices: fencers
-                                              .map((child) => child.firstName)
-                                              .toList(),
                                           itemList: userData.children
                                               .map((child) => child.firstName)
                                               .toList(),
                                           onSelectionChanged: (val) {
-                                            fencers = [];
-                                            fencers.addAll(fClass.fencers);
-                                            userIDs.addAll(fClass.userIDs);
-                                            for (var fencer in userData
-                                                .fencersInList(fencers)) {
-                                              fencers.remove(fencer);
-                                              userIDs.remove(fencer.id);
-                                            }
-                                            fencers.addAll(userData
-                                                .fencersFromFirstName(val));
-                                            userIDs.addAll(userData
-                                                .fencersFromFirstName(val)
-                                                .map((e) => e.id));
-                                            fencers = fencers.toSet().toList();
-                                            userIDs = userIDs.toSet().toList();
+                                            Navigator.pop(
+                                                context,
+                                                userData
+                                                    .fencersFromFirstName(val)
+                                                    .first);
                                           },
+                                          multi: false,
                                         ),
                                       ],
                                     ),
+                                  );
+                                });
+                          }
+                          dynamic result = await showCampRegistrationDialog(
+                            fencer,
+                            userData,
+                          );
+                          if (result != null && result == true) {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("All set!"),
+                                    content: Text(
+                                        "You are now registered for ${fClass.title}, payments can be given to any coach directly and then your status will be updated to paid. Thank you!"),
                                     actions: [
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("CANCEL"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          fClass = fClass.copyWith(
-                                              fencers: fencers,
-                                              userIDs: userIDs);
-                                          FirestoreService().updateData(
-                                            path:
-                                                FirestorePath.fClass(fClass.id),
-                                            data: fClass.toMap(),
-                                          );
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("CONFIRM CHANGES"),
-                                      ),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text("OK"))
                                     ],
                                   );
                                 });
-                              },
-                            );
                           }
-                          FirestoreService().updateData(
-                            path: FirestorePath.fClass(fClass.id),
-                            data: fClass.toMap(),
-                          );
                         },
-                      )
+                      ),
                   ],
                 ),
               );
@@ -428,4 +467,18 @@ class _FClassDetailsState extends State<FClassDetails> {
       },
     );
   }
+}
+
+int totalRegularCost(List<String> dates, List<String> selectedDates) {
+  int totalLength = dates.length;
+  int numTrue = selectedDates.length;
+  bool discountPrice = totalLength == numTrue;
+  return discountPrice ? 550 : 110 * numTrue;
+}
+
+int totalUnlimitedCost(List<String> dates, List<String> selectedDates) {
+  int totalLength = dates.length;
+  int numTrue = selectedDates.length;
+  bool discountPrice = totalLength == numTrue;
+  return discountPrice ? 500 : 100 * numTrue;
 }

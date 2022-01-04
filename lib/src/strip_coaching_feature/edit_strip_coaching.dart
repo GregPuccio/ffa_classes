@@ -4,54 +4,45 @@ import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:flutter/material.dart';
-import 'package:time_range/time_range.dart';
 
-class EditCamp extends StatefulWidget {
+class EditStripCoaching extends StatefulWidget {
   final ScreenArgs args;
-  const EditCamp({required this.args, Key? key}) : super(key: key);
-  static const routeName = "editCamp";
+  const EditStripCoaching({required this.args, Key? key}) : super(key: key);
+  static const routeName = "editStripCoaching";
 
   @override
-  _EditCampState createState() => _EditCampState();
+  _EditStripCoachingState createState() => _EditStripCoachingState();
 }
 
-class _EditCampState extends State<EditCamp> {
-  late TextEditingController customClassTitleController;
-  late TextEditingController customClassDescriptionController;
-  late TextEditingController customMaxNumberController;
+class _EditStripCoachingState extends State<EditStripCoaching> {
+  late TextEditingController tournamentNameController;
+  late TextEditingController tournamentDescriptionController;
   late TextEditingController regRateController;
-  late TextEditingController unlimRateController;
   late TextEditingController regDiscountController;
-  late TextEditingController unlimDiscountController;
+  late TextEditingController notesController;
   late FClass fClass;
 
   @override
   void initState() {
     fClass = widget.args.fClass!;
-    customClassTitleController =
+    tournamentNameController =
         TextEditingController(text: fClass.customClassTitle);
-    customClassDescriptionController =
+    tournamentDescriptionController =
         TextEditingController(text: fClass.customClassDescription);
-    customMaxNumberController =
-        TextEditingController(text: fClass.customMaxFencers);
     regRateController = TextEditingController(text: fClass.customRegRate);
     regDiscountController =
         TextEditingController(text: fClass.customRegDiscount);
-    unlimRateController = TextEditingController(text: fClass.customUnlimRate);
-    unlimDiscountController =
-        TextEditingController(text: fClass.customUnlimDiscount);
+    notesController = TextEditingController(text: fClass.notes);
     super.initState();
   }
 
   @override
   void dispose() {
-    customClassTitleController.dispose();
-    customClassDescriptionController.dispose();
-    customMaxNumberController.dispose();
+    tournamentNameController.dispose();
+    tournamentDescriptionController.dispose();
     regRateController.dispose();
-    unlimRateController.dispose();
     regDiscountController.dispose();
-    unlimDiscountController.dispose();
+    notesController.dispose();
     super.dispose();
   }
 
@@ -75,18 +66,16 @@ class _EditCampState extends State<EditCamp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Camp"),
+        title: const Text("Edit Strip Coaching"),
         actions: [
           TextButton(
             onPressed: () {
               fClass = fClass.copyWith(
-                customClassTitle: customClassTitleController.text,
-                customClassDescription: customClassDescriptionController.text,
-                customMaxFencers: customMaxNumberController.text,
+                customClassTitle: tournamentNameController.text,
+                customClassDescription: tournamentDescriptionController.text,
                 customRegRate: regRateController.text,
                 customRegDiscount: regDiscountController.text,
-                customUnlimRate: unlimRateController.text,
-                customUnlimDiscount: unlimDiscountController.text,
+                notes: notesController.text,
               );
               showDialog(
                 context: context,
@@ -141,16 +130,13 @@ class _EditCampState extends State<EditCamp> {
           constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
             children: [
-              const SizedBox(
-                height: 10,
-              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   textCapitalization: TextCapitalization.words,
-                  controller: customClassTitleController,
+                  controller: tournamentNameController,
                   decoration: const InputDecoration(
-                    labelText: "Title",
+                    labelText: "Tournament Name",
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -159,55 +145,18 @@ class _EditCampState extends State<EditCamp> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   textCapitalization: TextCapitalization.sentences,
-                  controller: customClassDescriptionController,
+                  controller: tournamentDescriptionController,
                   decoration: const InputDecoration(
-                    labelText: "Description",
+                    labelText: "Description/Location",
                     border: OutlineInputBorder(),
                   ),
                   maxLines: 5,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  keyboardType:
-                      const TextInputType.numberWithOptions(signed: true),
-                  controller: customMaxNumberController,
-                  decoration: const InputDecoration(
-                    labelText: "Maximum number of fencers",
-                    border: OutlineInputBorder(),
-                  ),
                 ),
               ),
               SecondaryButton(
                 active: true,
                 onPressed: showDateChooser,
                 text: fClass.dateRange,
-              ),
-              TimeRange(
-                fromTitle: const Text('From'),
-                toTitle: const Text('To'),
-                titlePadding: 20,
-                textStyle: Theme.of(context).textTheme.bodyText1,
-                activeTextStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.transparent,
-                firstTime: const TimeOfDay(hour: 8, minute: 00),
-                lastTime: const TimeOfDay(hour: 20, minute: 00),
-                initialRange: TimeRangeResult(fClass.startTime, fClass.endTime),
-                timeStep: 10,
-                timeBlock: 10,
-                onRangeCompleted: (range) => setState(() {
-                  fClass = fClass.copyWith(
-                    startTime: range?.start,
-                    endTime: range?.end,
-                  );
-                }),
-              ),
-              const SizedBox(
-                height: 10,
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -217,7 +166,7 @@ class _EditCampState extends State<EditCamp> {
                       child: TextField(
                         controller: regRateController,
                         decoration: const InputDecoration(
-                          labelText: "Reg Rate/Day",
+                          labelText: "First Event",
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.attach_money),
                         ),
@@ -228,9 +177,9 @@ class _EditCampState extends State<EditCamp> {
                       child: TextField(
                         controller: regDiscountController,
                         decoration: const InputDecoration(
-                          labelText: "Discount",
+                          labelText: "Add'l Event",
                           border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.remove),
+                          prefixIcon: Icon(Icons.attach_money),
                         ),
                       ),
                     ),
@@ -239,30 +188,15 @@ class _EditCampState extends State<EditCamp> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: TextField(
-                        controller: unlimRateController,
-                        decoration: const InputDecoration(
-                          labelText: "Unlim Rate/Day",
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.attach_money),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Flexible(
-                      child: TextField(
-                        controller: unlimDiscountController,
-                        decoration: const InputDecoration(
-                          labelText: "Discount",
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.remove),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: TextField(
+                  controller: notesController,
+                  decoration: const InputDecoration(
+                    labelText: "Notes",
+                    hintText:
+                        "Add any notes for the tournament or anything else you need to remember, here",
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 5,
                 ),
               ),
               TextButton(
@@ -273,7 +207,7 @@ class _EditCampState extends State<EditCamp> {
                         return AlertDialog(
                           title: const Text("Delete Camp"),
                           content: const Text(
-                              "Are you sure you would like to delete this camp and all of its data? (Fencers registered/paid for, etc.)"),
+                              "Are you sure you would like to delete this tournament and all of its data? (Fencers registered/paid for, etc.)"),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -289,7 +223,7 @@ class _EditCampState extends State<EditCamp> {
                                 Navigator.popUntil(
                                     context, ModalRoute.withName('/'));
                               },
-                              child: const Text("DELETE CAMP"),
+                              child: const Text("DELETE TOURNAMENT"),
                             ),
                           ],
                         );
