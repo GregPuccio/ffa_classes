@@ -32,6 +32,10 @@ class Coach {
     );
   }
 
+  String get fullName {
+    return "$firstName $lastName";
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

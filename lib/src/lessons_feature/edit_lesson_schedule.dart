@@ -15,17 +15,50 @@ class EditLessonSchedule extends StatefulWidget {
   _EditLessonScheduleState createState() => _EditLessonScheduleState();
 }
 
+bool changed = false;
+
 class _EditLessonScheduleState extends State<EditLessonSchedule> {
   late UserData userData;
   late List<Map<String, Map<String, List<DateTime>>>> availability;
 
+  Future getData() async {
+    userData = await FirestoreService().documentFuture(
+        path: FirestorePath.user(userData.id),
+        builder: (map, docID) => UserData.fromMap(map!).copyWith(id: docID));
+  }
+
+  void setAvailability() {
+    if (mounted) {
+      setState(() {
+        availability = userData.availability;
+        if (availability.length != daysOfWeek.length) {
+          availability = UserData.createAvailability();
+        }
+        changed = false;
+      });
+    } else {
+      availability = userData.availability;
+      if (availability.length != daysOfWeek.length) {
+        availability = UserData.createAvailability();
+      }
+    }
+  }
+
+  Future<void> updateAvailability() async {
+    if (changed) {
+      await FirestoreService().updateData(
+          path: FirestorePath.user(userData.id),
+          data: {'availability': availability});
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Availability updated")));
+    }
+    return;
+  }
+
   @override
   void initState() {
     userData = widget.args.userData!;
-    availability = userData.availability;
-    if (availability.length != daysOfWeek.length) {
-      availability = UserData.createAvailability();
-    }
+    setAvailability();
     super.initState();
   }
 
@@ -33,11 +66,7 @@ class _EditLessonScheduleState extends State<EditLessonSchedule> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        FirestoreService().updateData(
-            path: FirestorePath.user(userData.id),
-            data: {'availability': availability});
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Availability updated")));
+        updateAvailability();
         return true;
       },
       child: Scaffold(
@@ -50,6 +79,30 @@ class _EditLessonScheduleState extends State<EditLessonSchedule> {
             ListTile(
               title: Text(userData.fullName,
                   style: Theme.of(context).textTheme.headline6),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Employee"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: coaches
+                              .map((e) => TextButton(
+                                    child: Text(e.fullName),
+                                    onPressed: () async {
+                                      await updateAvailability();
+                                      userData = UserData.fromCoach(e);
+                                      await getData();
+                                      setAvailability();
+                                      Navigator.pop(context);
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                      );
+                    });
+              },
             ),
             const Divider(),
             Flexible(
@@ -145,6 +198,7 @@ Future showEditDay(
     int index = availability.indexWhere((map) => map.containsKey(dayOfWeek));
     setState(() {
       availability[index][dayOfWeek] = newValue;
+      changed = true;
     });
   }
 

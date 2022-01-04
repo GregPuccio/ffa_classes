@@ -253,4 +253,30 @@ class UserData {
     }
     return availability;
   }
+
+  static UserData create() {
+    return UserData(
+      id: 'id',
+      invoicingKey: '',
+      invoices: [],
+      admin: false,
+      emailAddress: '',
+      parentFirstName: '',
+      parentLastName: '',
+      children: [],
+      member: false,
+      unlimitedMember: false,
+      availability: [],
+    );
+  }
+
+  static UserData fromCoach(Coach e) {
+    return UserData.create().copyWith(
+      id: e.id,
+      emailAddress: e.emailAddress,
+      parentFirstName: e.firstName,
+      parentLastName: e.lastName,
+      availability: e.availability,
+    );
+  }
 }

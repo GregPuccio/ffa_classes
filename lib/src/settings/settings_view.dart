@@ -6,6 +6,7 @@ import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/constants/widgets/buttons.dart';
 import 'package:ffaclasses/src/constants/widgets/theme_popup_menu.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
+import 'package:ffaclasses/src/lessons_feature/edit_lesson_schedule.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/change_password.dart';
@@ -83,6 +84,21 @@ class _SettingsViewState extends State<SettingsView> {
                     },
                   ),
                 ),
+                if (userData.admin)
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: const Text("Update Lesson Availability"),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          EditLessonSchedule.routeName,
+                          arguments: ScreenArgs(userData: userData),
+                        );
+                      },
+                    ),
+                  ),
                 Container(
                   margin: const EdgeInsets.all(10),
                   child: const Text(
