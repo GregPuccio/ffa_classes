@@ -144,7 +144,7 @@ class _AddStudentLessonState extends State<AddStudentLesson> {
         return Scaffold(
           appBar: AppBar(
             title: const Text("Add Lesson"),
-            bottom: searchBar(
+            bottom: SearchBar(
               controller,
               Theme.of(context).cardColor,
               autoComplete: true,
