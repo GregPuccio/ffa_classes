@@ -86,6 +86,7 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TableCalendar(
+                  availableGestures: AvailableGestures.horizontalSwipe,
                   availableCalendarFormats: const {
                     CalendarFormat.month: 'Month'
                   },

@@ -71,49 +71,53 @@ class _AddStudentLessonState extends State<AddStudentLesson> {
     }
   }
 
-  Future<List<Lesson>> getLessonTimeSlotsForDay(
-      List<Lesson> lessonSlots) async {
+  Stream<List<Lesson>> getLessonTimeSlotsForDay(List<Lesson> lessonSlots) {
     if (lessonSlots.isNotEmpty) {
       DateTime start = lessonSlots.first.startTime;
       DateTime earliest = DateTime(start.year, start.month, start.day);
       DateTime latest = DateTime(start.year, start.month, start.day + 1);
-      List<Lesson> bookedLessons = await FirestoreService().collectionFuture(
-          path: FirestorePath.lessons(),
-          builder: (map, docID) => Lesson.fromMap(map!).copyWith(id: docID),
-          queryBuilder: (query) {
-            return query
-                .where('startTime',
-                    isGreaterThanOrEqualTo: earliest.millisecondsSinceEpoch)
-                .where('startTime', isLessThan: latest.millisecondsSinceEpoch);
-          });
-      List<Lesson> lessons = [];
-      for (int i = 0; i < lessonSlots.length; i++) {
-        DateTime startTime = lessonSlots[i].startTime;
-        DateTime endTime = lessonSlots[i].endTime;
-        int lessonLength = _lessonType == LessonType.privateLesson ? 20 : 30;
-        int timeSlots = endTime.difference(startTime).inMinutes ~/ lessonLength;
-        for (int j = 0; j < timeSlots; j++) {
-          Lesson lesson = Lesson.create().copyWith(
-            startTime: startTime.add(Duration(minutes: lessonLength * j)),
-            endTime: startTime.add(Duration(minutes: lessonLength * (j + 1))),
-            coach: coach,
-            fencer: fencer,
-            userID: fencer!.id.substring(0, fencer!.id.length - 1),
-            lessonType: _lessonType,
-          );
-          if (bookedLessons.any((bookedLesson) =>
-              (bookedLesson.startTime.isAtSameMomentAs(lesson.startTime) ||
-                  (bookedLesson.startTime.isAfter(lesson.startTime) &&
-                      bookedLesson.startTime.isBefore(lesson.endTime))) &&
-              lesson.coach.id == bookedLesson.coach.id)) {
-            lesson = lesson.copyWith(booked: true);
+      return FirestoreService()
+          .collectionStream(
+              path: FirestorePath.lessons(),
+              builder: (map, docID) => Lesson.fromMap(map!).copyWith(id: docID),
+              queryBuilder: (query) {
+                return query
+                    .where('startTime',
+                        isGreaterThanOrEqualTo: earliest.millisecondsSinceEpoch)
+                    .where('startTime',
+                        isLessThan: latest.millisecondsSinceEpoch);
+              })
+          .map((bookedLessons) {
+        List<Lesson> lessons = [];
+        for (int i = 0; i < lessonSlots.length; i++) {
+          DateTime startTime = lessonSlots[i].startTime;
+          DateTime endTime = lessonSlots[i].endTime;
+          int lessonLength = _lessonType == LessonType.privateLesson ? 20 : 30;
+          int timeSlots =
+              endTime.difference(startTime).inMinutes ~/ lessonLength;
+          for (int j = 0; j < timeSlots; j++) {
+            Lesson lesson = Lesson.create().copyWith(
+              startTime: startTime.add(Duration(minutes: lessonLength * j)),
+              endTime: startTime.add(Duration(minutes: lessonLength * (j + 1))),
+              coach: coach,
+              fencer: fencer,
+              userID: fencer!.id.substring(0, fencer!.id.length - 1),
+              lessonType: _lessonType,
+            );
+            if (bookedLessons.any((bookedLesson) =>
+                (bookedLesson.startTime.isAtSameMomentAs(lesson.startTime) ||
+                    (bookedLesson.startTime.isAfter(lesson.startTime) &&
+                        bookedLesson.startTime.isBefore(lesson.endTime))) &&
+                lesson.coach.id == bookedLesson.coach.id)) {
+              lesson = lesson.copyWith(booked: true);
+            }
+            lessons.add(lesson);
           }
-          lessons.add(lesson);
         }
-      }
-      return lessons;
+        return lessons;
+      });
     } else {
-      return [];
+      return Stream.value([]);
     }
   }
 
@@ -323,6 +327,8 @@ class _AddStudentLessonState extends State<AddStudentLesson> {
                               }
 
                               return TableCalendar(
+                                availableGestures:
+                                    AvailableGestures.horizontalSwipe,
                                 availableCalendarFormats: const {
                                   CalendarFormat.month: 'Month',
                                 },
@@ -347,9 +353,6 @@ class _AddStudentLessonState extends State<AddStudentLesson> {
                                     _selectedLessons.value = _getLessonsForDay(
                                         selectedDay, entry.value);
                                   });
-                                  // if (_selectedLessons.value.isNotEmpty) {
-                                  //   _scrollController.scrollToIndex(index + 3);
-                                  // }
                                 },
                                 onPageChanged: (focusedDay) {
                                   _focusedDay = focusedDay;
@@ -379,8 +382,8 @@ class _AddStudentLessonState extends State<AddStudentLesson> {
                       ? ValueListenableBuilder<List<Lesson>>(
                           valueListenable: _selectedLessons,
                           builder: (context, rawLessons, _) {
-                            return FutureBuilder<List<Lesson>>(
-                                future: getLessonTimeSlotsForDay(rawLessons),
+                            return StreamBuilder<List<Lesson>>(
+                                stream: getLessonTimeSlotsForDay(rawLessons),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
                                     List<Lesson> lessons = snapshot.data!;

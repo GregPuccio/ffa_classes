@@ -1,8 +1,10 @@
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
+import 'package:ffaclasses/src/lessons_feature/edit_lesson.dart';
 import 'package:ffaclasses/src/lessons_feature/lesson.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
+import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,6 +143,15 @@ class _LessonsListState extends State<LessonsList> {
                                                                   .endTime)),
                                                         ],
                                                       ),
+                                                      onTap: () {
+                                                        Navigator.pushNamed(
+                                                          context,
+                                                          EditLesson.routeName,
+                                                          arguments: ScreenArgs(
+                                                            lesson: fLesson,
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
                                                   ],
                                                 );

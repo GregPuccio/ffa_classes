@@ -9,14 +9,8 @@ Widget defaultEventTextBuilder(FlutterWeekViewEvent event, BuildContext context,
       text: event.title,
       style: const TextStyle(fontWeight: FontWeight.bold),
     ),
-    TextSpan(
-      text: ' ' +
-          dayView.hoursColumnStyle
-              .timeFormatter(HourMinute.fromDateTime(dateTime: event.start)) +
-          ' - ' +
-          dayView.hoursColumnStyle
-              .timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) +
-          '\n\n',
+    const TextSpan(
+      text: '\n\n',
     ),
     TextSpan(
       text: event.description,
