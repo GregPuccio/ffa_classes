@@ -112,52 +112,48 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
                 ),
               ),
             ),
-            Flexible(
-              child: ValueListenableBuilder<List<FClass>>(
-                valueListenable: _selectedFClasses,
-                builder: (context, fClasses, _) {
-                  fClasses.sort();
-                  return ListView.builder(
-                    itemCount: fClasses.length,
-                    itemBuilder: (context, index) {
-                      final FClass fClass = fClasses[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(fClass.title),
-                          subtitle: Text(
-                            "${fClass.fencers.length} fencers",
-                          ),
-                          trailing: fClass.classType != ClassType.stripCoaching
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(fClass.startTime.format(context)),
-                                    Text(fClass.endTime.format(context)),
-                                  ],
-                                )
-                              : null,
-                          onTap: () {
-                            String route;
-                            if (fClass.classType == ClassType.camp) {
-                              route = CampDetails.routeName;
-                            } else if (fClass.classType ==
-                                ClassType.stripCoaching) {
-                              route = StripCoachingDetails.routeName;
-                            } else {
-                              route = FClassDetails.routeName;
-                            }
-                            Navigator.restorablePushNamed(
-                              context,
-                              '$route/${fClass.id}',
-                            );
-                          },
+            ValueListenableBuilder<List<FClass>>(
+              valueListenable: _selectedFClasses,
+              builder: (context, fClasses, _) {
+                fClasses.sort();
+                return Column(
+                  children: fClasses.map((fClass) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(fClass.title),
+                        subtitle: Text(
+                          "${fClass.fencers.length} fencers",
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
+                        trailing: fClass.classType != ClassType.stripCoaching
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(fClass.startTime.format(context)),
+                                  Text(fClass.endTime.format(context)),
+                                ],
+                              )
+                            : null,
+                        onTap: () {
+                          String route;
+                          if (fClass.classType == ClassType.camp) {
+                            route = CampDetails.routeName;
+                          } else if (fClass.classType ==
+                              ClassType.stripCoaching) {
+                            route = StripCoachingDetails.routeName;
+                          } else {
+                            route = FClassDetails.routeName;
+                          }
+                          Navigator.restorablePushNamed(
+                            context,
+                            '$route/${fClass.id}',
+                          );
+                        },
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ];
           return Center(
@@ -165,23 +161,24 @@ class _ClassCalendarViewState extends State<ClassCalendarView> {
               alignment: Alignment.topCenter,
               width: 1000,
               child: portrait
-                  ? Column(
+                  ? ListView(
                       children: children,
                     )
                   : Row(
                       children: [
-                        Expanded(
+                        Flexible(
                           child: SingleChildScrollView(child: children[0]),
                         ),
                         const VerticalDivider(),
-                        Expanded(
-                          child: Column(
+                        Flexible(
+                          child: ListView(
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   "Classes for ${DateFormat.yMEd().format(_selectedDay!)}",
                                   style: Theme.of(context).textTheme.headline6,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               children[1],

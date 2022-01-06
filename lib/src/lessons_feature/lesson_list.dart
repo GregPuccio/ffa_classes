@@ -62,7 +62,7 @@ class _LessonsListState extends State<LessonsList> {
               }
 
               List<Lesson> lessons = snapshot.data!;
-              lessons.sort();
+              lessons.sort((a, b) => a.startTime.compareTo(b.startTime));
               List<List<Lesson>> lessonsByDate =
                   Lesson.sortClassesByDate(lessons);
               return Center(
