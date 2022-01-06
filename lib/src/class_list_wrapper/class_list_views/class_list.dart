@@ -140,15 +140,6 @@ class _ClassListViewState extends State<ClassListView> {
                   constraints: const BoxConstraints(maxWidth: 600),
                   child: Column(
                     children: [
-                      // ListTile(
-                      //     title: const Text(
-                      //       "Book Private Lessons (on Square)",
-                      //       textAlign: TextAlign.center,
-                      //     ),
-                      //     trailing: const Icon(Icons.launch),
-                      //     onTap: () {
-                      //       launch(squareLessonsLink);
-                      //     }),
                       MultiSelectChip(
                         initialChoices: [filters.first],
                         itemList: filters,

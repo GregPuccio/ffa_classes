@@ -8,7 +8,10 @@ import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_calenda
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_list.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_functions.dart';
 import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
+import 'package:ffaclasses/src/lessons_feature/add_lesson.dart';
+import 'package:ffaclasses/src/lessons_feature/add_student_lesson.dart';
 import 'package:ffaclasses/src/lessons_feature/lesson_calendar.dart';
+import 'package:ffaclasses/src/lessons_feature/lesson_list.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/settings/settings_view.dart';
 import 'package:ffaclasses/src/strip_coaching_feature/add_strip_coaching.dart';
@@ -64,7 +67,11 @@ class _HomeStructureState extends State<HomeStructure> {
           ],
         );
       case 1:
-        return const LessonCalendarView();
+        if (admin) {
+          return const LessonCalendarView();
+        } else {
+          return const LessonsList();
+        }
       case 2:
         if (admin) {
           return const ClientsView();
@@ -137,7 +144,24 @@ class _HomeStructureState extends State<HomeStructure> {
                       ),
                     ];
                   })
-              : null,
+              : index == 1
+                  ? FloatingActionButton(
+                      child: const Icon(Icons.add),
+                      onPressed: () {
+                        if (userData.admin) {
+                          Navigator.pushNamed(
+                            context,
+                            AddStudentLesson.routeName,
+                          );
+                        } else {
+                          Navigator.pushNamed(
+                            context,
+                            AddLesson.routeName,
+                          );
+                        }
+                      },
+                    )
+                  : null,
           body: getBody(userData.admin),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: index,

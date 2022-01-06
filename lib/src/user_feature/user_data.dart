@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ffaclasses/src/coach_feature/coach.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/lists.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer.dart';
 import 'package:ffaclasses/src/user_feature/child.dart';
@@ -18,6 +19,7 @@ class UserData {
   final bool member;
   final bool unlimitedMember;
   final List<Map<String, Map<String, List<DateTime>>>> availability;
+  final List<LessonType> lessonTypes;
 
   UserData({
     required this.id,
@@ -31,6 +33,7 @@ class UserData {
     required this.member,
     required this.unlimitedMember,
     required this.availability,
+    required this.lessonTypes,
   });
 
   UserData copyWith({
@@ -44,6 +47,7 @@ class UserData {
     bool? member,
     bool? unlimitedMember,
     List<Map<String, Map<String, List<DateTime>>>>? availability,
+    List<LessonType>? lessonTypes,
   }) {
     return UserData(
       id: id ?? this.id,
@@ -57,6 +61,7 @@ class UserData {
       member: member ?? this.member,
       unlimitedMember: unlimitedMember ?? this.unlimitedMember,
       availability: availability ?? this.availability,
+      lessonTypes: lessonTypes ?? this.lessonTypes,
     );
   }
 
@@ -83,6 +88,7 @@ class UserData {
       firstName: parentFirstName,
       lastName: parentLastName,
       availability: availability,
+      lessonTypes: lessonTypes,
     );
   }
 
@@ -210,6 +216,8 @@ class UserData {
       member: map['member'] ?? false,
       unlimitedMember: map['unlimitedMember'] ?? false,
       availability: secondList,
+      lessonTypes:
+          List.from(map['lessonTypes']?.map((x) => LessonType.values[x]) ?? []),
     );
   }
 
@@ -267,6 +275,7 @@ class UserData {
       member: false,
       unlimitedMember: false,
       availability: [],
+      lessonTypes: [],
     );
   }
 
@@ -277,6 +286,7 @@ class UserData {
       parentFirstName: e.firstName,
       parentLastName: e.lastName,
       availability: e.availability,
+      lessonTypes: e.lessonTypes,
     );
   }
 }

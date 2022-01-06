@@ -2,18 +2,22 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:ffaclasses/src/constants/enums.dart';
+
 class Coach {
   final String id;
   final String emailAddress;
   final String firstName;
   final String lastName;
   final List<Map<String, Map<String, List<DateTime>>>> availability;
+  final List<LessonType> lessonTypes;
   Coach({
     required this.id,
     required this.emailAddress,
     required this.firstName,
     required this.lastName,
     required this.availability,
+    required this.lessonTypes,
   });
 
   Coach copyWith({
@@ -22,6 +26,7 @@ class Coach {
     String? firstName,
     String? lastName,
     List<Map<String, Map<String, List<DateTime>>>>? availability,
+    List<LessonType>? lessonTypes,
   }) {
     return Coach(
       id: id ?? this.id,
@@ -29,6 +34,7 @@ class Coach {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       availability: availability ?? this.availability,
+      lessonTypes: lessonTypes ?? this.lessonTypes,
     );
   }
 
@@ -43,6 +49,7 @@ class Coach {
       'firstName': firstName,
       'lastName': lastName,
       'availability': availability,
+      'lessonTypes': lessonTypes.map((x) => x.index).toList(),
     };
   }
 
@@ -54,6 +61,8 @@ class Coach {
       lastName: map['lastName'] ?? '',
       availability: List<Map<String, Map<String, List<DateTime>>>>.from(
           map['availability'] ?? []),
+      lessonTypes: List<LessonType>.from(
+          map['lessonTypes']?.map((x) => LessonType.values[x ?? 0])),
     );
   }
 
@@ -63,7 +72,7 @@ class Coach {
 
   @override
   String toString() {
-    return 'Coach(id: $id, emailAddress: $emailAddress, firstName: $firstName, lastName: $lastName, availability: $availability)';
+    return 'Coach(id: $id, emailAddress: $emailAddress, firstName: $firstName, lastName: $lastName, availability: $availability, lessonTypes: $lessonTypes)';
   }
 
   @override
@@ -75,7 +84,8 @@ class Coach {
         other.emailAddress == emailAddress &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        listEquals(other.availability, availability);
+        listEquals(other.availability, availability) &&
+        listEquals(other.lessonTypes, lessonTypes);
   }
 
   @override
@@ -84,6 +94,7 @@ class Coach {
         emailAddress.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
-        availability.hashCode;
+        availability.hashCode ^
+        lessonTypes.hashCode;
   }
 }

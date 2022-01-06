@@ -11,6 +11,9 @@ import 'package:ffaclasses/src/constants/theming/app_data.dart';
 import 'package:ffaclasses/src/feedback_feature/custom_feedback.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_list.dart';
 import 'package:ffaclasses/src/fencer_feature/fencer_search.dart';
+import 'package:ffaclasses/src/lessons_feature/add_lesson.dart';
+import 'package:ffaclasses/src/lessons_feature/add_student_lesson.dart';
+import 'package:ffaclasses/src/lessons_feature/edit_lesson.dart';
 import 'package:ffaclasses/src/lessons_feature/edit_lesson_schedule.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
 import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
@@ -141,6 +144,13 @@ class MyApp extends StatelessWidget {
                           args: routeSettings.arguments as ScreenArgs);
                     case EditLessonSchedule.routeName:
                       return EditLessonSchedule(
+                          args: routeSettings.arguments as ScreenArgs);
+                    case AddLesson.routeName:
+                      return const AddLesson();
+                    case AddStudentLesson.routeName:
+                      return const AddStudentLesson();
+                    case EditLesson.routeName:
+                      return EditLesson(
                           args: routeSettings.arguments as ScreenArgs);
                     case FencerSearch.routeName:
                       return const FencerSearch();

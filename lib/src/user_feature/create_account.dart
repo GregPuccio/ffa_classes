@@ -186,18 +186,11 @@ class _AccountSetupState extends State<AccountSetup> {
                     lastName: childrenLastNames[i].text,
                   ));
                 }
-                UserData user = UserData(
-                  id: 'id',
-                  invoicingKey: '',
-                  invoices: [],
-                  admin: false,
+                UserData user = UserData.create().copyWith(
                   emailAddress: widget.user.email!,
                   parentFirstName: parentFirstName.text,
                   parentLastName: parentLastName.text,
                   children: children,
-                  member: false,
-                  unlimitedMember: false,
-                  availability: [],
                 );
                 FirestoreService().setData(
                   path: FirestorePath.user(widget.user.uid),

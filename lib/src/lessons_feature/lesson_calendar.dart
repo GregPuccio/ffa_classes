@@ -1,10 +1,13 @@
 import 'package:ffaclasses/src/app.dart';
 import 'package:ffaclasses/src/coach_feature/coach.dart';
 import 'package:ffaclasses/src/constants/links.dart';
+import 'package:ffaclasses/src/constants/widgets/calendar_lesson_event_text.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
+import 'package:ffaclasses/src/lessons_feature/edit_lesson.dart';
 import 'package:ffaclasses/src/lessons_feature/lesson.dart';
 import 'package:ffaclasses/src/riverpod/providers.dart';
+import 'package:ffaclasses/src/screen_arguments/screen_arguments.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,10 +75,11 @@ class _LessonCalendarViewState extends State<LessonCalendarView> {
 
                     return StreamBuilder<List<Lesson>>(
                         stream: FirestoreService().collectionStream(
-                          path: FirestorePath.lessons(),
-                          builder: (map, docID) =>
-                              Lesson.fromMap(map!).copyWith(id: docID),
-                        ),
+                            path: FirestorePath.lessons(),
+                            builder: (map, docID) =>
+                                Lesson.fromMap(map!).copyWith(id: docID),
+                            queryBuilder: (query) => query.where('coach.id',
+                                isEqualTo: userData.id)),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List<Lesson> lessons = snapshot.data!;
@@ -84,8 +88,8 @@ class _LessonCalendarViewState extends State<LessonCalendarView> {
                                 style: WeekViewStyle(
                                   dayViewSeparatorWidth: 1,
                                   dayViewWidth:
-                                      (MediaQuery.of(context).size.width - 80) /
-                                          7,
+                                      (MediaQuery.of(context).size.width - 60) /
+                                          5,
                                   dayViewSeparatorColor: Theme.of(context)
                                       .colorScheme
                                       .onBackground,
@@ -95,11 +99,26 @@ class _LessonCalendarViewState extends State<LessonCalendarView> {
                                 controller: weekViewController,
                                 dateCount: 100,
                                 events: lessons
-                                    .map((e) => FlutterWeekViewEvent(
-                                        title: e.fencer.name,
-                                        description: e.lessonType.toString(),
-                                        start: e.startTime,
-                                        end: e.endTime))
+                                    .map(
+                                      (e) => FlutterWeekViewEvent(
+                                          title: e.fencer.name,
+                                          description: e.type,
+                                          start: e.startTime,
+                                          end: e.endTime,
+                                          textStyle: Theme.of(context)
+                                              .textTheme
+                                              .caption,
+                                          padding: const EdgeInsets.all(5),
+                                          eventTextBuilder:
+                                              defaultEventTextBuilder,
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              EditLesson.routeName,
+                                              arguments: ScreenArgs(lesson: e),
+                                            );
+                                          }),
+                                    )
                                     .toList(),
                                 dateCreator: (index) =>
                                     DateTime(2022, 1, 2 + index),
@@ -116,16 +135,10 @@ class _LessonCalendarViewState extends State<LessonCalendarView> {
                                 ),
                                 dayViewStyleBuilder: (date) =>
                                     DayViewStyle.fromDate(date: date).copyWith(
-                                  backgroundColor: DateTime(date.year,
-                                              date.month, date.day) ==
-                                          DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day)
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .primaryVariant
-                                      : Theme.of(context).colorScheme.primary,
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withAlpha(126),
                                   backgroundRulesColor: Theme.of(context)
                                       .colorScheme
                                       .onBackground,

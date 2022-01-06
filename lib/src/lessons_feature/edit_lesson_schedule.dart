@@ -1,3 +1,4 @@
+import 'package:ffaclasses/src/constants/enums.dart';
 import 'package:ffaclasses/src/constants/lists.dart';
 import 'package:ffaclasses/src/firebase/firestore_path.dart';
 import 'package:ffaclasses/src/firebase/firestore_service.dart';
@@ -46,9 +47,11 @@ class _EditLessonScheduleState extends State<EditLessonSchedule> {
 
   Future<void> updateAvailability() async {
     if (changed) {
-      await FirestoreService().updateData(
-          path: FirestorePath.user(userData.id),
-          data: {'availability': availability});
+      await FirestoreService()
+          .updateData(path: FirestorePath.user(userData.id), data: {
+        'availability': availability,
+        'lessonTypes': userData.lessonTypes.map((x) => x.index).toList()
+      });
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Availability updated")));
     }
@@ -73,100 +76,143 @@ class _EditLessonScheduleState extends State<EditLessonSchedule> {
         appBar: AppBar(
           title: const Text("Edit Lesson Schedule"),
         ),
-        body: Column(
-          children: [
-            const Divider(),
-            ListTile(
-              title: Text(userData.fullName,
-                  style: Theme.of(context).textTheme.headline6),
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Employee"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: coaches
-                              .map((e) => TextButton(
-                                    child: Text(e.fullName),
-                                    onPressed: () async {
-                                      await updateAvailability();
-                                      userData = UserData.fromCoach(e);
-                                      await getData();
-                                      setAvailability();
-                                      Navigator.pop(context);
-                                    },
-                                  ))
-                              .toList(),
-                        ),
-                      );
-                    });
-              },
-            ),
-            const Divider(),
-            Flexible(
-              child: ListView.builder(
-                itemCount: daysOfWeek.length,
-                itemBuilder: (context, index) {
-                  String day = daysOfWeek[index];
-                  List<String> dates = [];
-
-                  dates = availability
-                      .firstWhere(
-                        (map) => map.containsKey(daysOfWeek[index]),
-                      )
-                      .entries
-                      .firstWhere((element) => element.key == daysOfWeek[index])
-                      .value
-                      .values
-                      .map((e) {
-                    String dateString = "";
-
-                    for (var element in e) {
-                      if (element != e.first) {
-                        dateString = dateString + " - ";
-                      }
-                      dateString =
-                          dateString + DateFormat('hh:mm aa').format(element);
-                    }
-                    return dateString;
-                  }).toList();
-
-                  return Column(
+        body: ListView.builder(
+          itemCount: daysOfWeek.length + 1,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Column(
+                children: [
+                  const Divider(),
+                  ListTile(
+                    title: Text(userData.fullName,
+                        style: Theme.of(context).textTheme.headline6),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Employee"),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: coaches
+                                    .map((e) => TextButton(
+                                          child: Text(e.fullName),
+                                          onPressed: () async {
+                                            await updateAvailability();
+                                            userData = UserData.fromCoach(e);
+                                            await getData();
+                                            setAvailability();
+                                            Navigator.pop(context);
+                                          },
+                                        ))
+                                    .toList(),
+                              ),
+                            );
+                          });
+                    },
+                  ),
+                  const Divider(),
+                  Row(
                     children: [
-                      const Divider(),
-                      ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(day),
-                            if (availability.isNotEmpty)
-                              Builder(builder: (context) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: dates.map((e) => Text(e)).toList(),
-                                );
-                              }),
-                          ],
+                      Flexible(
+                        child: SwitchListTile.adaptive(
+                          title: const Text("Private Lessons"),
+                          value: userData.lessonTypes
+                              .contains(LessonType.privateLesson),
+                          onChanged: (val) {
+                            setState(() {
+                              changed = true;
+                              if (val == true) {
+                                userData.lessonTypes
+                                    .add(LessonType.privateLesson);
+                              } else {
+                                userData.lessonTypes.removeWhere(
+                                    (type) => type == LessonType.privateLesson);
+                              }
+                            });
+                          },
                         ),
-                        onTap: () {
-                          showEditDay(context, availability, daysOfWeek[index],
-                              setState);
-                        },
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.edit),
-                          ],
+                      ),
+                      Flexible(
+                        child: SwitchListTile.adaptive(
+                          title: const Text("Bouting Lessons"),
+                          value: userData.lessonTypes
+                              .contains(LessonType.boutingLesson),
+                          onChanged: (val) {
+                            setState(() {
+                              changed = true;
+                              if (val == true) {
+                                userData.lessonTypes
+                                    .add(LessonType.boutingLesson);
+                              } else {
+                                userData.lessonTypes.removeWhere(
+                                    (type) => type == LessonType.boutingLesson);
+                              }
+                            });
+                          },
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                  const Divider(),
+                ],
+              );
+            } else {
+              String day = daysOfWeek[index - 1];
+              List<String> dates = [];
+
+              dates = availability
+                  .firstWhere(
+                    (map) => map.containsKey(day),
+                  )
+                  .entries
+                  .firstWhere((element) => element.key == day)
+                  .value
+                  .values
+                  .map((e) {
+                String dateString = "";
+
+                for (var element in e) {
+                  if (element != e.first) {
+                    dateString = dateString + " - ";
+                  }
+                  dateString =
+                      dateString + DateFormat('hh:mm aa').format(element);
+                }
+                return dateString;
+              }).toList();
+
+              return Column(
+                children: [
+                  const Divider(),
+                  ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(day),
+                        if (availability.isNotEmpty)
+                          Builder(builder: (context) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: dates.map((e) => Text(e)).toList(),
+                            );
+                          }),
+                      ],
+                    ),
+                    onTap: () {
+                      showEditDay(context, availability, day, setState);
+                    },
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.edit),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );

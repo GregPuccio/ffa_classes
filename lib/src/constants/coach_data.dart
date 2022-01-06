@@ -1,4 +1,5 @@
 import 'package:ffaclasses/src/coach_feature/coach.dart';
+import 'package:ffaclasses/src/constants/enums.dart';
 
 Coach zackBrown = Coach(
   id: "5nqAx4Y0toRCrhcSfH3DKYg9fCB3",
@@ -6,6 +7,7 @@ Coach zackBrown = Coach(
   firstName: "Zack",
   lastName: "Brown",
   availability: [],
+  lessonTypes: [LessonType.privateLesson],
 );
 
 Coach gregPuccio = Coach(
@@ -14,6 +16,7 @@ Coach gregPuccio = Coach(
   firstName: "Greg",
   lastName: "Puccio",
   availability: [],
+  lessonTypes: [LessonType.boutingLesson],
 );
 
 Coach andrewRichardson = Coach(
@@ -22,4 +25,5 @@ Coach andrewRichardson = Coach(
   firstName: "Andrew",
   lastName: "Richardson",
   availability: [],
+  lessonTypes: [LessonType.boutingLesson],
 );

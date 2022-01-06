@@ -115,4 +115,16 @@ class Fencer {
         registeredByID.hashCode ^
         registeredAt.hashCode;
   }
+
+  static Fencer create() {
+    return Fencer(
+      id: '',
+      firstName: '',
+      lastName: '',
+      emailAddress: '',
+      checkedIn: false,
+      registeredByID: '',
+      registeredAt: DateTime.now(),
+    );
+  }
 }

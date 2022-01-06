@@ -126,7 +126,7 @@ class FClass implements Comparable {
   }
 
   String get writtenDate {
-    return "${DateFormat('EEEE').format(date)} ${date.month}/${date.day}/${date.year}";
+    return DateFormat('EEEE M/d/y').format(date);
   }
 
   String get dateRange {
