@@ -345,6 +345,15 @@ class FClass implements Comparable {
     for (int i = 1; i <= lastDay.day; i++) {
       dates.add(DateTime.utc(now.year, now.month, i));
     }
+    DateTime weekBeforeLastDay =
+        DateTime.utc(now.year, now.month + 1).subtract(const Duration(days: 8));
+    if (now.day >= weekBeforeLastDay.day) {
+      DateTime secondMonthLastDay = DateTime.utc(now.year, now.month + 2)
+          .subtract(const Duration(hours: 24));
+      for (int i = 1; i <= secondMonthLastDay.day; i++) {
+        dates.add(DateTime.utc(now.year, now.month + 1, i));
+      }
+    }
     List<List<FClass>> listOfListOfClasses = [];
     for (var date in dates) {
       List<FClass> newList = [];

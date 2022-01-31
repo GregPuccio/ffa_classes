@@ -62,7 +62,8 @@ class Coach {
       availability: List<Map<String, Map<String, List<DateTime>>>>.from(
           map['availability'] ?? []),
       lessonTypes: List<LessonType>.from(
-          map['lessonTypes']?.map((x) => LessonType.values[x ?? 0])),
+        map['lessonTypes']?.map((x) => LessonType.values[x ?? 0]) ?? [],
+      ),
     );
   }
 

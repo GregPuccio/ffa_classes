@@ -6,6 +6,7 @@ import 'package:ffaclasses/src/camp_feature/add_camp.dart';
 import 'package:ffaclasses/src/class_feature/add_class.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_calendar.dart';
 import 'package:ffaclasses/src/class_list_wrapper/class_list_views/class_list.dart';
+import 'package:ffaclasses/src/constants/links.dart';
 import 'package:ffaclasses/src/feedback_feature/feedback_functions.dart';
 import 'package:ffaclasses/src/invoice_feature/client_invoicing.dart';
 import 'package:ffaclasses/src/lessons_feature/add_lesson.dart';
@@ -18,6 +19,7 @@ import 'package:ffaclasses/src/strip_coaching_feature/add_strip_coaching.dart';
 import 'package:ffaclasses/src/user_feature/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeStructure extends StatefulWidget {
   const HomeStructure({Key? key}) : super(key: key);
@@ -32,7 +34,24 @@ class _HomeStructureState extends State<HomeStructure> {
   int index = 0;
 
   void changeTab(int newIndex) {
-    if (index != newIndex) {
+    if (newIndex == 1) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text("External Site"),
+                content: const Text(
+                    "While we are currently working on our private lessons page, we will continue to use Square in the meantime."),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel")),
+                  TextButton(
+                    onPressed: () => launch(squareLessonsLink),
+                    child: const Text("Continue"),
+                  ),
+                ],
+              ));
+    } else if (index != newIndex) {
       setState(() {
         index = newIndex;
       });
@@ -164,6 +183,7 @@ class _HomeStructureState extends State<HomeStructure> {
                   : null,
           body: getBody(userData.admin),
           bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
             currentIndex: index,
             onTap: changeTab,
             items: [
