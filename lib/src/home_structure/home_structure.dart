@@ -32,9 +32,10 @@ class HomeStructure extends StatefulWidget {
 class _HomeStructureState extends State<HomeStructure> {
   bool calendar = false;
   int index = 0;
+  bool admin = false;
 
   void changeTab(int newIndex) {
-    if (newIndex == 1) {
+    if (newIndex == 1 && !admin) {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -108,6 +109,7 @@ class _HomeStructureState extends State<HomeStructure> {
   Widget build(BuildContext context) {
     Widget whenData(UserData? userData) {
       if (userData != null) {
+        admin = userData.admin;
         return Scaffold(
           appBar: AppBar(
             title: const Text('Forward Fencing Academy'),
@@ -190,7 +192,7 @@ class _HomeStructureState extends State<HomeStructure> {
               const BottomNavigationBarItem(
                   icon: Icon(Icons.people), label: 'Group'),
               const BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: 'Private'),
+                  icon: Icon(Icons.person), label: 'Lessons'),
               BottomNavigationBarItem(
                   icon:
                       Icon(userData.admin ? Icons.attach_money : Icons.payment),
