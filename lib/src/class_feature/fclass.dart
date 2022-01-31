@@ -112,13 +112,13 @@ class FClass implements Comparable {
       case ClassType.stripCoaching:
         return customClassDescription ?? 'Custom Class Description';
       case ClassType.foundation:
-        return "The class most suitable for younger and newer fencers (age 7-11) or by Coach invitation. This class focuses on coordination, fundamentals, and physical strategy games to build a correct technical base and to have fun and exercise! 12 max per class";
+        return "The class most suitable for younger and newer fencers (age 7-11) or by Coach invitation. This class focuses on coordination, fundamentals, and physical strategy games to build a correct technical base and to have fun and exercise.";
       case ClassType.youth:
-        return "LIMITED TO 12 Open to any athlete age 10-14: YOUTH ATHLETES WHO ATTEND ADULT CLASSES MUST ATTEND AT LEAST ONE YOUTH or YOUTH COMPETITIVE CLASS PER WEEK";
+        return "Open to any athletes ages 10-14. Youth athletes who attend any adult classes must also attend at least one Youth Competitive class per week.";
       case ClassType.mixed:
-        return "Open to any athlete age 10-14. YOUTH ATHLETES WHO ATTEND ADULT CLASSES MUST ATTEND AT LEAST ONE YOUTH CLASS PER WEEK";
+        return "For students of any level who compete or aspire to compete in scholastic or USA Fencing-sanctioned tournaments. Age is generally 12 and above.";
       case ClassType.advanced:
-        return "For experienced competitors 13+ or by Coach invitation";
+        return "For experienced competitors 13+ or by Coach invitation.";
 
       default:
         return "Sorry we couldn't find that class!";
