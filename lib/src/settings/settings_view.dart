@@ -46,10 +46,10 @@ class _SettingsViewState extends State<SettingsView> {
             child: ListView(
               children: [
                 const SizedBox(
-                  height: 20,
+                  height: 8,
                 ),
                 Container(
-                  margin: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(8.0),
                   child: const Text(
                     "ACCOUNT",
                     style: TextStyle(
@@ -173,7 +173,31 @@ class _SettingsViewState extends State<SettingsView> {
                 SecondaryButton(
                   text: "Logout",
                   onPressed: () {
-                    AuthService().signOut();
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text(
+                            "Are you sure you would like to log out?"),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Cancel")),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                AuthService().signOut();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "You have successfully logged out!"),
+                                  ),
+                                );
+                              },
+                              child: const Text("Log Out")),
+                        ],
+                      ),
+                    );
                   },
                 ),
                 TextButton(
