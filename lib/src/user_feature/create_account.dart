@@ -51,7 +51,7 @@ class _AccountSetupState extends State<AccountSetup> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "Parent:",
+                    "Parent/Guardian:",
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
@@ -131,21 +131,6 @@ class _AccountSetupState extends State<AccountSetup> {
                 ),
                 Row(
                   children: [
-                    if (childrenFirstNames.length > 1)
-                      Flexible(
-                        child: SecondaryButton(
-                          onPressed: () {
-                            setState(() {
-                              // if (childrenFirstNames.length > 1) {
-                              childrenFirstNames.removeLast();
-                              childrenLastNames.removeLast();
-                              // }
-                            });
-                          },
-                          text: "- Remove child",
-                          activeColor: Colors.red,
-                        ),
-                      ),
                     Flexible(
                       child: SecondaryButton(
                         text: "+ Add child",
@@ -160,6 +145,19 @@ class _AccountSetupState extends State<AccountSetup> {
                         },
                       ),
                     ),
+                    if (childrenFirstNames.isNotEmpty)
+                      Flexible(
+                        child: SecondaryButton(
+                          onPressed: () {
+                            setState(() {
+                              childrenFirstNames.removeLast();
+                              childrenLastNames.removeLast();
+                            });
+                          },
+                          text: "- Remove child",
+                          activeColor: Colors.red,
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -168,9 +166,7 @@ class _AccountSetupState extends State<AccountSetup> {
           InkButton(
             text: "Complete setup",
             onPressed: () {
-              if (parentFirstName.text.isEmpty ||
-                  parentLastName.text.isEmpty ||
-                  childrenFirstNames.isEmpty) {
+              if (parentFirstName.text.isEmpty || parentLastName.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(

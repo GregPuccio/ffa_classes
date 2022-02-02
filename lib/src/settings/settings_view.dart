@@ -60,7 +60,7 @@ class _SettingsViewState extends State<SettingsView> {
                 Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: const Text("Edit Parent & Children"),
+                    title: const Text("Update Names"),
                     trailing: const Icon(Icons.arrow_forward),
                     onTap: () {
                       Navigator.pushNamed(
@@ -74,7 +74,7 @@ class _SettingsViewState extends State<SettingsView> {
                 Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: const Text("Change Password"),
+                    title: const Text("Update Password"),
                     trailing: const Icon(Icons.arrow_forward),
                     onTap: () {
                       Navigator.pushNamed(

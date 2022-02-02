@@ -157,7 +157,7 @@ class _EditAccountState extends State<EditAccount> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "Parent:",
+                          "Parent/Guardian:",
                           style: Theme.of(context).textTheme.headline5,
                         ),
                       ),
@@ -267,24 +267,6 @@ class _EditAccountState extends State<EditAccount> {
                       ),
                       Row(
                         children: [
-                          if (childrenFirstNames.length > 1)
-                            Flexible(
-                              child: SecondaryButton(
-                                onPressed: () {
-                                  setState(() {
-                                    // if (childrenFirstNames.length > 1) {
-                                    childrenFirstNames.removeLast();
-                                    childrenLastNames.removeLast();
-                                    // }
-                                    if (!edited) {
-                                      edited = true;
-                                    }
-                                  });
-                                },
-                                text: "- Remove child",
-                                activeColor: Colors.red,
-                              ),
-                            ),
                           Flexible(
                             child: SecondaryButton(
                               text: "+ Add child",
@@ -300,6 +282,22 @@ class _EditAccountState extends State<EditAccount> {
                               },
                             ),
                           ),
+                          if (childrenFirstNames.isNotEmpty)
+                            Flexible(
+                              child: SecondaryButton(
+                                onPressed: () {
+                                  setState(() {
+                                    childrenFirstNames.removeLast();
+                                    childrenLastNames.removeLast();
+                                    if (!edited) {
+                                      edited = true;
+                                    }
+                                  });
+                                },
+                                text: "- Remove child",
+                                activeColor: Colors.red,
+                              ),
+                            ),
                         ],
                       ),
                     ],
@@ -310,8 +308,7 @@ class _EditAccountState extends State<EditAccount> {
                   active: edited,
                   onPressed: () {
                     if (parentFirstName.text.isEmpty ||
-                        parentLastName.text.isEmpty ||
-                        childrenFirstNames.isEmpty) {
+                        parentLastName.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
