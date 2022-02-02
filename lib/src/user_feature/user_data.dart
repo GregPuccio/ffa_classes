@@ -175,6 +175,7 @@ class UserData {
       'member': member,
       'unlimitedMember': unlimitedMember,
       'availability': availability,
+      'lessonTypes': lessonTypes.map((x) => x.index).toList(),
     };
   }
 
