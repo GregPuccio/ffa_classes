@@ -60,6 +60,7 @@ class _ClientsViewState extends ConsumerState<ClientsView> {
                             child: ListTile(
                               title: Text(
                                   "${user.parentFirstName} ${user.parentLastName}"),
+                              subtitle: Text(user.childrenFirstNames),
                               trailing: const Icon(Icons.edit),
                               onTap: () {
                                 Navigator.pushNamed(

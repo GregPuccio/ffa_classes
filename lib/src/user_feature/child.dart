@@ -33,8 +33,8 @@ class Child {
   factory Child.fromMap(Map<String, dynamic> map) {
     return Child(
       id: map['id'],
-      firstName: map['firstName'],
-      lastName: map['lastName'],
+      firstName: map['firstName'].trim(),
+      lastName: map['lastName'].trim(),
     );
   }
 

@@ -147,13 +147,21 @@ class UserData {
     return newFencers;
   }
 
-  List<String> setSearchParam(List<String> fencerNames) {
+  String get childrenFirstNames {
+    List<String> firstNames = children.map((e) => e.firstName).toList();
+    return firstNames.join(", ");
+  }
+
+  List<String> getSearchParams() {
+    List<String> names =
+        children.map((e) => e.firstName.toLowerCase()).toList();
+    names.addAll([parentFirstName.toLowerCase(), parentLastName.toLowerCase()]);
     List<String> caseSearchList = [];
     String temp = "";
-    for (int i = 0; i < fencerNames.length; i++) {
+    for (int i = 0; i < names.length; i++) {
       temp = "";
-      for (int j = 0; j < fencerNames[i].length; j++) {
-        temp = temp + fencerNames[i][j];
+      for (int j = 0; j < names[i].length; j++) {
+        temp = temp + names[i][j];
         caseSearchList.add(temp);
       }
     }
@@ -166,8 +174,7 @@ class UserData {
       'invoicingKey': invoicingKey,
       'invoices': invoices,
       'admin': admin,
-      'searchTerms': setSearchParam(
-          children.map((e) => e.firstName.toLowerCase()).toList()),
+      'searchTerms': getSearchParams(),
       'emailAddress': emailAddress,
       'parentFirstName': parentFirstName,
       'parentLastName': parentLastName,
@@ -209,8 +216,8 @@ class UserData {
       invoices: List<String>.from(map['invoices'] ?? []),
       admin: map['admin'] ?? false,
       emailAddress: map['emailAddress'],
-      parentFirstName: map['parentFirstName'],
-      parentLastName: map['parentLastName'],
+      parentFirstName: map['parentFirstName'].trim(),
+      parentLastName: map['parentLastName'].trim(),
       children: (map['children'] != null)
           ? List<Child>.from(map['children'].map((x) => Child.fromMap(x)))
           : [],

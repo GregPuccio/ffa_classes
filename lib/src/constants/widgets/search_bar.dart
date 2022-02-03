@@ -90,7 +90,7 @@ class SearchBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 PreferredSizeWidget searchBar(TextEditingController controller, Color cardColor,
-    {String text = 'Search by first name',
+    {String text = 'Search by name',
     bool autoComplete = false,
     void Function(Fencer result)? onResult}) {
   Widget withAutoComplete() {
