@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:ffaclasses/src/constants/enums.dart';
 
@@ -54,13 +54,35 @@ class Coach {
   }
 
   factory Coach.fromMap(Map<String, dynamic> map) {
+    List<Map<String, dynamic>> firstList =
+        List<Map<String, dynamic>>.from(map['availability'] ?? []);
+    List<Map<String, Map<String, List<DateTime>>>> secondList = firstList
+        .map(
+          (val) => val.map(
+            (key, value) => MapEntry(
+              key,
+              Map<String, List<DateTime>>.from(
+                value.map(
+                  (key, value) => MapEntry(
+                    key,
+                    List<DateTime>.from(
+                      value.map(
+                        (e) => (e as Timestamp).toDate(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+        .toList();
     return Coach(
       id: map['id'] ?? '',
       emailAddress: map['emailAddress'] ?? '',
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
-      availability: List<Map<String, Map<String, List<DateTime>>>>.from(
-          map['availability'] ?? []),
+      availability: secondList,
       lessonTypes: List<LessonType>.from(
         map['lessonTypes']?.map((x) => LessonType.values[x ?? 0]) ?? [],
       ),
@@ -80,13 +102,7 @@ class Coach {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Coach &&
-        other.id == id &&
-        other.emailAddress == emailAddress &&
-        other.firstName == firstName &&
-        other.lastName == lastName &&
-        listEquals(other.availability, availability) &&
-        listEquals(other.lessonTypes, lessonTypes);
+    return other is Coach && other.id == id;
   }
 
   @override

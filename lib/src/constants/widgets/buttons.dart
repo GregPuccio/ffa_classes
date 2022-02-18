@@ -21,7 +21,7 @@ class InkButton extends StatelessWidget {
             colors: active
                 ? [
                     Theme.of(context).colorScheme.secondary,
-                    Theme.of(context).colorScheme.secondaryVariant,
+                    Theme.of(context).colorScheme.secondaryContainer
                   ]
                 : [
                     Colors.grey,
@@ -62,7 +62,7 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color color = active
-        ? activeColor ?? Theme.of(context).colorScheme.secondaryVariant
+        ? activeColor ?? Theme.of(context).colorScheme.secondaryContainer
         : Colors.grey;
     return Center(
       child: Container(
