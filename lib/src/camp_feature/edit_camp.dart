@@ -131,7 +131,7 @@ class _EditCampState extends State<EditCamp> {
               style: Theme.of(context)
                   .textTheme
                   .button!
-                  .copyWith(color: Theme.of(context).colorScheme.onPrimary),
+                  .copyWith(color: Colors.white),
             ),
           ),
         ],

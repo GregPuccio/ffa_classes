@@ -100,9 +100,10 @@ class _EditClassState extends State<EditClass> {
             },
             child: Text(
               "Save",
-              style: Theme.of(context).textTheme.button?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+              style: Theme.of(context)
+                  .textTheme
+                  .button
+                  ?.copyWith(color: Colors.white),
             ),
           ),
         ],
