@@ -58,7 +58,7 @@ class _LessonsListState extends State<LessonsList> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (_needScroll) {
-                WidgetsBinding.instance!
+                WidgetsBinding.instance
                     .addPostFrameCallback((_) => _scrollToDate());
                 _needScroll = false;
               }

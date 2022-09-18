@@ -117,7 +117,7 @@ class _ClassListViewState extends State<ClassListView> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (_needScroll) {
-                WidgetsBinding.instance!
+                WidgetsBinding.instance
                     .addPostFrameCallback((_) => _scrollToDate());
                 _needScroll = false;
               }
